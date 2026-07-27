@@ -110,6 +110,12 @@ export const db = {
     return data;
   },
 
+  async listAllSubmissions() {
+    if (fx()) return localStore.all("submissions");
+    const { data } = await supabaseAdmin().from("submissions").select("*");
+    return data ?? [];
+  },
+
   async listSubmissionsForQuestion(questionId: string) {
     if (fx()) return localStore.find("submissions", (s: any) => s.question_id === questionId);
     const { data } = await supabaseAdmin().from("submissions").select("*").eq("question_id", questionId);
