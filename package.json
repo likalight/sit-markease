@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
+    "seed-gold": "tsx scripts/seed-gold-submissions.ts",
+    "seed-ai-fixtures": "tsx scripts/seed-ai-fixtures.ts",
     "ingest-corpus": "tsx scripts/ingest-corpus.ts",
     "eval": "tsx eval/run.ts",
     "sidecar:dev": "python -m uvicorn main:app --reload --app-dir sidecar --port 8000"

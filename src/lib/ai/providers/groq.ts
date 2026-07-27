@@ -8,7 +8,7 @@ import { throttle, withBackoff } from "../rate-limit";
 // than same-family disagreement). No native structured-output mode here —
 // JSON-object mode + Zod validation, with the retry-once-on-failure policy
 // applied by src/lib/ai/client.ts (CLAUDE.md rule 2).
-const DEFAULT_MODEL = "llama-3.2-11b-vision-preview";
+export const DEFAULT_MODEL = "llama-3.2-11b-vision-preview";
 const DEFAULT_RPM = 25;
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 

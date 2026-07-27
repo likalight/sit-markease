@@ -3,8 +3,8 @@ import { aiCache, cacheKey, hashImage } from "./cache";
 import { db } from "@/lib/db/facade";
 import { ModelCallError } from "./types";
 import type { CompleteOptions, ImageInput, LLMClient } from "./types";
-import { GeminiClient } from "./providers/gemini";
-import { GroqClient } from "./providers/groq";
+import { GeminiClient, DEFAULT_MODEL as GEMINI_DEFAULT_MODEL } from "./providers/gemini";
+import { GroqClient, DEFAULT_MODEL as GROQ_DEFAULT_MODEL } from "./providers/groq";
 import type { ZodType } from "zod";
 
 // The single seam every pipeline stage calls through. Provider selection is
@@ -66,12 +66,19 @@ export interface CallStructuredArgs<T> {
 }
 
 export async function callStructured<T>(args: CallStructuredArgs<T>): Promise<T> {
-  const client = getClient(args.role);
+  // Resolve provider/model WITHOUT constructing a client — that needs an API
+  // key, and a cache hit (or fixture-mode miss) must not require one.
+  const providerName = providerNameForRole(args.role);
+  const model =
+    providerName === "gemini"
+      ? (process.env.AIMS_GEMINI_MODEL ?? GEMINI_DEFAULT_MODEL)
+      : (process.env.AIMS_GROQ_MODEL ?? GROQ_DEFAULT_MODEL);
+
   const imageHashes = (args.images ?? []).map((img) => hashImage(img.base64));
   const key = cacheKey({
     promptVersion: args.promptVersion,
-    provider: client.provider,
-    model: client.model,
+    provider: providerName,
+    model,
     system: args.system,
     prompt: args.prompt,
     imageHashes,
@@ -115,6 +122,7 @@ export async function callStructured<T>(args: CallStructuredArgs<T>): Promise<T>
   };
 
   try {
+    const client = getClient(args.role);
     const result = await attemptWithOneRetry(client, baseOpts);
     aiCache.set(key, {
       data: result.data,

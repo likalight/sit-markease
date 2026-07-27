@@ -6,7 +6,7 @@ import { throttle, withBackoff } from "../rate-limit";
 // Google AI Studio (Gemini) — free tier. Vision-capable Flash model, native
 // structured output via responseSchema (no prompt-and-parse for this
 // provider — docs/DECISIONS.md "M2 — free-tier providers").
-const DEFAULT_MODEL = "gemini-2.0-flash";
+export const DEFAULT_MODEL = "gemini-2.0-flash";
 const DEFAULT_RPM = 10; // AI Studio free tier is stingy; keep this conservative and env-overridable.
 
 function isRateLimit(err: unknown): boolean {

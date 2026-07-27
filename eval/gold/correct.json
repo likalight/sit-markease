@@ -1,0 +1,8 @@
+{
+  "id": "correct",
+  "image": "images/correct.png",
+  "description": "Fully correct separation-of-variables solution, IC applied to the general solution, +C tracked throughout.",
+  "human_marks": { "c_setup": 4, "c_method": 6, "c_ic": 5, "c_answer": 5, "total": 20 },
+  "key_error": null,
+  "expected_misconceptions": []
+}

@@ -1,0 +1,8 @@
+{
+  "id": "ic_too_early",
+  "image": "images/ic_too_early.png",
+  "description": "Substitutes the initial condition into the separated (not yet integrated) equation, gets a nonsensical intermediate result, then integrates the original equation anyway without ever resolving it — final answer is wrong.",
+  "human_marks": { "c_setup": 4, "c_method": 2, "c_ic": 1, "c_answer": 1, "total": 8 },
+  "key_error": "mc_ic_applied_before_general",
+  "expected_misconceptions": ["mc_ic_applied_before_general"]
+}

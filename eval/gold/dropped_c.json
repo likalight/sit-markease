@@ -1,0 +1,8 @@
+{
+  "id": "dropped_c",
+  "image": "images/dropped_c.png",
+  "description": "Drops the constant of integration after integrating, then patches the final answer to match the initial condition anyway — correct final answer, unsound method.",
+  "human_marks": { "c_setup": 4, "c_method": 3, "c_ic": 3, "c_answer": 5, "total": 15 },
+  "key_error": "mc_constant_of_integration_dropped",
+  "expected_misconceptions": ["mc_constant_of_integration_dropped"]
+}

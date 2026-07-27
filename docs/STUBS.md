@@ -28,3 +28,7 @@ Anything not fully implemented, listed immediately as it's introduced.
 ## M3
 
 - `sidecar/symbolic.py`'s `equivalent()` is real and passes all 10 of `sidecar/tests/test_symbolic.py`'s known pairs. `verify_item()` (the S7 verification gate) is still a stub — real implementation lands in M7.
+
+## M2 (bugfix, noted for completeness)
+
+- `src/lib/ai/client.ts`'s `callStructured()` originally constructed the resolved `LLMClient` (which requires an API key) *before* checking the cache — meaning even a cache hit or a fixture-mode "replay only" call would throw `AIMS_GEMINI_API_KEY is not set`. Fixed by resolving provider/model as plain strings first (no client construction), checking cache/fixture-mode against that, and only calling `getClient()` right before an actual network attempt. Caught by trying to run the real S2/S3 pipeline against the seeded fixtures — the first genuine end-to-end run this build did with zero API keys present, and it immediately surfaced the bug fixture-only testing couldn't have easily caught otherwise.
