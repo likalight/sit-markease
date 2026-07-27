@@ -22,7 +22,7 @@ async function main() {
   }
   const student = localStore.findOne("users", (u: any) => u.role === "student");
 
-  const goldFiles = fs.readdirSync(GOLD_DIR).filter((f) => f.endsWith(".json"));
+  const goldFiles = fs.readdirSync(GOLD_DIR).filter((f) => f.endsWith(".json") && f !== "submission-ids.json");
   const mapping: Record<string, { submissionId: string; pageId: string }> = {};
 
   for (const file of goldFiles) {
