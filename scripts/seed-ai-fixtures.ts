@@ -23,11 +23,17 @@ import {
   s2ReadBUserPrompt,
   s4AssessSystemPrompt,
   s4AssessUserPrompt,
+  s5DiagnoseSystemPrompt,
+  s5DiagnoseUserPrompt,
+  s6FeedbackSystemPrompt,
+  s6FeedbackUserPrompt,
   PROMPT_VERSIONS,
 } from "../src/lib/pipeline/prompts";
 import { stripVariableAssignment } from "../src/lib/pipeline/s4-assess";
 import type { ReadA, ReadB } from "../src/lib/schemas/transcription";
 import type { Assessment } from "../src/lib/schemas/assessment";
+import type { Diagnosis } from "../src/lib/schemas/diagnosis";
+import type { Feedback } from "../src/lib/schemas/feedback";
 import { DEFAULT_MODEL as GEMINI_DEFAULT_MODEL } from "../src/lib/ai/providers/gemini";
 import { DEFAULT_MODEL as GROQ_DEFAULT_MODEL } from "../src/lib/ai/providers/groq";
 
@@ -158,6 +164,81 @@ const ASSESSMENTS: Record<string, Assessment> = {
   },
 };
 
+// Hand-authored S5 diagnosis fixtures, matching eval/gold/*.json's
+// expected_misconceptions.
+const DIAGNOSES: Record<string, Diagnosis> = {
+  correct: { detected: [], novel_candidates: [] },
+  dropped_c: {
+    detected: [
+      {
+        misconception_key: "mc_constant_of_integration_dropped",
+        confidence: 0.85,
+        evidence_step_indices: [2, 3],
+        severity: "notational",
+        observed_signature: "Integrated to ln|y| = x^2/2 with no +C, then patched the final answer with an ad-hoc factor of 2 at step 4 to match the initial condition.",
+      },
+    ],
+    novel_candidates: [],
+  },
+  ic_too_early: {
+    detected: [
+      {
+        misconception_key: "mc_ic_applied_before_general",
+        confidence: 0.82,
+        evidence_step_indices: [2],
+        severity: "conceptual",
+        observed_signature: "Substituted y(0)=2 into the separated but unintegrated equation, producing the nonsensical statement 2/y = 0.",
+      },
+    ],
+    novel_candidates: [],
+  },
+};
+
+// Hand-authored S6 feedback fixtures.
+const FEEDBACKS: Record<string, Feedback> = {
+  correct: {
+    summary: "Clean, correct solution from start to finish.",
+    strengths: [
+      { text: "Separated variables correctly and integrated with the constant of integration retained.", step_indices: [1, 2] },
+      { text: "Applied the initial condition to the general solution to solve for C.", step_indices: [3] },
+    ],
+    breakdown_points: [],
+    next_action: "Try a separable ODE with a different initial condition to confirm the method generalizes for you.",
+    tone: "supportive",
+    word_count: 60,
+  },
+  dropped_c: {
+    summary: "Your setup and final answer were both correct, but the method has a gap worth fixing.",
+    strengths: [{ text: "Separated variables correctly: dy/y = x dx.", step_indices: [1] }],
+    breakdown_points: [
+      {
+        step_index: 2,
+        what_happened: "You wrote ln|y| = x^2/2 without a constant of integration.",
+        why_it_matters: "Every indefinite integral has a family of solutions differing by a constant — dropping it means your 'general solution' is actually only one particular case, and you have to guess your way back to the right answer instead of solving for it.",
+        misconception_key: "mc_constant_of_integration_dropped",
+      },
+    ],
+    next_action: "Redo step 2 writing +C explicitly, then solve for C using y(0)=2 — you'll land on the same answer, but through a method that works for any initial condition.",
+    tone: "supportive",
+    word_count: 95,
+  },
+  ic_too_early: {
+    summary: "Your setup was right, but the initial condition got applied at the wrong point in the process.",
+    strengths: [{ text: "Separated variables correctly: dy/y = x dx.", step_indices: [1] }],
+    breakdown_points: [
+      {
+        step_index: 2,
+        what_happened: "You substituted y(0)=2 directly into dy/y = x dx before integrating, producing 2/y = 0.",
+        why_it_matters: "The initial condition applies to the solved (integrated) function, not to the differential relationship itself — substituting this early throws away the information you need and produces a statement that isn't actually meaningful.",
+        misconception_key: "mc_ic_applied_before_general",
+      },
+    ],
+    next_action: "Integrate first to get the general solution with +C, and only then substitute y(0)=2 to solve for C.",
+    tone: "supportive",
+    word_count: 90,
+  },
+};
+
 async function main() {
   const mapping = JSON.parse(fs.readFileSync(path.join(GOLD_DIR, "submission-ids.json"), "utf-8"));
 
@@ -237,6 +318,75 @@ async function main() {
     const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: "gemini", model: GEMINI_MODEL, system, prompt });
     aiCache.seed({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: "gemini", model: GEMINI_MODEL, system, prompt }, assessment);
     console.log(`  seeded S4 fixture for ${goldId} (symbolic=${symbolicCheck}, key ${key.slice(0, 8)}…)`);
+  }
+
+  console.log("\nSeeding S5 diagnosis fixtures (requires S4 already run)...");
+  for (const [goldId, diagnosis] of Object.entries(DIAGNOSES)) {
+    const ids = mapping[goldId];
+    if (!ids) continue;
+
+    const submission = await db.getSubmission(ids.submissionId);
+    const transcription = await db.getTranscription(ids.submissionId);
+    const grade = await db.getGradeRecommendation(ids.submissionId);
+    if (!transcription || !grade) {
+      console.warn(`  skipping S5 fixture for ${goldId}: run S2/S3/S4 first`);
+      continue;
+    }
+    const steps = await db.listSolutionSteps(transcription.id);
+    const criteria = await db.listCriterionResults(grade.id);
+    const module_ = await db.getModuleForQuestion(submission.question_id);
+    const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
+
+    const system = s5DiagnoseSystemPrompt();
+    const prompt = s5DiagnoseUserPrompt({
+      steps,
+      criteriaJustifications: criteria.map((c: any) => `${c.level} on ${c.criterion_key}: ${c.justification}`),
+      taxonomy: taxonomy.map((t: any) => ({ key: t.key, name: t.name, typical_signature: t.typical_signature, description: t.description })),
+    });
+
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s5Diagnose, provider: "groq", model: GROQ_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s5Diagnose, provider: "groq", model: GROQ_MODEL, system, prompt }, diagnosis);
+    console.log(`  seeded S5 fixture for ${goldId} (${diagnosis.detected.length} detected, key ${key.slice(0, 8)}…)`);
+  }
+
+  console.log("\nSeeding S6 feedback fixtures (requires S2/S3/S4 already run)...");
+  for (const [goldId, feedback] of Object.entries(FEEDBACKS)) {
+    const ids = mapping[goldId];
+    if (!ids) continue;
+
+    const submission = await db.getSubmission(ids.submissionId);
+    const transcription = await db.getTranscription(ids.submissionId);
+    const grade = await db.getGradeRecommendation(ids.submissionId);
+    if (!transcription || !grade) {
+      console.warn(`  skipping S6 fixture for ${goldId}: run S2/S3/S4 first`);
+      continue;
+    }
+    const steps = await db.listSolutionSteps(transcription.id);
+    const module_ = await db.getModuleForQuestion(submission.question_id);
+    const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
+    const taxonomyByKey = new Map(taxonomy.map((t: any) => [t.key, t]));
+    const diagnosis = DIAGNOSES[goldId];
+    // Mirrors src/lib/pipeline/s6-feedback.ts's real mapping (taxonomy name,
+    // not the misconception_key) so the prompt text — and therefore the
+    // cache key — matches exactly what the real pipeline builds at request time.
+    const misconceptions = (diagnosis?.detected ?? []).map((d) => ({
+      name: (taxonomyByKey.get(d.misconception_key) as any)?.name ?? "unnamed misconception",
+      evidence_step_indices: d.evidence_step_indices,
+      observed_signature: d.observed_signature,
+    }));
+
+    const system = s6FeedbackSystemPrompt();
+    const prompt = s6FeedbackUserPrompt({
+      steps: steps.map((s: any) => ({ step_index: s.step_index, plain_text: s.plain_text })),
+      totalScore: grade.total_recommended,
+      maxScore: grade.max_total,
+      misconceptions,
+      tone: "supportive",
+    });
+
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: "gemini", model: GEMINI_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: "gemini", model: GEMINI_MODEL, system, prompt }, feedback);
+    console.log(`  seeded S6 fixture for ${goldId} (key ${key.slice(0, 8)}…)`);
   }
 
   console.log("\nFixture seeding complete.");

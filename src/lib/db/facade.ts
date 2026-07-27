@@ -60,6 +60,13 @@ export const db = {
     return data ?? [];
   },
 
+  async insertMisconception(row: Record<string, any>) {
+    if (fx()) return localStore.insert("misconceptions", row);
+    const { data, error } = await supabaseAdmin().from("misconceptions").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
   async getModuleForQuestion(questionId: string) {
     if (fx()) {
       const question = localStore.get("questions", questionId);
