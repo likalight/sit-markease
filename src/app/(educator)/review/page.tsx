@@ -2,9 +2,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getReviewQueue } from "@/lib/pipeline/review-queue";
+import { ConfidenceBar } from "@/components/confidence-bar";
 
-// §11.1 E3 review queue: lowest confidence first (§5.1). Links into the
-// three-pane console at /review/[submissionId].
+// docs/DESIGN.md §3 `review-queue-row` / §2 product density. Sorted lowest-
+// confidence first (§5.1) — an ethical position: attention goes where
+// judgement is needed.
 export default async function ReviewQueuePage() {
   const user = await getCurrentUser();
   if (!user || user.role !== "educator") redirect("/login");
@@ -12,32 +14,29 @@ export default async function ReviewQueuePage() {
   const queue = await getReviewQueue();
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
+    <main className="mx-auto flex max-w-2xl flex-col gap-lg px-6 py-xl">
       <div>
-        <h1 className="text-2xl font-semibold">Review queue</h1>
-        <p className="text-sm text-neutral-500">{queue.length} submission(s) awaiting approval, lowest confidence first.</p>
+        <h1 className="text-title-lg text-body-strong">Review queue</h1>
+        <p className="text-body-sm text-muted">{queue.length} submission(s) awaiting approval, lowest confidence first.</p>
       </div>
 
       {queue.length === 0 ? (
-        <p className="text-sm text-neutral-500">Nothing to review — upload a submission and process it first.</p>
+        <p className="text-body-sm text-muted">Nothing to review — upload a submission and process it first.</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-neutral-200 rounded border border-neutral-200">
+        <ul className="flex flex-col divide-y divide-hairline rounded-lg border border-hairline">
           {queue.map((entry) => (
             <li key={entry.submissionId}>
               <Link
                 href={`/review/${entry.submissionId}`}
-                className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-neutral-50"
+                className="grid min-h-11 grid-cols-[1fr_120px_80px_140px] items-center gap-sm px-md py-xs hover:bg-surface-soft"
               >
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">
-                    {entry.totalRecommended ?? "?"}/{entry.maxTotal ?? "?"}
-                  </span>
-                  {entry.needsHumanReview && (
-                    <span className="text-xs text-amber-600">flagged for human review</span>
-                  )}
-                </div>
-                <span className="text-xs text-neutral-400">
-                  confidence {(entry.avgConfidence * 100).toFixed(0)}%
+                <span className="text-body-sm text-body">Submission {entry.submissionId.slice(0, 8)}</span>
+                <ConfidenceBar value={entry.avgConfidence} />
+                <span className="text-data-sm tabular-nums text-body-strong">
+                  {entry.totalRecommended ?? "?"}/{entry.maxTotal ?? "?"}
+                </span>
+                <span className="text-caption-caps text-attention">
+                  {entry.needsHumanReview ? "⚑ human required" : ""}
                 </span>
               </Link>
             </li>

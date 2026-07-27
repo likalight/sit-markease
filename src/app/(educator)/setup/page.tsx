@@ -5,7 +5,7 @@ import { UploadAndViewer } from "@/components/upload-and-viewer";
 
 // M1 scope only: prove upload → deskew → line-detect → persist → overlay
 // works end to end for the seeded demo question. The real E1 rubric-editor
-// screen is a later milestone.
+// screen is a later milestone (see docs/STUBS.md).
 export default async function SetupPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -14,8 +14,8 @@ export default async function SetupPage() {
 
   if (!question) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-16">
-        <p className="text-sm text-neutral-500">
+      <main className="mx-auto max-w-2xl px-6 py-xl">
+        <p className="text-body-sm text-muted">
           No seeded question found — run <code>npm run seed</code> first.
         </p>
       </main>
@@ -23,10 +23,10 @@ export default async function SetupPage() {
   }
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
+    <main className="mx-auto flex max-w-2xl flex-col gap-lg px-6 py-xl">
       <div>
-        <h1 className="text-2xl font-semibold">Upload a submission</h1>
-        <p className="text-sm text-neutral-500">{question.prompt_text}</p>
+        <h1 className="text-title-lg text-body-strong">Upload a submission</h1>
+        <p className="text-body-sm text-muted">{question.prompt_text}</p>
       </div>
       <UploadAndViewer questionId={question.id} />
     </main>

@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-
-interface Box {
-  lineIndex: number;
-  box: { x: number; y: number; w: number; h: number };
-}
+import { ScriptViewer } from "./script-viewer";
+import { ConfidenceBar } from "./confidence-bar";
+import { MathText } from "./math";
+import { stepState } from "@/lib/design/step-state";
 
 interface Step {
   stepIndex: number;
@@ -16,6 +15,13 @@ interface Step {
   role: string;
   confidence: number;
   agreement: number;
+  hasMisconception: boolean;
+}
+
+interface RubricLevel {
+  level: string;
+  score: number;
+  descriptor: string;
 }
 
 interface Criterion {
@@ -28,14 +34,17 @@ interface Criterion {
   confidence: number;
 }
 
+// docs/DESIGN.md §3/§4 — the review console. Product density: dense,
+// keyboard-first, built for the fortieth script of the evening.
 export function ReviewConsole(props: {
   submissionId: string;
   questionPromptText: string;
   originalUrl: string | null;
-  boxes: Box[];
+  boxes: { lineIndex: number; box: { x: number; y: number; w: number; h: number } }[];
   steps: Step[];
   criteria: Criterion[];
-  rubricCriteria: { key: string; name: string }[];
+  rubricCriteria: { key: string; name: string; levels: RubricLevel[] }[];
+  misconceptions: { name: string; evidenceStepIndices: number[] }[];
   needsHumanReview: boolean;
   totalRecommended: number;
   maxTotal: number;
@@ -45,19 +54,29 @@ export function ReviewConsole(props: {
   const [scores, setScores] = useState<Record<string, number>>(
     Object.fromEntries(props.criteria.map((c) => [c.criterionKey, c.score]))
   );
+  const [levels, setLevels] = useState<Record<string, string>>(
+    Object.fromEntries(props.criteria.map((c) => [c.criterionKey, c.level]))
+  );
   const [selectedStep, setSelectedStep] = useState<number | null>(null);
+  const [focusedCriterionIdx, setFocusedCriterionIdx] = useState(0);
+  const [editingStep, setEditingStep] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
+  const [stepTexts, setStepTexts] = useState<Record<number, string>>(
+    Object.fromEntries(props.steps.map((s) => [s.stepIndex, s.plainText]))
+  );
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const mountedAt = useRef(Date.now());
-  const firstScoreInputRef = useRef<HTMLInputElement | null>(null);
   const stepRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const nameByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.name]));
+  const levelsByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.levels]));
   const adjusted = props.criteria.some((c) => scores[c.criterionKey] !== c.score);
   const currentTotal = Object.values(scores).reduce((a, b) => a + b, 0);
 
-  function scrollToStep(stepIndex: number) {
-    setSelectedStep(stepIndex);
-    stepRefs.current[stepIndex]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  function scrollToStep(idx: number) {
+    setSelectedStep(idx);
+    stepRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   async function approveAndAdvance() {
@@ -68,11 +87,7 @@ export function ReviewConsole(props: {
       const res = await fetch(`/api/submissions/${props.submissionId}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          totalScore: currentTotal,
-          adjusted,
-          reviewSeconds,
-        }),
+        body: JSON.stringify({ totalScore: currentTotal, adjusted, reviewSeconds }),
       });
       if (!res.ok) throw new Error(await res.text());
       router.push(props.nextSubmissionId ? `/review/${props.nextSubmissionId}` : "/review");
@@ -85,6 +100,39 @@ export function ReviewConsole(props: {
     router.push(props.nextSubmissionId ? `/review/${props.nextSubmissionId}` : "/review");
   }
 
+  function setLevelOnFocused(levelIdx: number) {
+    const criterion = props.criteria[focusedCriterionIdx];
+    const options = levelsByKey[criterion.criterionKey] ?? [];
+    const chosen = options[levelIdx];
+    if (!chosen) return;
+    setLevels((prev) => ({ ...prev, [criterion.criterionKey]: chosen.level }));
+    setScores((prev) => ({ ...prev, [criterion.criterionKey]: chosen.score }));
+    fetch(`/api/submissions/${props.submissionId}/criteria/${criterion.criterionKey}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ level: chosen.level, score: chosen.score }),
+    });
+  }
+
+  function startEditFocusedStep() {
+    const step = props.steps.find((s) => s.stepIndex === (selectedStep ?? props.steps[0]?.stepIndex));
+    if (!step) return;
+    setSelectedStep(step.stepIndex);
+    setEditingStep(step.stepIndex);
+    setEditText(stepTexts[step.stepIndex] ?? step.plainText);
+  }
+
+  async function saveEditedStep() {
+    if (editingStep === null) return;
+    setStepTexts((prev) => ({ ...prev, [editingStep]: editText }));
+    await fetch(`/api/submissions/${props.submissionId}/steps/${editingStep}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plain_text: editText }),
+    });
+    setEditingStep(null);
+  }
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -93,143 +141,243 @@ export function ReviewConsole(props: {
         approveAndAdvance();
       } else if (e.key === "j" || e.key === "J") {
         e.preventDefault();
-        firstScoreInputRef.current?.focus();
+        setFocusedCriterionIdx((i) => (i + 1) % Math.max(props.criteria.length, 1));
+      } else if (e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        setFocusedCriterionIdx((i) => (i - 1 + props.criteria.length) % Math.max(props.criteria.length, 1));
+      } else if (e.key >= "1" && e.key <= "5") {
+        e.preventDefault();
+        setLevelOnFocused(Number(e.key) - 1);
+      } else if (e.key === "e" || e.key === "E") {
+        e.preventDefault();
+        startEditFocusedStep();
       } else if (e.key === "s" || e.key === "S") {
         e.preventDefault();
         skip();
+      } else if (e.key === "?") {
+        e.preventDefault();
+        setShowShortcuts((v) => !v);
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTotal, adjusted, submitting]);
+  }, [currentTotal, adjusted, submitting, focusedCriterionIdx, selectedStep, props.criteria.length]);
+
+  const scriptBoxes = props.boxes.map((b) => {
+    const step = props.steps.find((s) => s.lineIndices.includes(b.lineIndex));
+    return {
+      lineIndex: b.lineIndex,
+      box: b.box,
+      state: step ? stepState(step.agreement, step.hasMisconception) : ("neutral" as const),
+    };
+  });
+  const activeLines = new Set(
+    props.steps.filter((s) => s.stepIndex === selectedStep).flatMap((s) => s.lineIndices)
+  );
 
   return (
-    <div className="grid h-screen grid-cols-[1fr_1fr_1fr]">
-      {/* Left: original script with line overlays */}
-      <div className="overflow-auto border-r border-neutral-200 p-4">
-        <h2 className="mb-2 text-sm font-semibold text-neutral-500">Original script</h2>
+    <div className="grid h-screen grid-cols-[1fr_1fr_1fr] bg-canvas">
+      {/* Left: script-viewer */}
+      <div className="overflow-auto border-r border-hairline p-lg">
+        <h2 className="mb-sm text-caption-caps text-muted-soft">Original script</h2>
         {props.originalUrl ? (
-          <div className="relative inline-block">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={props.originalUrl} alt="original submission" className="block max-w-full" />
-            {props.boxes.map((b) => {
-              const highlighted = props.steps.some(
-                (s) => s.stepIndex === selectedStep && s.lineIndices.includes(b.lineIndex)
-              );
-              return (
-                <div
-                  key={b.lineIndex}
-                  className={`absolute border-2 ${highlighted ? "border-amber-500 bg-amber-400/20" : "border-red-500/60"}`}
-                  style={{
-                    left: `${b.box.x * 100}%`,
-                    top: `${b.box.y * 100}%`,
-                    width: `${b.box.w * 100}%`,
-                    height: `${b.box.h * 100}%`,
-                  }}
-                />
-              );
-            })}
-          </div>
+          <ScriptViewer
+            imageUrl={props.originalUrl}
+            boxes={scriptBoxes}
+            activeLineIndices={activeLines}
+            onBoxClick={(lineIndex) => {
+              const step = props.steps.find((s) => s.lineIndices.includes(lineIndex));
+              if (step) scrollToStep(step.stepIndex);
+            }}
+          />
         ) : (
-          <p className="text-sm text-neutral-400">No image available.</p>
+          <p className="text-body-sm text-muted-soft">No image available.</p>
         )}
       </div>
 
-      {/* Centre: numbered steps */}
-      <div className="overflow-auto border-r border-neutral-200 p-4">
-        <h2 className="mb-2 text-sm font-semibold text-neutral-500">Reconciled steps</h2>
-        <p className="mb-3 text-xs text-neutral-400">{props.questionPromptText}</p>
-        <div className="flex flex-col gap-3">
-          {props.steps.map((s) => (
-            <div
-              key={s.stepIndex}
-              ref={(el) => {
-                stepRefs.current[s.stepIndex] = el;
-              }}
-              onClick={() => scrollToStep(s.stepIndex)}
-              className={`cursor-pointer rounded border px-3 py-2 text-sm ${
-                selectedStep === s.stepIndex ? "border-amber-500 bg-amber-50" : "border-neutral-200"
-              }`}
-            >
-              <div className="flex items-center justify-between text-xs text-neutral-400">
-                <span>Step {s.stepIndex}</span>
-                <span>
-                  conf {(s.confidence * 100).toFixed(0)}% · agree {(s.agreement * 100).toFixed(0)}%
-                </span>
+      {/* Centre: step-row list */}
+      <div className="overflow-auto border-r border-hairline p-lg">
+        <h2 className="mb-sm text-caption-caps text-muted-soft">Reconciled steps</h2>
+        <p className="mb-md text-caption text-muted-soft">{props.questionPromptText}</p>
+        <div className="flex flex-col gap-xs">
+          {props.steps.map((s) => {
+            const state = stepState(s.agreement, s.hasMisconception);
+            const railColor =
+              state === "verified" ? "bg-verified" : state === "attention" ? "bg-attention" : "bg-disputed";
+            return (
+              <div
+                key={s.stepIndex}
+                ref={(el) => {
+                  stepRefs.current[s.stepIndex] = el;
+                }}
+                onClick={() => scrollToStep(s.stepIndex)}
+                className={`flex min-h-11 cursor-pointer gap-sm rounded-sm border px-sm py-xs ${
+                  selectedStep === s.stepIndex ? "border-hairline bg-surface-soft" : "border-transparent"
+                }`}
+              >
+                <div className={`w-[3px] shrink-0 rounded-pill ${railColor}`} />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between text-caption text-muted-soft">
+                    <span className="tabular-nums">Step {s.stepIndex}</span>
+                    <span className="tabular-nums">
+                      {state !== "verified" && (
+                        <span className="mr-xs rounded-pill bg-surface-card px-xs py-[1px] text-caption-caps">
+                          {state === "disputed" ? "human required" : "misconception"}
+                        </span>
+                      )}
+                      conf {(s.confidence * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  {editingStep === s.stepIndex ? (
+                    <div className="mt-xs flex flex-col gap-xs">
+                      <textarea
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        className="min-h-16 rounded-sm border border-primary/40 bg-canvas px-xs py-xs text-body-sm"
+                        autoFocus
+                      />
+                      <div className="flex gap-xs">
+                        <button
+                          onClick={saveEditedStep}
+                          className="rounded-sm bg-ink px-xs py-[2px] text-caption text-on-dark"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingStep(null)}
+                          className="rounded-sm border border-hairline px-xs py-[2px] text-caption"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-body-sm text-body">
+                        <MathText latex={s.latex} />
+                      </p>
+                      <p className="text-caption text-muted">{stepTexts[s.stepIndex]}</p>
+                    </>
+                  )}
+                  <div className="mt-xs w-24">
+                    <ConfidenceBar value={s.confidence} />
+                  </div>
+                </div>
               </div>
-              <p>{s.plainText}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Right: criterion cards + approve */}
-      <div className="flex flex-col overflow-auto p-4">
-        <h2 className="mb-2 text-sm font-semibold text-neutral-500">Recommendation</h2>
+      {/* Right: criterion-cards + approve */}
+      <div className="flex flex-col overflow-auto p-lg">
+        <h2 className="mb-sm text-caption-caps text-muted-soft">Recommendation</h2>
         {props.needsHumanReview && (
-          <p className="mb-3 rounded bg-amber-50 px-3 py-2 text-xs text-amber-700">Flagged for human review.</p>
+          <p className="mb-sm rounded-sm bg-disputed-soft px-sm py-xs text-caption text-disputed">
+            ⚑ Flagged for human review
+          </p>
         )}
-        <div className="flex flex-col gap-3">
-          {props.criteria.map((c, i) => (
-            <div key={c.criterionKey} className="rounded border border-neutral-200 p-3">
-              <div className="mb-1 flex items-center justify-between">
-                <span className="text-sm font-medium">{nameByKey[c.criterionKey] ?? c.criterionKey}</span>
-                <span className="text-xs text-neutral-400">{c.level} · conf {(c.confidence * 100).toFixed(0)}%</span>
+        <div className="flex flex-col gap-sm">
+          {props.criteria.map((c, i) => {
+            const evidenceSteps = props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex));
+            const cardState = evidenceSteps.some((s) => s.agreement < 0.6)
+              ? "disputed"
+              : c.confidence < 0.85
+                ? "attention"
+                : "verified";
+            const borderColor =
+              cardState === "verified" ? "border-l-verified" : cardState === "attention" ? "border-l-attention" : "border-l-disputed";
+            const focused = i === focusedCriterionIdx;
+            return (
+              <div
+                key={c.criterionKey}
+                onClick={() => setFocusedCriterionIdx(i)}
+                className={`rounded-lg border border-hairline border-l-[3px] ${borderColor} bg-canvas p-lg ${
+                  focused ? "shadow-raised ring-1 ring-primary/15" : ""
+                }`}
+              >
+                <div className="mb-xs flex items-center justify-between">
+                  <span className="text-title-sm text-body-strong">{nameByKey[c.criterionKey] ?? c.criterionKey}</span>
+                  <span className="text-data-sm tabular-nums text-muted">
+                    {levels[c.criterionKey]} · {scores[c.criterionKey]}/{c.maxScore}
+                  </span>
+                </div>
+                <p className="mb-xs text-body-sm text-muted">{c.justification}</p>
+                <div className="mb-xs flex flex-wrap gap-xxs">
+                  {c.evidenceStepIndices.map((idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        scrollToStep(idx);
+                      }}
+                      className="rounded-pill bg-surface-card px-xs py-[1px] text-caption text-body"
+                    >
+                      Step {idx}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="mb-2 text-xs text-neutral-600">{c.justification}</p>
-              <div className="mb-2 flex flex-wrap gap-1">
-                {c.evidenceStepIndices.map((idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => scrollToStep(idx)}
-                    className="rounded-full border border-neutral-300 px-2 py-0.5 text-xs hover:bg-neutral-100"
-                  >
-                    step {idx}
-                  </button>
-                ))}
-              </div>
-              <label className="flex items-center gap-2 text-sm">
-                Score
-                <input
-                  ref={i === 0 ? firstScoreInputRef : undefined}
-                  type="number"
-                  min={0}
-                  max={c.maxScore}
-                  value={scores[c.criterionKey]}
-                  onChange={(e) =>
-                    setScores((prev) => ({ ...prev, [c.criterionKey]: Number(e.target.value) }))
-                  }
-                  className="w-16 rounded border border-neutral-300 px-2 py-1"
-                />
-                / {c.maxScore}
-              </label>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="mt-auto flex flex-col gap-2 border-t border-neutral-200 pt-4">
-          <p className="text-sm">
-            Total: <strong>{currentTotal}</strong> / {props.maxTotal}
-            {adjusted && <span className="ml-2 text-xs text-amber-600">adjusted</span>}
+        {props.misconceptions.length > 0 && (
+          <div className="mt-sm rounded-lg bg-attention-soft p-sm">
+            <p className="text-caption-caps text-attention">Misconceptions detected</p>
+            {props.misconceptions.map((m, i) => (
+              <p key={i} className="text-body-sm text-body">
+                {m.name} <span className="text-caption text-muted">(step {m.evidenceStepIndices.join(", ")})</span>
+              </p>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-auto flex flex-col gap-xs border-t border-hairline pt-md">
+          <p className="text-body-sm tabular-nums">
+            Total: <strong className="text-body-strong">{currentTotal}</strong> / {props.maxTotal}
+            {adjusted && <span className="ml-xs text-caption text-attention">adjusted</span>}
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-xs">
             <button
               onClick={approveAndAdvance}
               disabled={submitting}
-              className="rounded bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="rounded-sm bg-primary px-sm py-xs text-body-sm font-medium text-on-primary disabled:opacity-50"
             >
-              Approve &amp; next <span className="opacity-60">(A)</span>
+              Approve &amp; next <span className="opacity-70">(A)</span>
             </button>
-            <button onClick={() => firstScoreInputRef.current?.focus()} className="rounded border border-neutral-300 px-3 py-2 text-sm">
-              Adjust <span className="opacity-60">(J)</span>
+            <button onClick={startEditFocusedStep} className="rounded-sm border border-hairline px-sm py-xs text-body-sm">
+              Edit step <span className="opacity-60">(E)</span>
             </button>
-            <button onClick={skip} className="rounded border border-neutral-300 px-3 py-2 text-sm">
+            <button onClick={skip} className="rounded-sm border border-hairline px-sm py-xs text-body-sm">
               Skip <span className="opacity-60">(S)</span>
             </button>
           </div>
+          <p className="text-caption text-muted-soft">
+            J/K focus criterion · 1–5 set level · ? for shortcuts
+          </p>
         </div>
       </div>
+
+      {showShortcuts && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-surface-dark/60"
+          onClick={() => setShowShortcuts(false)}
+        >
+          <div className="w-80 rounded-lg bg-canvas p-lg shadow-overlay" onClick={(e) => e.stopPropagation()}>
+            <h3 className="mb-sm font-serif text-display-sm text-ink">Shortcuts</h3>
+            <ul className="flex flex-col gap-xxs text-body-sm text-body">
+              <li><strong>A</strong> — Approve and advance</li>
+              <li><strong>J / K</strong> — Next / previous criterion</li>
+              <li><strong>1–5</strong> — Set level on focused criterion</li>
+              <li><strong>E</strong> — Edit focused step transcription</li>
+              <li><strong>S</strong> — Skip, leave in queue</li>
+              <li><strong>?</strong> — Toggle this overlay</li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

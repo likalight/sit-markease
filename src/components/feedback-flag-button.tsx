@@ -17,14 +17,14 @@ export function FeedbackFlagButton({ feedbackId }: { feedbackId: string }) {
   }
 
   if (state === "sent") {
-    return <p className="text-xs text-neutral-400">Thanks — flagged for educator review.</p>;
+    return <p className="text-caption text-muted-soft">Thanks — flagged for educator review.</p>;
   }
 
   return (
     <button
       onClick={submit}
       disabled={state === "sending"}
-      className="text-xs text-neutral-400 underline disabled:opacity-50"
+      className="text-caption text-muted-soft underline disabled:opacity-50"
     >
       Was this feedback wrong or unhelpful?
     </button>

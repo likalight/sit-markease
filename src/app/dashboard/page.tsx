@@ -10,30 +10,30 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 px-6 py-16">
       <div>
-        <h1 className="text-2xl font-semibold">Welcome, {user.name}</h1>
-        <p className="text-sm text-neutral-500">
-          Signed in as <strong>{user.role}</strong>
+        <h1 className="font-serif text-display-sm text-ink">Welcome, {user.name}</h1>
+        <p className="text-body-sm text-muted">
+          Signed in as <strong className="text-body-strong">{user.role}</strong>
         </p>
       </div>
 
       {user.role === "educator" && (
         <div className="flex flex-col gap-2">
-          <Link href="/setup" className="text-sm underline">
+          <Link href="/setup" className="text-body-sm text-body underline">
             Upload a submission →
           </Link>
-          <Link href="/review" className="text-sm underline">
+          <Link href="/review" className="text-body-sm text-body underline">
             Review queue →
           </Link>
         </div>
       )}
       {user.role === "student" && (
-        <Link href="/feedback" className="text-sm underline">
+        <Link href="/feedback" className="text-body-sm text-body underline">
           My feedback →
         </Link>
       )}
 
       <form action={signOutAction}>
-        <button type="submit" className="text-sm text-neutral-400 underline">
+        <button type="submit" className="text-caption text-muted-soft underline">
           Sign out
         </button>
       </form>

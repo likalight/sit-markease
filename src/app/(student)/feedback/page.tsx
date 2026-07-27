@@ -3,11 +3,14 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { FeedbackFlagButton } from "@/components/feedback-flag-button";
+import { ScriptViewer } from "@/components/script-viewer";
+import { stepState } from "@/lib/design/step-state";
 
-// §11.1 S1 — student feedback view. Mark + criterion bars, annotated script
-// with the breakdown step(s) highlighted, feedback blocks, misconception
-// cards with an expandable explainer, "was this helpful?" flag, and a link
-// into the practice set (S2, /practice/[submissionId]).
+// §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
+// a student reads this once, carefully. Mark + criterion bars, the
+// annotated script with the breakdown step(s) highlighted, feedback blocks,
+// misconception cards with an expandable explainer, "was this helpful?"
+// flag, and a link into the practice set (S2, /practice/[submissionId]).
 export default async function StudentFeedbackPage() {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
@@ -39,13 +42,15 @@ export default async function StudentFeedbackPage() {
         why_it_matters: string;
         misconception_key: string | null;
       }[];
+
+      const tags = await db.listMisconceptionTags(submission.id);
+      const misconceptionStepIndices = new Set<number>(tags.flatMap((t: any) => t.evidence_step_indices));
       const highlightedLineIndices = new Set(
         steps
           .filter((s: any) => breakdownPoints.some((b) => b.step_index === s.step_index))
           .flatMap((s: any) => s.line_indices)
       );
 
-      const tags = await db.listMisconceptionTags(submission.id);
       const module_ = await db.getModuleForQuestion(submission.question_id);
       const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
       const taxonomyById = new Map(taxonomy.map((t: any) => [t.id, t]));
@@ -63,7 +68,14 @@ export default async function StudentFeedbackPage() {
           maxScore: c.max_score,
         })),
         originalUrl,
-        lines: lines.map((l: any) => ({ lineIndex: l.line_index, box: l.box })),
+        scriptBoxes: lines.map((l: any) => {
+          const step = steps.find((s: any) => s.line_indices.includes(l.line_index));
+          return {
+            lineIndex: l.line_index,
+            box: l.box,
+            state: step ? stepState(step.agreement, misconceptionStepIndices.has(step.step_index)) : ("neutral" as const),
+          };
+        }),
         highlightedLineIndices,
         summary: feedback.summary,
         strengths: feedback.strengths as { text: string; step_indices: number[] }[],
@@ -83,71 +95,54 @@ export default async function StudentFeedbackPage() {
   const visible = cards.filter((c): c is NonNullable<typeof c> => c !== null);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-16">
-      <h1 className="text-2xl font-semibold">Your feedback</h1>
+    <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
+      <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
 
-      {visible.length === 0 && <p className="text-sm text-neutral-500">No feedback yet.</p>}
+      {visible.length === 0 && <p className="text-body-md text-muted">No feedback yet.</p>}
 
       {visible.map((c) => (
-        <div key={c.submissionId} className="flex flex-col gap-5 rounded border border-neutral-200 p-5">
+        <div key={c.submissionId} className="flex flex-col gap-xl border-t border-hairline pt-xl">
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-semibold">
+            <span className="font-serif text-display-md tabular-nums text-ink">
               {c.total}/{c.maxTotal}
             </span>
           </div>
 
           {/* Criterion bars */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-xs">
             {c.criteria.map((cr, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                <span className="w-40 shrink-0 text-neutral-600">{cr.name}</span>
-                <div className="h-2 flex-1 rounded-full bg-neutral-100">
+              <div key={i} className="flex items-center gap-sm text-body-sm">
+                <span className="w-40 shrink-0 text-muted">{cr.name}</span>
+                <div className="h-2 flex-1 rounded-pill bg-surface-soft">
                   <div
-                    className="h-2 rounded-full bg-neutral-800"
+                    className="h-2 rounded-pill bg-ink"
                     style={{ width: `${(cr.score / cr.maxScore) * 100}%` }}
                   />
                 </div>
-                <span className="w-12 shrink-0 text-right text-neutral-400">
+                <span className="w-12 shrink-0 text-right tabular-nums text-muted">
                   {cr.score}/{cr.maxScore}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Annotated script — the emotional core (§11.2) */}
+          {/* Annotated script — the emotional core (docs/DESIGN.md §3) */}
           {c.originalUrl && (
             <div>
-              <h2 className="mb-1 text-xs font-semibold uppercase text-neutral-400">Your script</h2>
-              <div className="relative inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.originalUrl} alt="your submission" className="block max-w-full" />
-                {c.lines.map((l) => (
-                  <div
-                    key={l.lineIndex}
-                    className={`absolute border-2 ${
-                      c.highlightedLineIndices.has(l.lineIndex) ? "border-amber-500 bg-amber-400/20" : "border-transparent"
-                    }`}
-                    style={{
-                      left: `${l.box.x * 100}%`,
-                      top: `${l.box.y * 100}%`,
-                      width: `${l.box.w * 100}%`,
-                      height: `${l.box.h * 100}%`,
-                    }}
-                  />
-                ))}
-              </div>
+              <h2 className="mb-xs text-caption-caps text-muted-soft">Your script</h2>
+              <ScriptViewer imageUrl={c.originalUrl} boxes={c.scriptBoxes} activeLineIndices={c.highlightedLineIndices} />
             </div>
           )}
 
-          <p className="text-sm">{c.summary}</p>
+          <p className="text-body-md text-body">{c.summary}</p>
 
           {c.strengths.length > 0 && (
             <div>
-              <h2 className="text-xs font-semibold uppercase text-neutral-400">What went well</h2>
-              <ul className="mt-1 list-disc pl-5 text-sm">
+              <h2 className="text-caption-caps text-muted-soft">What went well</h2>
+              <ul className="mt-xs list-disc pl-5 text-body-md text-body">
                 {c.strengths.map((s, i) => (
                   <li key={i}>
-                    {s.text} <span className="text-neutral-400">(step {s.step_indices.join(", ")})</span>
+                    {s.text} <span className="text-muted-soft">(step {s.step_indices.join(", ")})</span>
                   </li>
                 ))}
               </ul>
@@ -156,13 +151,13 @@ export default async function StudentFeedbackPage() {
 
           {c.breakdownPoints.length > 0 && (
             <div>
-              <h2 className="text-xs font-semibold uppercase text-neutral-400">Where it broke down</h2>
-              <ul className="mt-1 flex flex-col gap-2 text-sm">
+              <h2 className="text-caption-caps text-muted-soft">Where it broke down</h2>
+              <ul className="mt-xs flex flex-col gap-sm">
                 {c.breakdownPoints.map((b, i) => (
-                  <li key={i} className="rounded bg-amber-50 px-3 py-2">
-                    <p className="font-medium">Step {b.step_index}</p>
-                    <p>{b.what_happened}</p>
-                    <p className="text-neutral-600">{b.why_it_matters}</p>
+                  <li key={i} className="rounded-lg border-l-[3px] border-l-attention bg-attention-soft px-md py-sm">
+                    <p className="text-title-sm text-body-strong">Step {b.step_index}</p>
+                    <p className="text-body-md text-body">{b.what_happened}</p>
+                    <p className="text-body-sm text-muted">{b.why_it_matters}</p>
                   </li>
                 ))}
               </ul>
@@ -171,18 +166,18 @@ export default async function StudentFeedbackPage() {
 
           {c.misconceptions.length > 0 && (
             <div>
-              <h2 className="text-xs font-semibold uppercase text-neutral-400">Misconception cards</h2>
-              <ul className="mt-1 flex flex-col gap-2 text-sm">
+              <h2 className="text-caption-caps text-muted-soft">Misconception cards</h2>
+              <ul className="mt-xs flex flex-col gap-sm">
                 {c.misconceptions.map((m, i) => (
-                  <li key={i} className="rounded border border-neutral-200 px-3 py-2">
-                    <p className="font-medium">
-                      {m.name} <span className="text-xs text-neutral-400">({m.severity})</span>
+                  <li key={i} className="rounded-lg border-l-[3px] border-l-attention bg-surface-soft px-md py-sm">
+                    <p className="text-title-md text-body-strong">
+                      {m.name} <span className="text-caption-caps text-muted-soft">({m.severity})</span>
                     </p>
-                    <p className="text-neutral-600">{m.observedSignature}</p>
+                    <p className="text-body-md text-muted">{m.observedSignature}</p>
                     {m.remediationNote && (
-                      <details className="mt-1">
-                        <summary className="cursor-pointer text-xs text-neutral-400">Why this matters</summary>
-                        <p className="mt-1 text-neutral-600">{m.remediationNote}</p>
+                      <details className="mt-xs">
+                        <summary className="cursor-pointer text-caption text-muted-soft">Why this matters</summary>
+                        <p className="mt-xs text-body-sm text-muted">{m.remediationNote}</p>
                       </details>
                     )}
                   </li>
@@ -191,13 +186,13 @@ export default async function StudentFeedbackPage() {
             </div>
           )}
 
-          <div className="rounded bg-neutral-50 px-3 py-2 text-sm">
-            <span className="font-medium">Next: </span>
+          <div className="rounded-lg bg-surface-soft px-md py-sm text-body-md text-body">
+            <span className="font-medium text-body-strong">Next: </span>
             {c.nextAction}
           </div>
 
           {c.hasPracticeSet && (
-            <Link href={`/practice/${c.submissionId}`} className="text-sm underline">
+            <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
               Go to your practice set →
             </Link>
           )}

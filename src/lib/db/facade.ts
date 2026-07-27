@@ -215,6 +215,12 @@ export const db = {
     return data ?? [];
   },
 
+  async updateSolutionStep(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("solution_steps", id, patch);
+    const { error } = await supabaseAdmin().from("solution_steps").update(patch).eq("id", id);
+    if (error) throw error;
+  },
+
   async listSolutionSteps(transcriptionId: string) {
     if (fx()) {
       return localStore
@@ -253,6 +259,12 @@ export const db = {
     const { data, error } = await supabaseAdmin().from("criterion_results").insert(rows).select("*");
     if (error) throw error;
     return data ?? [];
+  },
+
+  async updateCriterionResult(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("criterion_results", id, patch);
+    const { error } = await supabaseAdmin().from("criterion_results").update(patch).eq("id", id);
+    if (error) throw error;
   },
 
   async listCriterionResults(gradeRecommendationId: string) {

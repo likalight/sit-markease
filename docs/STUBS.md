@@ -2,6 +2,14 @@
 
 Anything not fully implemented, listed immediately as it's introduced.
 
+## Rebrand + design system (docs/DESIGN.md)
+
+- The `/demo` and `/demo/student` instant-demo routes only auto-authenticate in `AIMS_FIXTURE_MODE=true` (they redirect to `/login` otherwise) — there's no safe way to auto-create a real Supabase session without real credentials. Their "instant, pre-populated" guarantee also depends on `npm run seed && npm run ingest-corpus && npm run seed-gold && npm run seed-ai-fixtures` having already been run at least once (README documents this) — on a truly empty environment (no seeded question at all) `/demo` throws rather than degrading gracefully, since there's nothing sensible to show. Graceful degradation only covers the case where the module/question exists but no submission has been processed yet (it ingests+processes the gold `dropped_c` script on the fly).
+- The landing page's "real script, annotated" embed silently omits that section if anything in the demo-data lookup throws (try/catch around it) — acceptable for a marketing page that must never hard-500, but means a broken pipeline could ship a landing page with a missing section and no visible error.
+- Exact Zest Red value is still the placeholder from docs/DESIGN.md §1.1, not SIT's official brand hex — swapping it is a one-line change to `--color-primary` in `globals.css` per the design doc's own instructions.
+- Only the review console, student feedback/practice views, login/dashboard, and the new landing page were migrated to the docs/DESIGN.md token system. The M1 upload/setup screen got a light pass (tokens on text/buttons) but not the full `script-viewer` treatment beyond swapping its red status indicator for `verified` (§1.2: red must not appear on status indicators).
+- `docs/DESIGN.md`'s `pipeline-strip` component (8-dot per-stage progress) was not built — there's no live-progress UI in this app (submissions process synchronously per request, not via a background job + SSE), so there was nothing to attach it to.
+
 ## M0
 
 - Auth is Supabase email/password only — no magic link, no SSO (out of scope per §4.3 anyway).

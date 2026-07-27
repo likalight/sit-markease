@@ -6,8 +6,8 @@ import { ReviewConsole } from "@/components/review-console";
 
 // §11.1 E3 — the hero screen. Three panes: original image + line boxes |
 // numbered steps | criterion cards with evidence chips. Approve writes
-// final_grades + audit_log; A/J/S keyboard shortcuts; review_seconds timed
-// client-side from mount to approve.
+// final_grades + audit_log; keyboard model per docs/DESIGN.md §4;
+// review_seconds timed client-side from mount to approve.
 export default async function ReviewSubmissionPage({
   params,
 }: {
@@ -33,6 +33,14 @@ export default async function ReviewSubmissionPage({
   const grade = await db.getGradeRecommendation(submissionId);
   const criteria = grade ? await db.listCriterionResults(grade.id) : [];
 
+  const module_ = await db.getModuleForQuestion(submission.question_id);
+  const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
+  const taxonomyById = new Map(taxonomy.map((t: any) => [t.id, t]));
+  const misconceptionTags = await db.listMisconceptionTags(submissionId);
+  const misconceptionStepIndices = new Set<number>(
+    misconceptionTags.flatMap((t: any) => t.evidence_step_indices as number[])
+  );
+
   const queue = await getReviewQueue();
   const currentIndex = queue.findIndex((q) => q.submissionId === submissionId);
   const nextSubmissionId = currentIndex >= 0 && currentIndex + 1 < queue.length ? queue[currentIndex + 1].submissionId : null;
@@ -51,6 +59,7 @@ export default async function ReviewSubmissionPage({
         role: s.role,
         confidence: s.confidence,
         agreement: s.agreement,
+        hasMisconception: misconceptionStepIndices.has(s.step_index),
       }))}
       criteria={criteria.map((c: any) => ({
         criterionKey: c.criterion_key,
@@ -61,7 +70,11 @@ export default async function ReviewSubmissionPage({
         justification: c.justification,
         confidence: c.confidence,
       }))}
-      rubricCriteria={(question?.criteria ?? []).map((c: any) => ({ key: c.key, name: c.name }))}
+      rubricCriteria={(question?.criteria ?? []).map((c: any) => ({ key: c.key, name: c.name, levels: c.levels }))}
+      misconceptions={misconceptionTags.map((t: any) => ({
+        name: (taxonomyById.get(t.misconception_id) as any)?.name ?? "unnamed",
+        evidenceStepIndices: t.evidence_step_indices,
+      }))}
       needsHumanReview={grade?.needs_human_review ?? false}
       totalRecommended={grade?.total_recommended ?? 0}
       maxTotal={grade?.max_total ?? 0}

@@ -80,7 +80,7 @@ function seedLocal() {
   let educator = localStore.findOne("users", (u: any) => u.role === "educator");
   if (!educator) {
     educator = localStore.insert("users", {
-      email: process.env.AIMS_DEMO_EDUCATOR_EMAIL ?? "educator@aims.demo",
+      email: process.env.AIMS_DEMO_EDUCATOR_EMAIL ?? "educator@stepwise.demo",
       name: "Dr. Tan",
       role: "educator",
     });
@@ -92,7 +92,7 @@ function seedLocal() {
   let student = localStore.findOne("users", (u: any) => u.role === "student");
   if (!student) {
     student = localStore.insert("users", {
-      email: process.env.AIMS_DEMO_STUDENT_EMAIL ?? "student@aims.demo",
+      email: process.env.AIMS_DEMO_STUDENT_EMAIL ?? "student@stepwise.demo",
       name: "Wei Ming",
       role: "student",
     });
@@ -180,10 +180,10 @@ async function seedSupabase() {
   }
 
   console.log("Seeding demo accounts...");
-  const educatorEmail = process.env.AIMS_DEMO_EDUCATOR_EMAIL ?? "educator@aims.demo";
-  const educatorPassword = process.env.AIMS_DEMO_EDUCATOR_PASSWORD ?? "aims-demo-educator-1";
-  const studentEmail = process.env.AIMS_DEMO_STUDENT_EMAIL ?? "student@aims.demo";
-  const studentPassword = process.env.AIMS_DEMO_STUDENT_PASSWORD ?? "aims-demo-student-1";
+  const educatorEmail = process.env.AIMS_DEMO_EDUCATOR_EMAIL ?? "educator@stepwise.demo";
+  const educatorPassword = process.env.AIMS_DEMO_EDUCATOR_PASSWORD ?? "stepwise-demo-educator-1";
+  const studentEmail = process.env.AIMS_DEMO_STUDENT_EMAIL ?? "student@stepwise.demo";
+  const studentPassword = process.env.AIMS_DEMO_STUDENT_PASSWORD ?? "stepwise-demo-student-1";
 
   async function ensureDemoUser(email: string, password: string, name: string, role: "educator" | "student") {
     const { data: existing } = await admin.from("users").select("id").eq("email", email).maybeSingle();

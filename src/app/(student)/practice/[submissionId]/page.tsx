@@ -3,8 +3,9 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { PracticeItemCard } from "@/components/practice-item-card";
 
-// §11.1 S2 — practice set. Difficulty ramp visible, provenance line on
-// every item, hint ladder + solution gating in the client component.
+// §11.1 S2 — practice set. Editorial density. Difficulty ramp visible,
+// provenance line on every item, hint ladder + solution gating in the
+// client component.
 export default async function PracticeSetPage({
   params,
 }: {
@@ -23,15 +24,15 @@ export default async function PracticeSetPage({
   const items = await db.listPracticeItems((practiceSet as any).id);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
+    <main className="mx-auto flex max-w-2xl flex-col gap-xl px-6 py-section">
       <div>
-        <h1 className="text-2xl font-semibold">Your practice set</h1>
-        <p className="text-sm text-neutral-500">
+        <h1 className="font-serif text-display-lg text-ink">Your practice set</h1>
+        <p className="text-body-md text-muted">
           {items.length} problem(s), scaffold → target → extension, drawn from your module's own material.
         </p>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-lg">
         {items.map((item: any) => (
           <PracticeItemCard
             key={item.id}
@@ -42,6 +43,7 @@ export default async function PracticeSetPage({
             hintLadder={item.hint_ladder}
             targetsBecause={item.targets_because}
             provenance={item.provenance}
+            verifiedBy={item.verified_by}
           />
         ))}
       </div>

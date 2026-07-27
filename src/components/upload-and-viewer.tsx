@@ -56,37 +56,37 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <form onSubmit={handleSubmit} className="flex items-center gap-3">
-        <input type="file" name="file" accept="image/*" className="text-sm" />
+    <div className="flex flex-col gap-lg">
+      <form onSubmit={handleSubmit} className="flex items-center gap-sm">
+        <input type="file" name="file" accept="image/*" className="text-body-sm" />
         <button
           type="submit"
           disabled={loading}
-          className="rounded bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-sm bg-ink px-sm py-xs text-body-sm font-medium text-on-dark disabled:opacity-50"
         >
           {loading ? "Processing…" : "Upload"}
         </button>
       </form>
 
       {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
           {error}
         </p>
       )}
 
       {result && (
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-neutral-500">
+        <div className="flex flex-col gap-xs">
+          <p className="text-body-sm text-muted">
             skew: {result.skewDeg.toFixed(2)}° · quality: {result.qualityScore.toFixed(2)} ·
             detector: {result.detector} · {result.boxes.length} line(s) detected
           </p>
-          <div className="relative inline-block border border-neutral-200">
+          <div className="relative inline-block rounded-lg bg-surface-dark p-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={result.originalUrl} alt="original submission" className="block max-w-2xl" />
+            <img src={result.originalUrl} alt="original submission" className="block max-w-2xl rounded-sm" />
             {result.boxes.map((box, i) => (
               <div
                 key={i}
-                className="absolute border-2 border-red-500/80"
+                className="absolute rounded-sm border-[1.5px] border-verified bg-verified-soft opacity-60"
                 style={{
                   left: `${box.x * 100}%`,
                   top: `${box.y * 100}%`,
