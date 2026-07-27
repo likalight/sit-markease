@@ -27,13 +27,17 @@ import {
   s5DiagnoseUserPrompt,
   s6FeedbackSystemPrompt,
   s6FeedbackUserPrompt,
+  s7PracticeSystemPrompt,
+  s7PracticeUserPrompt,
   PROMPT_VERSIONS,
 } from "../src/lib/pipeline/prompts";
 import { stripVariableAssignment } from "../src/lib/pipeline/s4-assess";
+import { retrieveChunks } from "../src/lib/rag/retrieve";
 import type { ReadA, ReadB } from "../src/lib/schemas/transcription";
 import type { Assessment } from "../src/lib/schemas/assessment";
 import type { Diagnosis } from "../src/lib/schemas/diagnosis";
 import type { Feedback } from "../src/lib/schemas/feedback";
+import type { PracticeGeneration } from "../src/lib/schemas/practice";
 import { DEFAULT_MODEL as GEMINI_DEFAULT_MODEL } from "../src/lib/ai/providers/gemini";
 import { DEFAULT_MODEL as GROQ_DEFAULT_MODEL } from "../src/lib/ai/providers/groq";
 
@@ -239,6 +243,96 @@ const FEEDBACKS: Record<string, Feedback> = {
   },
 };
 
+// Hand-authored S7 practice-generation fixtures. Every "variant_of" item's
+// solution was checked by hand to actually satisfy its stated dy/dx (see
+// sidecar/symbolic.py verify_item — these are designed to pass that gate for
+// real, not just claimed). "correct" has no misconception, so no practice
+// set is generated (see src/lib/pipeline/s7-practice.ts — skipped_no_misconception).
+const THREE_HINTS = ["Which method separates the variables here?", "Don't forget the constant of integration.", "Apply the initial condition only after integrating."];
+
+const PRACTICE_GENERATIONS: Record<string, PracticeGeneration> = {
+  dropped_c: {
+    items: [
+      {
+        position: 1,
+        difficulty: "scaffold",
+        prompt_latex: "dy/dx = 2x y",
+        solution_latex: "y = e^{x^2}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Isolates a single separable integration step with an explicit +C, mirroring exactly the step this student skipped.",
+        provenance: { type: "retrieved", source_label: "Tutorial 6 Q3" },
+      },
+      {
+        position: 2,
+        difficulty: "target",
+        prompt_latex: "dy/dx = 3x^2 y",
+        solution_latex: "y = 4e^{x^3}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Requires writing +C during integration before determining the particular solution.",
+        provenance: { type: "variant_of", source_label: "Tutorial 6 Q3" },
+      },
+      {
+        position: 3,
+        difficulty: "target",
+        prompt_latex: "dy/dx = 4x^3 y",
+        solution_latex: "y = 2e^{x^4}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Same +C-tracking skill at target difficulty, a different exponent than the worked example.",
+        provenance: { type: "retrieved", source_label: "Tutorial 6 Q5" },
+      },
+      {
+        position: 4,
+        difficulty: "extension",
+        prompt_latex: "dy/dx = 5x^4 y",
+        solution_latex: "y = 6e^{x^5}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Extension: higher-degree exponent, same underlying constant-of-integration discipline.",
+        provenance: { type: "variant_of", source_label: "Tutorial 6 Q5" },
+      },
+    ],
+  },
+  ic_too_early: {
+    items: [
+      {
+        position: 1,
+        difficulty: "scaffold",
+        prompt_latex: "dy/dx = 3x^2 y",
+        solution_latex: "y = 5e^{x^3}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Directly practices integrating to the general solution before touching the initial condition.",
+        provenance: { type: "retrieved", source_label: "Tutorial 4 Q2" },
+      },
+      {
+        position: 2,
+        difficulty: "target",
+        prompt_latex: "dy/dx = 2x y",
+        solution_latex: "y = e^{x^2}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Same order-of-operations skill at target difficulty.",
+        provenance: { type: "retrieved", source_label: "Tutorial 6 Q3" },
+      },
+      {
+        position: 3,
+        difficulty: "target",
+        prompt_latex: "dy/dx = 4x^3 y",
+        solution_latex: "y = 3e^{x^4}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Requires integrating to the general solution before touching the initial condition — the exact step this student skipped.",
+        provenance: { type: "variant_of", source_label: "Tutorial 4 Q2" },
+      },
+      {
+        position: 4,
+        difficulty: "extension",
+        prompt_latex: "dy/dx = 6x^5 y",
+        solution_latex: "y = 7e^{x^6}",
+        hint_ladder: THREE_HINTS,
+        targets_because: "Extension: higher-degree exponent, same order-of-operations discipline.",
+        provenance: { type: "variant_of", source_label: "Tutorial 6 Q5" },
+      },
+    ],
+  },
+};
+
 async function main() {
   const mapping = JSON.parse(fs.readFileSync(path.join(GOLD_DIR, "submission-ids.json"), "utf-8"));
 
@@ -387,6 +481,46 @@ async function main() {
     const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: "gemini", model: GEMINI_MODEL, system, prompt });
     aiCache.seed({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: "gemini", model: GEMINI_MODEL, system, prompt }, feedback);
     console.log(`  seeded S6 fixture for ${goldId} (key ${key.slice(0, 8)}…)`);
+  }
+
+  console.log("\nSeeding S7 practice fixtures (requires S5 already run — misconception_tags must exist)...");
+  for (const [goldId, generation] of Object.entries(PRACTICE_GENERATIONS)) {
+    const ids = mapping[goldId];
+    if (!ids) continue;
+
+    const submission = await db.getSubmission(ids.submissionId);
+    const tags = await db.listMisconceptionTags(ids.submissionId);
+    if (tags.length === 0) {
+      console.warn(`  skipping S7 fixture for ${goldId}: no misconception_tags found — run S5 first`);
+      continue;
+    }
+
+    const module_ = await db.getModuleForQuestion(submission.question_id);
+    const question = await db.getQuestionWithRubric(submission.question_id);
+    const taxonomy = await db.listMisconceptions(module_.id);
+    const taxonomyById = new Map(taxonomy.map((t: any) => [t.id, t]));
+    const topTag = [...tags].sort((a: any, b: any) => b.confidence - a.confidence)[0];
+    const misconception = taxonomyById.get(topTag.misconception_id) as any;
+
+    const resources = await db.listResources(module_.id);
+    const chunks = await db.listResourceChunks(resources.map((r: any) => r.id));
+    const resourceLabelById = new Map(resources.map((r: any) => [r.id, r.label]));
+
+    const retrievalQuery = `${misconception.description} ${topTag.observed_signature} ${(question.topic_tags ?? []).join(" ")}`;
+    const retrieved = retrieveChunks(retrievalQuery, chunks, 4);
+
+    const system = s7PracticeSystemPrompt();
+    const prompt = s7PracticeUserPrompt({
+      misconceptionName: misconception.name,
+      misconceptionDescription: misconception.description,
+      observedSignature: topTag.observed_signature,
+      topicTags: question.topic_tags ?? [],
+      retrievedItems: retrieved.map((c: any) => ({ label: resourceLabelById.get(c.resource_id) ?? "unknown source", content: c.content })),
+    });
+
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s7Practice, provider: "gemini", model: GEMINI_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s7Practice, provider: "gemini", model: GEMINI_MODEL, system, prompt }, generation);
+    console.log(`  seeded S7 fixture for ${goldId} (${generation.items.length} items, key ${key.slice(0, 8)}…)`);
   }
 
   console.log("\nFixture seeding complete.");

@@ -74,6 +74,19 @@ export function s4AssessUserPrompt(args: {
     .join("\n");
 }
 
+export function s7VerifySystemPrompt(): string {
+  return loadPrompt("s7_verify.v1.md");
+}
+
+export function s7VerifyUserPrompt(promptLatex: string, solutionLatex: string): string {
+  return [
+    `PROBLEM: ${promptLatex}`,
+    `STATED SOLUTION: ${solutionLatex}`,
+    ``,
+    `Respond with the JSON shape you were given.`,
+  ].join("\n");
+}
+
 export function s5DiagnoseSystemPrompt(): string {
   return loadPrompt("s5_diagnose.v1.md");
 }
