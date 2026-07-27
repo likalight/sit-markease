@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MathText } from "./math";
 
 interface Props {
   position: number;
@@ -31,7 +32,9 @@ export function PracticeItemCard(props: Props) {
         </span>
       </div>
 
-      <p className="text-sm font-medium">{props.promptLatex}</p>
+      <p className="text-sm font-medium">
+        <MathText latex={props.promptLatex} />
+      </p>
       <p className="text-xs text-neutral-400">{props.targetsBecause}</p>
 
       <textarea
@@ -71,7 +74,7 @@ export function PracticeItemCard(props: Props) {
 
       {showSolution && (
         <p className="rounded bg-neutral-50 px-3 py-2 text-sm">
-          <strong>Solution:</strong> {props.solutionLatex}
+          <strong>Solution:</strong> <MathText latex={props.solutionLatex} />
         </p>
       )}
     </div>
