@@ -29,6 +29,10 @@ Anything not fully implemented, listed immediately as it's introduced.
 
 - `sidecar/symbolic.py`'s `equivalent()` is real and passes all 10 of `sidecar/tests/test_symbolic.py`'s known pairs. `verify_item()` (the S7 verification gate) is still a stub — real implementation lands in M7.
 
+## M4
+
+- `sidecar/symbolic.py`'s `equivalent()` (M3) parses bare expressions, not equations — `parse_latex("y = 2e^{x^2/2}")` fails where `parse_latex("2e^{x^2/2}")` succeeds. Since final answers are almost always written as `"<var> = <expr>"`, `src/lib/pipeline/s4-assess.ts` strips a leading `identifier =` before calling the sidecar (`stripVariableAssignment()`). Found immediately when seeding this milestone's gold fixtures — every equation-form answer came back `unparseable` until this was added. Simple regex, handles the common case (`y = ...`, `x_1 = ...`); doesn't handle multi-variable systems or answers with no leading assignment.
+
 ## M2 (bugfix, noted for completeness)
 
 - `src/lib/ai/client.ts`'s `callStructured()` originally constructed the resolved `LLMClient` (which requires an API key) *before* checking the cache — meaning even a cache hit or a fixture-mode "replay only" call would throw `AIMS_GEMINI_API_KEY is not set`. Fixed by resolving provider/model as plain strings first (no client construction), checking cache/fixture-mode against that, and only calling `getClient()` right before an actual network attempt. Caught by trying to run the real S2/S3 pipeline against the seeded fixtures — the first genuine end-to-end run this build did with zero API keys present, and it immediately surfaced the bug fixture-only testing couldn't have easily caught otherwise.

@@ -13,9 +13,21 @@ import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { localFiles } from "../src/lib/storage/local-files";
+import { db } from "../src/lib/db/facade";
+import { sidecar } from "../src/lib/sidecar/client";
 import { aiCache, cacheKey, hashImage } from "../src/lib/ai/cache";
-import { s2ReadASystemPrompt, s2ReadAUserPrompt, s2ReadBSystemPrompt, s2ReadBUserPrompt, PROMPT_VERSIONS } from "../src/lib/pipeline/prompts";
+import {
+  s2ReadASystemPrompt,
+  s2ReadAUserPrompt,
+  s2ReadBSystemPrompt,
+  s2ReadBUserPrompt,
+  s4AssessSystemPrompt,
+  s4AssessUserPrompt,
+  PROMPT_VERSIONS,
+} from "../src/lib/pipeline/prompts";
+import { stripVariableAssignment } from "../src/lib/pipeline/s4-assess";
 import type { ReadA, ReadB } from "../src/lib/schemas/transcription";
+import type { Assessment } from "../src/lib/schemas/assessment";
 import { DEFAULT_MODEL as GEMINI_DEFAULT_MODEL } from "../src/lib/ai/providers/gemini";
 import { DEFAULT_MODEL as GROQ_DEFAULT_MODEL } from "../src/lib/ai/providers/groq";
 
@@ -100,6 +112,52 @@ const FIXTURES: Record<string, { readA: ReadA; readB: ReadB }> = {
   },
 };
 
+// Hand-authored S4 assessment fixtures. Deliberately not a perfect match to
+// eval/gold/*.json's human_marks (off by 1 mark on the two flawed scripts) —
+// see docs/DECISIONS.md: a suspicious 0.0 MAE would misrepresent what this
+// synthetic set can honestly demonstrate.
+const ASSESSMENTS: Record<string, Assessment> = {
+  correct: {
+    criterion_results: [
+      { criterion_key: "c_setup", level: "expert", score: 4, max_score: 4, evidence_step_indices: [1], justification: "Correctly separates variables into dy/y = x dx.", confidence: 0.95 },
+      { criterion_key: "c_method", level: "expert", score: 6, max_score: 6, evidence_step_indices: [2], justification: "Both sides integrated correctly with the constant of integration retained.", confidence: 0.93 },
+      { criterion_key: "c_ic", level: "expert", score: 5, max_score: 5, evidence_step_indices: [3], justification: "Initial condition applied to the general solution to solve for C.", confidence: 0.94 },
+      { criterion_key: "c_answer", level: "expert", score: 5, max_score: 5, evidence_step_indices: [4], justification: "Final answer correct and simplified.", confidence: 0.96 },
+    ],
+    total_recommended: 20,
+    max_total: 20,
+    error_carry_forward_applied: false,
+    needs_human_review: false,
+    review_reasons: [],
+  },
+  dropped_c: {
+    criterion_results: [
+      { criterion_key: "c_setup", level: "expert", score: 4, max_score: 4, evidence_step_indices: [1], justification: "Correctly separates variables into dy/y = x dx.", confidence: 0.92 },
+      { criterion_key: "c_method", level: "proficient", score: 4, max_score: 6, evidence_step_indices: [2, 3], justification: "Integrated correctly but never wrote the constant of integration — the general solution loses a degree of freedom.", confidence: 0.8 },
+      { criterion_key: "c_ic", level: "proficient", score: 3, max_score: 5, evidence_step_indices: [4], justification: "The initial condition is patched onto an already-particular solution via an ad-hoc factor of 2, rather than solved for a genuine constant C.", confidence: 0.75 },
+      { criterion_key: "c_answer", level: "expert", score: 5, max_score: 5, evidence_step_indices: [4], justification: "Final answer matches the expected result (verified symbolically).", confidence: 0.9 },
+    ],
+    total_recommended: 16,
+    max_total: 20,
+    error_carry_forward_applied: true,
+    needs_human_review: true,
+    review_reasons: ["method_omits_constant_of_integration_but_reaches_correct_answer"],
+  },
+  ic_too_early: {
+    criterion_results: [
+      { criterion_key: "c_setup", level: "expert", score: 4, max_score: 4, evidence_step_indices: [1], justification: "Correctly separates variables into dy/y = x dx.", confidence: 0.9 },
+      { criterion_key: "c_method", level: "novice", score: 1, max_score: 6, evidence_step_indices: [3], justification: "Integration is performed but is disconnected from the flawed step 2 — the overall method is incoherent.", confidence: 0.7 },
+      { criterion_key: "c_ic", level: "novice", score: 1, max_score: 5, evidence_step_indices: [2], justification: "Initial condition substituted into the unintegrated separated equation, producing the nonsensical statement 2/y = 0.", confidence: 0.72 },
+      { criterion_key: "c_answer", level: "novice", score: 1, max_score: 5, evidence_step_indices: [4], justification: "Final answer omits the constant entirely and does not match the expected result (verified symbolically).", confidence: 0.85 },
+    ],
+    total_recommended: 7,
+    max_total: 20,
+    error_carry_forward_applied: false,
+    needs_human_review: true,
+    review_reasons: ["unusual_and_inconsistent_method", "initial_condition_misapplied"],
+  },
+};
+
 async function main() {
   const mapping = JSON.parse(fs.readFileSync(path.join(GOLD_DIR, "submission-ids.json"), "utf-8"));
 
@@ -146,7 +204,42 @@ async function main() {
     console.log(`  seeded S2 fixtures for ${goldId} (readA key ${keyA.slice(0, 8)}…, readB key ${keyB.slice(0, 8)}…)`);
   }
 
-  console.log("\nS2 fixture seeding complete.");
+  console.log("\nSeeding S4 assessment fixtures (requires S2/S3 already run — npm run seed-gold then transcribeSubmission)...");
+  for (const [goldId, assessment] of Object.entries(ASSESSMENTS)) {
+    const ids = mapping[goldId];
+    if (!ids) continue;
+
+    const submission = await db.getSubmission(ids.submissionId);
+    const question = await db.getQuestionWithRubric(submission.question_id);
+    const transcription = await db.getTranscription(ids.submissionId);
+    if (!transcription) {
+      console.warn(`  skipping S4 fixture for ${goldId}: no transcription found — run the S2/S3 pipeline first`);
+      continue;
+    }
+    const steps = await db.listSolutionSteps(transcription.id);
+
+    const symbolicResult = await sidecar.mathEquivalent(
+      stripVariableAssignment(transcription.final_answer_latex),
+      stripVariableAssignment(question.expected_answer_latex)
+    );
+    const symbolicCheck = !symbolicResult.parsed ? "unparseable" : symbolicResult.equivalent ? "equivalent" : "not_equivalent";
+
+    const system = s4AssessSystemPrompt();
+    const prompt = s4AssessUserPrompt({
+      questionPromptText: question.prompt_text,
+      modelSolution: question.model_solution,
+      expectedAnswerLatex: question.expected_answer_latex,
+      criteria: question.criteria,
+      steps,
+      symbolicCheck,
+    });
+
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: "gemini", model: GEMINI_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: "gemini", model: GEMINI_MODEL, system, prompt }, assessment);
+    console.log(`  seeded S4 fixture for ${goldId} (symbolic=${symbolicCheck}, key ${key.slice(0, 8)}…)`);
+  }
+
+  console.log("\nFixture seeding complete.");
 }
 
 main().catch((err) => {
