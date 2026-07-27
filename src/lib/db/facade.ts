@@ -380,6 +380,13 @@ export const db = {
     return relativePath;
   },
 
+  async downloadImage(relativePath: string): Promise<Buffer> {
+    if (fx()) return localFiles.read(relativePath);
+    const { data, error } = await supabaseAdmin().storage.from("submissions").download(relativePath);
+    if (error || !data) throw error ?? new Error(`could not download ${relativePath}`);
+    return Buffer.from(await data.arrayBuffer());
+  },
+
   async getImageUrl(relativePath: string) {
     if (fx()) return localFiles.publicUrl(relativePath);
     const { data } = await supabaseAdmin().storage.from("submissions").createSignedUrl(relativePath, 3600);

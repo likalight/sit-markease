@@ -1,4 +1,9 @@
-"""S4 symbolic maths — §7.5 / §8. Skeleton only until M3; see docs/STUBS.md."""
+"""S4 symbolic maths — §7.5 / §8.
+
+`equivalent()` is real (M3 — verified against 10 known pairs, see
+tests/test_symbolic.py). `verify_item()` is still a stub until M7, see
+docs/STUBS.md.
+"""
 
 from sympy import simplify
 from sympy.parsing.latex import parse_latex

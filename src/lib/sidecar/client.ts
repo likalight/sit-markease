@@ -5,6 +5,12 @@ import {
   type DetectLinesResponse,
   type PreprocessResponse,
 } from "@/lib/schemas/geometry";
+import {
+  EquivalentResponseSchema,
+  VerifyItemResponseSchema,
+  type EquivalentResponse,
+  type VerifyItemResponse,
+} from "@/lib/schemas/symbolic";
 
 async function postJson<T>(path: string, body: unknown, schema: { parse(v: unknown): T }): Promise<T> {
   const res = await fetch(`${env.sidecarUrl()}${path}`, {
@@ -29,5 +35,13 @@ export const sidecar = {
 
   detectLines(imageB64: string): Promise<DetectLinesResponse> {
     return postJson("/cv/detect-lines", { image_b64: imageB64 }, DetectLinesResponseSchema);
+  },
+
+  mathEquivalent(aLatex: string, bLatex: string): Promise<EquivalentResponse> {
+    return postJson("/math/equivalent", { a_latex: aLatex, b_latex: bLatex }, EquivalentResponseSchema);
+  },
+
+  verifyItem(prompt: string, solution: string): Promise<VerifyItemResponse> {
+    return postJson("/math/verify-item", { prompt, solution }, VerifyItemResponseSchema);
   },
 };
