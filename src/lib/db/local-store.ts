@@ -28,6 +28,7 @@ export interface StoreSchema {
   misconceptions: any[];
   misconception_tags: any[];
   feedback: any[];
+  feedback_flags: any[];
   resources: any[];
   resource_chunks: any[];
   practice_sets: any[];
@@ -54,6 +55,7 @@ const TABLES: (keyof StoreSchema)[] = [
   "misconceptions",
   "misconception_tags",
   "feedback",
+  "feedback_flags",
   "resources",
   "resource_chunks",
   "practice_sets",

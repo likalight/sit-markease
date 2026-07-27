@@ -312,6 +312,13 @@ export const db = {
     return data;
   },
 
+  async insertFeedbackFlag(row: Record<string, any>) {
+    if (fx()) return localStore.insert("feedback_flags", row);
+    const { data, error } = await supabaseAdmin().from("feedback_flags").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
   // --- RAG corpus + practice (S7) ---
   async insertResource(row: Record<string, any>) {
     if (fx()) return localStore.insert("resources", row);
