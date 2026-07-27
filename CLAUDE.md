@@ -17,13 +17,16 @@ Project: **AIMS — AI for Individualised Mastery Support**. Full spec: `docs/PR
 
 - **TypeScript app** (Next.js 15 App Router) + **Python sidecar** (FastAPI at `SIDECAR_URL`) for OpenCV, SymPy, and local embeddings.
 - **Line geometry comes from OpenCV projection profiling**, behind the `LineDetector` interface. Not from a paid OCR service.
-- **Recognition comes from two Claude reads**, not from an OCR engine: Read A literal (`AIMS_MODEL_PRIMARY`), Read B semantic (`AIMS_MODEL_FAST`).
+- **Recognition comes from two reads on two different free-tier providers**, not from an OCR engine and not from two models in the same vendor family: Read A on the `primary` role (Gemini by default), Read B on the `fast` role (Groq by default). Cross-provider disagreement is stronger evidence than same-family disagreement — see docs/PRD.md §7.3.
+- **No Anthropic API budget for this build** (docs/DECISIONS.md "M2 — free-tier providers"). Every model call goes through the provider-agnostic `LLMClient` interface in `src/lib/ai/` — never call a vendor SDK directly from pipeline code. Provider per role is an env var (`AIMS_PROVIDER_PRIMARY` / `_FAST` / `_ADJUDICATOR`); swapping to a paid provider later is a new file under `src/lib/ai/providers/` plus those three lines, not a rewrite.
+- **Every model call is cached to disk** keyed by `(prompt_version, model, input_hash)` (`src/lib/ai/cache.ts`). Re-running the eval harness must never re-spend free-tier quota.
 - **Embeddings are local** (`bge-small-en-v1.5`, 384-dim). If they fail, set `AIMS_RETRIEVAL_MODE=fulltext` and use Postgres `tsvector`.
 - Prompts live in `/prompts/*.vN.md`. Persist `prompt_version` and `model` on every `stage_run`.
-- Log `input_tokens`, `output_tokens`, `latency_ms`, `cost_usd` on every AI call. Metrics M10/M11 depend on it.
+- Log `input_tokens`, `output_tokens`, `latency_ms`, `cost_usd` on every AI call — `cost_usd` is always 0 on free-tier providers, but token/request counts still matter for real quota reporting. Metrics M10/M11 depend on it.
 - Temperature: 0.0–0.1 for S2/S4, 0.2 for S5, 0.4–0.6 for S6/S7.
 - Render all maths with KaTeX. Never show raw LaTeX to a user.
-- `AIMS_FIXTURE_MODE=true` serves cached outputs with zero API calls. **Keep this working — it is the demo-day safety net.**
+- **Free tiers WILL 429 mid-batch.** Every provider call goes through `src/lib/ai/rate-limit.ts` (per-provider RPM ceiling + exponential backoff); a quota hit pauses a batch run rather than losing it.
+- `AIMS_FIXTURE_MODE=true` serves cached responses from `local-data/ai-cache/` with zero network calls. **Keep this working — it is the demo-day safety net.**
 
 ## Process
 

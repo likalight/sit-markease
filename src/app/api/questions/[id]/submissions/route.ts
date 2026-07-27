@@ -1,12 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { supabaseAdmin } from "@/lib/db/supabase-admin";
+import { db } from "@/lib/db/facade";
 import { sidecar } from "@/lib/sidecar/client";
 import { getLineDetector } from "@/lib/pipeline/line-detector";
 
 // §10 — POST /api/questions/:id/submissions
 // M1 scope: single-image upload → S1 preprocess → S1b line detection →
 // persisted submission/page/lines. Batch upload and PDF ingestion are later work
-// (see docs/STUBS.md).
+// (see docs/STUBS.md). Persists through src/lib/db/facade.ts, which branches
+// on AIMS_FIXTURE_MODE (docs/DECISIONS.md "M2 — free-tier providers").
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: questionId } = await params;
 
@@ -19,14 +20,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const bytes = Buffer.from(await file.arrayBuffer());
   const originalB64 = bytes.toString("base64");
 
-  const admin = supabaseAdmin();
-
-  const { data: question, error: questionError } = await admin
-    .from("questions")
-    .select("id")
-    .eq("id", questionId)
-    .single();
-  if (questionError || !question) {
+  const question = await db.getQuestionWithRubric(questionId);
+  if (!question) {
     return NextResponse.json(
       { error: { code: "QUESTION_NOT_FOUND", message: "unknown question id" } },
       { status: 404 }
@@ -34,19 +29,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   const studentEmail = process.env.AIMS_DEMO_STUDENT_EMAIL ?? "student@aims.demo";
-  const { data: student } = await admin.from("users").select("id").eq("email", studentEmail).maybeSingle();
+  const student = await db.findUserByEmail(studentEmail);
 
-  const { data: submission, error: submissionError } = await admin
-    .from("submissions")
-    .insert({ question_id: questionId, student_id: student?.id ?? null, status: "processing" })
-    .select("id")
-    .single();
-  if (submissionError || !submission) {
-    return NextResponse.json(
-      { error: { code: "SUBMISSION_CREATE_FAILED", message: submissionError?.message } },
-      { status: 500 }
-    );
-  }
+  const submission = await db.createSubmission({
+    questionId,
+    studentId: student?.id ?? null,
+    status: "processing",
+  });
 
   let preprocessResult;
   let linesResult;
@@ -54,15 +43,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     preprocessResult = await sidecar.preprocess(originalB64);
     linesResult = await getLineDetector().detect(preprocessResult.processed_b64);
   } catch (err) {
-    await admin
-      .from("stage_runs")
-      .insert({
-        submission_id: submission.id,
-        stage: "S1_ingest",
-        status: "failed",
-        error: err instanceof Error ? err.message : String(err),
-      });
-    await admin.from("submissions").update({ status: "failed" }).eq("id", submission.id);
+    await db.logStageRun({
+      submissionId: submission.id,
+      stage: "S1_ingest",
+      status: "failed",
+      error: err instanceof Error ? err.message : String(err),
+    });
+    await db.updateSubmission(submission.id, { status: "failed" });
     return NextResponse.json(
       { error: { code: "SIDECAR_UNAVAILABLE", message: "line detection failed", recoverable: true } },
       { status: 502 }
@@ -72,67 +59,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const originalPath = `${submission.id}/original.png`;
   const processedPath = `${submission.id}/processed.png`;
 
-  const { error: uploadOriginalError } = await admin.storage
-    .from("submissions")
-    .upload(originalPath, bytes, { contentType: file.type || "image/png", upsert: true });
-  if (uploadOriginalError) {
-    return NextResponse.json(
-      { error: { code: "STORAGE_UPLOAD_FAILED", message: uploadOriginalError.message } },
-      { status: 500 }
-    );
-  }
-
+  await db.uploadImage(originalPath, bytes, file.type || "image/png");
   const processedBytes = Buffer.from(preprocessResult.processed_b64, "base64");
-  await admin.storage
-    .from("submissions")
-    .upload(processedPath, processedBytes, { contentType: "image/png", upsert: true });
+  await db.uploadImage(processedPath, processedBytes, "image/png");
 
-  const { data: page, error: pageError } = await admin
-    .from("submission_pages")
-    .insert({
-      submission_id: submission.id,
-      page_index: 0,
-      storage_path: originalPath,
-      processed_path: processedPath,
-      skew_deg: preprocessResult.skew_deg,
-      quality_score: preprocessResult.quality_score,
-    })
-    .select("id")
-    .single();
-  if (pageError || !page) {
-    return NextResponse.json(
-      { error: { code: "PAGE_CREATE_FAILED", message: pageError?.message } },
-      { status: 500 }
-    );
-  }
+  const page = await db.createSubmissionPage({
+    submissionId: submission.id,
+    pageIndex: 0,
+    storagePath: originalPath,
+    processedPath,
+    skewDeg: preprocessResult.skew_deg,
+    qualityScore: preprocessResult.quality_score,
+  });
 
-  const lineRows = linesResult.boxes.map((box, index) => ({
-    submission_page_id: page.id,
-    line_index: index + 1,
-    box,
-    detector: linesResult.source,
-  }));
-  if (lineRows.length > 0) {
-    await admin.from("detected_lines").insert(lineRows);
-  }
+  await db.insertDetectedLines(page.id, linesResult.boxes, linesResult.source);
 
-  await admin
-    .from("stage_runs")
-    .insert({
-      submission_id: submission.id,
-      stage: "S1_ingest",
-      status: "succeeded",
-    });
-  await admin.from("submissions").update({ status: "ready_for_review" }).eq("id", submission.id);
+  await db.logStageRun({ submissionId: submission.id, stage: "S1_ingest", status: "succeeded" });
+  await db.updateSubmission(submission.id, { status: "ready_for_review" });
 
-  const { data: signed } = await admin.storage
-    .from("submissions")
-    .createSignedUrl(originalPath, 3600);
+  const originalUrl = await db.getImageUrl(originalPath);
 
   return NextResponse.json({
     submissionId: submission.id,
     pageId: page.id,
-    originalUrl: signed?.signedUrl,
+    originalUrl,
     skewDeg: preprocessResult.skew_deg,
     qualityScore: preprocessResult.quality_score,
     boxes: linesResult.boxes,

@@ -11,4 +11,5 @@ export const env = {
   supabaseAnonKey: () => required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
   supabaseServiceRoleKey: () => required("SUPABASE_SERVICE_ROLE_KEY"),
   sidecarUrl: () => process.env.SIDECAR_URL ?? "http://localhost:8000",
+  isFixtureMode: () => process.env.AIMS_FIXTURE_MODE === "true",
 };

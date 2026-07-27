@@ -258,11 +258,17 @@ LTI/LMS integration, SSO, multi-tenancy, offline mode, mobile app, question auth
 | CV / symbolic / embeddings | Python sidecar: FastAPI + OpenCV + SymPy + sentence-transformers | $0 |
 | Embeddings | `bge-small-en-v1.5` locally (384-dim), CPU-fine | $0 |
 | Retrieval fallback | Postgres `tsvector` full-text | $0 |
-| LLM | Anthropic API | ~$2–4 total |
+| LLM | Free-tier providers (Google AI Studio Gemini + Groq) | $0 |
 | Validation | Zod (shared schemas) | $0 |
 | Jobs | In-process queue + SSE | $0 |
 
-**Models:** `claude-sonnet-5` (primary — vision, assessment, feedback, practice), `claude-haiku-4-5-20251001` (second transcription read, misconception tagging), `claude-opus-5` (optional adjudicator for low-confidence cases only).
+**Models (revised — see docs/DECISIONS.md "M2 — free-tier providers"):** No Anthropic API budget for this build. All model calls go through a provider-agnostic `LLMClient` interface (`src/lib/ai/`); provider is chosen per model role via env var, so a future paid swap-in is a one-line change, not a rewrite.
+
+- **Primary role** (assessment, feedback, practice; Read A in dual-read): **Google AI Studio, Gemini 2.0 Flash** (`AIMS_GEMINI_MODEL`) — vision-capable, generous free tier, native structured output via `responseSchema` (no prompt-and-parse for this provider).
+- **Fast role** (Read B in dual-read; misconception tagging): **Groq** (`AIMS_GROQ_MODEL`, a vision-capable Llama model) — a *different provider*, not just a different model, so S2's dual-read gets cross-vendor disagreement rather than same-family disagreement (see §7.3).
+- **Adjudicator role** (optional, low-confidence cases only): Gemini by default; same swap mechanism as the other two roles.
+
+Every call is cached to disk keyed by `(prompt_version, model, input_hash)` (`src/lib/ai/cache.ts`) — re-running the eval harness never re-spends free-tier quota, and `AIMS_FIXTURE_MODE=true` replays *only* from this cache with zero network calls. Free-tier rate limits are handled with a per-provider RPM ceiling and exponential backoff on 429 (`src/lib/ai/rate-limit.ts`); a quota hit pauses a batch run rather than losing it.
 
 **Explicitly rejected:** LangChain/LangGraph in the runtime pipeline (fixed DAG, not an agent loop — direct SDK calls are fewer layers to debug at 3am); LlamaIndex (redundant for a 40-page corpus); hosted vector DBs (pgvector is already there); Redis/Celery (in-process queue handles 30 scripts); commercial OCR (see §6.4). If two or more teammates already ship LangChain daily, override this and record it in `DECISIONS.md` — familiarity beats elegance at hackathon speed.
 
@@ -357,13 +363,13 @@ interface LineDetector {
 
 ## 7.3 S2 — Dual-read transcription
 
-Two **independently framed** reads. Different framings, not just different seeds — independent framings catch genuinely different errors than temperature noise does.
+Two **independently framed** reads, from **different providers** (revised — see docs/DECISIONS.md "M2 — free-tier providers"). Different framings alone catch different errors than temperature noise does; different *vendors* go further — two models from the same family share training data, RLHF process, and failure modes, so agreement between them is weaker evidence than agreement between genuinely independent systems. A Gemini/Groq disagreement is more likely to reflect real transcription ambiguity than two same-vendor models converging on a shared blind spot. Where a second free provider isn't available or is down, fall back to a second Gemini model (different size/version) and note the reduced independence in `stage_runs`.
 
 ```
-              ┌─ Read A: claude-sonnet-5, temp 0 ─────
- page image ──┤   "literal line-by-line transcription"│
-   + boxes    │                                       ├── S3 Reconcile
-              └─ Read B: claude-haiku-4-5, temp 0 ─────
+              ┌─ Read A: Gemini (primary role), temp 0 ─
+ page image ──┤   "literal line-by-line transcription" │
+   + boxes    │                                        ├── S3 Reconcile
+              └─ Read B: Groq (fast role), temp 0 ──────
                   "step-segmented semantic reading"
 ```
 
@@ -451,7 +457,7 @@ Persist both raw reads in `transcriptions.read_a_raw` / `read_b_raw` for audit a
 
 ## 7.5 S4 — Rubric-aligned assessment
 
-**Model:** `claude-sonnet-5`, temp 0.1. **Input:** question, model solution (optional), rubric criteria with level descriptors, reconciled steps, symbolic answer-check result.
+**Model:** primary role (Gemini by default), temp 0.1. **Input:** question, model solution (optional), rubric criteria with level descriptors, reconciled steps, symbolic answer-check result.
 
 **Prompt principles:**
 - Grade **only** against the supplied rubric. Import no external standards.
@@ -491,7 +497,7 @@ Instruct the model to treat EQUIVALENT/NOT EQUIVALENT as authoritative on correc
 
 ## 7.6 S5 — Misconception detection
 
-**Model:** `claude-haiku-4-5-20251001` (cheap, sufficient), temp 0.2. **Input:** steps, criterion results, module taxonomy.
+**Model:** fast role (Groq by default — cheap, sufficient), temp 0.2. **Input:** steps, criterion results, module taxonomy.
 
 ```jsonc
 {
@@ -520,7 +526,7 @@ Instruct the model to treat EQUIVALENT/NOT EQUIVALENT as authoritative on correc
 
 ## 7.7 S6 — Feedback generation
 
-**Model:** `claude-sonnet-5`, temp 0.5.
+**Model:** primary role (Gemini by default), temp 0.5.
 
 **Principles, encoded in the prompt:**
 - Open with what was **specifically** correct ("your separation of variables at step 2 was clean"). Never generic praise.
@@ -1165,6 +1171,7 @@ State these in the pitch. They are worth real points under Feasibility, and they
 - **Right of appeal.** Full audit trail — what was recommended, what the human decided, when, and any note. Appeals are answerable with data.
 - **Equity.** Legibility must not determine marks. Measure it (M12); route low-legibility scripts to humans rather than penalising them.
 - **Data protection (PDPA).** Student scripts are personal data. Minimise — pseudonymous IDs, strip names before model calls where possible. State retention. Use a no-training data path. **For the hackathon, use consented volunteer scripts only, and say so on the slide.**
+- **Free-tier LLM providers may train on submitted data.** Google AI Studio's and Groq's free tiers (docs/DECISIONS.md "M2 — free-tier providers") do not carry the same no-training guarantee as a paid enterprise endpoint — submitted images and text may be used to improve the provider's models. This build only ever sends **consented volunteer scripts** (same rule as the PDPA line above), and that consent must explicitly cover this. **Before any real deployment**, replace the free-tier providers with a paid no-training endpoint (Anthropic, Google Cloud Vertex AI, or equivalent) — the `LLMClient` interface exists specifically so this is a config change, not a rewrite.
 - **Wellbeing.** Feedback is corrective, never demeaning. A struggling student should finish reading more motivated, not less.
 - **Not surveillance.** Cohort analytics exist for curriculum improvement, not for ranking or flagging individuals.
 - **Against deskilling.** The design keeps educators making judgements rather than rubber-stamping. Confidence-first queue ordering exists partly to direct attention where judgement actually matters.
@@ -1254,21 +1261,30 @@ Check this before cutting anything.
 ## 23.1 Environment
 
 ```
-ANTHROPIC_API_KEY=
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 SIDECAR_URL=http://localhost:8000
 
-AIMS_MODEL_PRIMARY=claude-sonnet-5
-AIMS_MODEL_FAST=claude-haiku-4-5-20251001
-AIMS_MODEL_ADJUDICATOR=claude-opus-5
+# Free-tier providers (docs/DECISIONS.md "M2 — free-tier providers") — no
+# Anthropic API budget for this build. Swap-in path for a paid provider is a
+# new src/lib/ai/providers/*.ts file plus these three lines.
+AIMS_PROVIDER_PRIMARY=gemini      # gemini | groq
+AIMS_PROVIDER_FAST=groq
+AIMS_PROVIDER_ADJUDICATOR=gemini
+
+AIMS_GEMINI_API_KEY=
+AIMS_GEMINI_MODEL=gemini-2.0-flash
+AIMS_GEMINI_RPM=10
+AIMS_GROQ_API_KEY=
+AIMS_GROQ_MODEL=llama-3.2-11b-vision-preview
+AIMS_GROQ_RPM=25
 
 AIMS_DUAL_READ_ENABLED=true
 AIMS_AGREEMENT_THRESHOLD=0.85
 AIMS_LINE_DETECTOR=opencv        # opencv | paddle
 AIMS_RETRIEVAL_MODE=hybrid       # hybrid | fulltext
-AIMS_FIXTURE_MODE=false          # true = cached outputs, zero API calls
+AIMS_FIXTURE_MODE=false          # true = cached responses only (local-data/ai-cache), zero network calls, zero quota spend
 ```
 
 ## 23.2 Glossary

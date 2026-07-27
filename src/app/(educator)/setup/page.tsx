@@ -1,24 +1,16 @@
 import { redirect } from "next/navigation";
-import { supabaseServer } from "@/lib/db/supabase-server";
-import { supabaseAdmin } from "@/lib/db/supabase-admin";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { db } from "@/lib/db/facade";
 import { UploadAndViewer } from "@/components/upload-and-viewer";
 
 // M1 scope only: prove upload → deskew → line-detect → persist → overlay
 // works end to end for the seeded demo question. The real E1 rubric-editor
 // screen is a later milestone.
 export default async function SetupPage() {
-  const supabase = await supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const { data: question } = await supabaseAdmin()
-    .from("questions")
-    .select("id, prompt_text")
-    .eq("position", 1)
-    .limit(1)
-    .maybeSingle();
+  const question = await db.getFirstQuestion();
 
   if (!question) {
     return (

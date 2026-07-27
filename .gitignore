@@ -9,3 +9,4 @@ __pycache__/
 .venv/
 sidecar/.venv/
 *.tsbuildinfo
+local-data/
