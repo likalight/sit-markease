@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+opencv-python-headless
+numpy
+sympy
+antlr4-python3-runtime==4.11
+sentence-transformers
+pdf2image
+python-multipart
+pydantic
