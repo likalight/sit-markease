@@ -116,55 +116,72 @@ export async function generatePracticeSet(submissionId: string): Promise<Practic
     return { status: "failed", itemCount: 0, discardedCount: 0 };
   }
 
-  const verifiedItems: (PracticeItem & { verifiedBy: "sympy" | "llm" | "unverified" })[] = [];
-  let discardedCount = 0;
+  // Everything from here on used to be unguarded: a throw from the
+  // per-item verification loop or the two DB writes below propagated all
+  // the way up through the orchestrator with no stage_runs row ever
+  // written — found live, where callStructured's own success log (for the
+  // generation call itself) was the ONLY S7_practice row on record despite
+  // no practice_set ever landing in the DB. Wrapping this closes that
+  // blind spot: any failure here now degrades and logs, per CLAUDE.md rule 8.
+  try {
+    const verifiedItems: (PracticeItem & { verifiedBy: "sympy" | "llm" | "unverified" })[] = [];
+    let discardedCount = 0;
 
-  for (const item of generation.items) {
-    if (item.provenance.type === "retrieved") {
-      // Retrieved verbatim from the module's own corpus — trusted, no gate.
-      verifiedItems.push({ ...item, verifiedBy: "sympy" });
-      continue;
+    for (const item of generation.items) {
+      if (item.provenance.type === "retrieved") {
+        // Retrieved verbatim from the module's own corpus — trusted, no gate.
+        verifiedItems.push({ ...item, verifiedBy: "sympy" });
+        continue;
+      }
+      const { verified, verifiedBy } = await verifyGeneratedItem(item, submissionId);
+      if (verified) {
+        verifiedItems.push({ ...item, verifiedBy });
+      } else {
+        discardedCount += 1;
+      }
     }
-    const { verified, verifiedBy } = await verifyGeneratedItem(item, submissionId);
-    if (verified) {
-      verifiedItems.push({ ...item, verifiedBy });
-    } else {
-      discardedCount += 1;
-    }
-  }
 
-  if (verifiedItems.length === 0) {
+    if (verifiedItems.length === 0) {
+      await db.logStageRun({
+        submissionId,
+        stage: "S7_practice",
+        status: "failed",
+        error: `all ${generation.items.length} generated items failed verification`,
+      });
+      return { status: "failed", itemCount: 0, discardedCount };
+    }
+
+    const practiceSet = await db.createPracticeSet({
+      student_id: submission.student_id,
+      submission_id: submissionId,
+      target_misconception_ids: [misconception.id],
+    });
+
+    await db.insertPracticeItems(
+      verifiedItems.map((item, i) => ({
+        practice_set_id: (practiceSet as any).id,
+        position: i + 1,
+        difficulty: item.difficulty,
+        prompt_latex: item.prompt_latex,
+        solution_latex: item.solution_latex,
+        hint_ladder: item.hint_ladder,
+        targets_because: item.targets_because,
+        provenance: item.provenance,
+        verified: true,
+        verified_by: item.verifiedBy,
+      }))
+    );
+
+    await db.logStageRun({ submissionId, stage: "S7_practice", status: "succeeded", promptVersion: PROMPT_VERSIONS.s7Practice });
+
+    return { status: "generated", itemCount: verifiedItems.length, discardedCount };
+  } catch (err) {
     await db.logStageRun({
       submissionId,
       stage: "S7_practice",
       status: "failed",
-      error: `all ${generation.items.length} generated items failed verification`,
+      error: err instanceof Error ? err.message : String(err),
     });
-    return { status: "failed", itemCount: 0, discardedCount };
+    return { status: "failed", itemCount: 0, discardedCount: 0 };
   }
-
-  const practiceSet = await db.createPracticeSet({
-    student_id: submission.student_id,
-    submission_id: submissionId,
-    target_misconception_ids: [misconception.id],
-  });
-
-  await db.insertPracticeItems(
-    verifiedItems.map((item, i) => ({
-      practice_set_id: (practiceSet as any).id,
-      position: i + 1,
-      difficulty: item.difficulty,
-      prompt_latex: item.prompt_latex,
-      solution_latex: item.solution_latex,
-      hint_ladder: item.hint_ladder,
-      targets_because: item.targets_because,
-      provenance: item.provenance,
-      verified: true,
-      verified_by: item.verifiedBy,
-    }))
-  );
-
-  await db.logStageRun({ submissionId, stage: "S7_practice", status: "succeeded", promptVersion: PROMPT_VERSIONS.s7Practice });
-
-  return { status: "generated", itemCount: verifiedItems.length, discardedCount };
 }

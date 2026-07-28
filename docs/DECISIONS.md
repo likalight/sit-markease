@@ -2,6 +2,15 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Post-M9 — three live-only bugs found by actually running the deployed app end to end
+
+Every one of these was invisible in local dev and passed typecheck cleanly; only a real submission through the real Vercel deployment surfaced them.
+
+- **Every AI-calling stage was silently crashing on Vercel.** `src/lib/ai/cache.ts`'s disk write ran unconditionally after every real model call, with no error handling. Vercel's serverless filesystem is read-only outside `/tmp`; the write threw `EROFS` *after* a successful, real, billed AI response, and since nothing caught it, the whole stage (and everything after it) was recorded as failed even though the model call itself had worked. Fixed by making both `aiCache.get` and `aiCache.set` best-effort (`try`/`catch`, cache-miss-or-skip on any filesystem error) — caching is an optimisation, never load-bearing.
+- **The full S2-S7 pipeline reliably exceeded Vercel's default function timeout.** Seven-plus sequential real network calls (two transcription reads, reconcile, assess, diagnose, feedback, then practice generation with per-item verification) routinely run past a minute; the platform silently kills the function mid-pipeline with no exception ever reaching `stage_runs` — S7 in particular could show zero rows at all, not even a `failed` one, because the request was cut off before any of its own logging ran. Added `export const maxDuration = 300` to both routes that call `runFullPipeline` (`api/questions/[id]/submissions`, `api/submissions/[id]/process`).
+- **`generatePracticeSet`'s own body (verification loop + the two DB writes) had no try/catch.** A throw there propagated all the way up uncaught, so a real, successful AI generation call (`callStructured`'s own success log for the `S7_practice` stage) could exist in `stage_runs` while no `practice_sets` row was ever created — indistinguishable from success unless you checked the DB directly. Wrapped the whole body; any failure now logs a real `S7_practice` failure row instead of vanishing. Also fixed `getPracticeSetForSubmission`, which used `.maybeSingle()` and discarded the error — if a submission ever ended up with 2+ practice_sets rows (itself caused by this same bug racing the idempotency guard), the lookup silently returned "not found" and the guard would create yet another duplicate. Now orders by `created_at` and takes the most recent.
+- **Free-tier Gemini quota (20 requests/day) is a real, hard ceiling**, hit organically during this same round of live testing (`429 Too Many Requests`, `generate_content_free_tier_requests`). Not a bug — a genuine constraint of the free-tier `fast` role provider that will throttle real classroom usage almost immediately; a paid tier or a different `fast`-role provider is needed before any real cohort uses this.
+
 ## Post-M9 — went live: real OpenAI + Gemini, real Supabase, product renamed to Practica
 
 The M2 pivot above was explicitly temporary. This entry records switching it off for real:

@@ -410,12 +410,19 @@ export const db = {
 
   async getPracticeSetForSubmission(submissionId: string) {
     if (fx()) return localStore.findOne("practice_sets", (p: any) => p.submission_id === submissionId);
+    // .maybeSingle() throws if 2+ rows match, and since only `data` was ever
+    // destructured here, that error silently became "no practice set found"
+    // — which made generatePracticeSet's own idempotency guard think it was
+    // safe to create a duplicate on retry, compounding the problem. Ordering
+    // + limit(1) tolerates duplicates that already exist instead of hiding
+    // them as false negatives.
     const { data } = await supabaseAdmin()
       .from("practice_sets")
       .select("*")
       .eq("submission_id", submissionId)
-      .maybeSingle();
-    return data;
+      .order("created_at", { ascending: false })
+      .limit(1);
+    return data?.[0] ?? null;
   },
 
   async listPracticeItems(practiceSetId: string) {
