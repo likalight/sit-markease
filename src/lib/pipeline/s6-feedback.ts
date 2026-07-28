@@ -17,6 +17,12 @@ export async function generateFeedback(
   submissionId: string,
   tone: "supportive" | "concise" | "socratic" = "supportive"
 ): Promise<FeedbackResult> {
+  // Idempotency guard — see s2-transcribe.ts's identical guard.
+  const existingFeedback = await db.getFeedback(submissionId);
+  if (existingFeedback) {
+    return { status: "generated", feedbackId: (existingFeedback as any).id };
+  }
+
   const submission = await db.getSubmission(submissionId);
   const transcription = submission ? await db.getTranscription(submissionId) : null;
   const grade = submission ? await db.getGradeRecommendation(submissionId) : null;

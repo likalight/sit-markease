@@ -54,6 +54,34 @@ export const db = {
     return data;
   },
 
+  async createUser(row: { name: string; email: string; role: "educator" | "student" | "admin" }) {
+    if (fx()) return localStore.insert("users", row);
+    const { data, error } = await supabaseAdmin().from("users").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  // Used right after a real Supabase Auth signup, where our own `users` row
+  // must share the same id as the auth.users row Supabase already created.
+  async createUserWithId(id: string, row: { name: string; email: string; role: "educator" | "student" | "admin" }) {
+    if (fx()) return localStore.insert("users", { id, ...row });
+    const { data, error } = await supabaseAdmin().from("users").insert({ id, ...row }).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getUser(id: string) {
+    if (fx()) return localStore.get("users", id);
+    const { data } = await supabaseAdmin().from("users").select("*").eq("id", id).maybeSingle();
+    return data;
+  },
+
+  async listAllQuestions() {
+    if (fx()) return localStore.all("questions");
+    const { data } = await supabaseAdmin().from("questions").select("*");
+    return data ?? [];
+  },
+
   async listMisconceptions(moduleId: string) {
     if (fx()) return localStore.find("misconceptions", (m: any) => m.module_id === moduleId);
     const { data } = await supabaseAdmin().from("misconceptions").select("*").eq("module_id", moduleId);
@@ -64,6 +92,12 @@ export const db = {
     if (fx()) return localStore.insert("misconceptions", row);
     const { data, error } = await supabaseAdmin().from("misconceptions").insert(row).select("*").single();
     if (error) throw error;
+    return data;
+  },
+
+  async findModuleByCode(code: string) {
+    if (fx()) return localStore.findOne("modules", (m: any) => m.code === code);
+    const { data } = await supabaseAdmin().from("modules").select("*").eq("code", code).maybeSingle();
     return data;
   },
 
@@ -395,6 +429,66 @@ export const db = {
       .select("*")
       .eq("practice_set_id", practiceSetId)
       .order("position");
+    return data ?? [];
+  },
+
+  // One attempt per (practice_item, student) — a student revisiting a
+  // problem updates their existing attempt rather than creating a new row,
+  // so hints/response/outcome persist across visits instead of resetting.
+  async upsertPracticeAttempt(row: { practiceItemId: string; studentId: string; response?: string; hintsUsed?: number; outcome?: "correct" | "partial" | "incorrect" | null }) {
+    const existing = await this.getPracticeAttempt(row.practiceItemId, row.studentId);
+    const patch = {
+      response: row.response,
+      hints_used: row.hintsUsed,
+      outcome: row.outcome,
+    };
+    if (existing) {
+      if (fx()) return localStore.update("practice_attempts", (existing as any).id, patch);
+      const { data, error } = await supabaseAdmin()
+        .from("practice_attempts")
+        .update(patch)
+        .eq("id", (existing as any).id)
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    }
+    const insertRow = { practice_item_id: row.practiceItemId, student_id: row.studentId, ...patch };
+    if (fx()) return localStore.insert("practice_attempts", insertRow);
+    const { data, error } = await supabaseAdmin().from("practice_attempts").insert(insertRow).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getPracticeAttempt(practiceItemId: string, studentId: string) {
+    if (fx()) {
+      return localStore.findOne(
+        "practice_attempts",
+        (a: any) => a.practice_item_id === practiceItemId && a.student_id === studentId
+      );
+    }
+    const { data } = await supabaseAdmin()
+      .from("practice_attempts")
+      .select("*")
+      .eq("practice_item_id", practiceItemId)
+      .eq("student_id", studentId)
+      .maybeSingle();
+    return data;
+  },
+
+  async listPracticeAttemptsForItems(practiceItemIds: string[], studentId: string) {
+    if (practiceItemIds.length === 0) return [];
+    if (fx()) {
+      return localStore.find(
+        "practice_attempts",
+        (a: any) => practiceItemIds.includes(a.practice_item_id) && a.student_id === studentId
+      );
+    }
+    const { data } = await supabaseAdmin()
+      .from("practice_attempts")
+      .select("*")
+      .in("practice_item_id", practiceItemIds)
+      .eq("student_id", studentId);
     return data ?? [];
   },
 

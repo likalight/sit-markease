@@ -24,6 +24,15 @@ export default async function StudentFeedbackPage() {
       const feedback = await db.getFeedback(submission.id);
       if (!feedback || !grade) return null;
 
+      // CLAUDE.md rule 3: nothing reaches a student without explicit
+      // educator approval. grade.total_recommended is the AI's unapproved
+      // recommendation — until an educator approves it (writing a
+      // final_grades row), the student sees a pending card, not a mark.
+      const finalGrade = await db.getFinalGrade(submission.id);
+      if (!finalGrade) {
+        return { submissionId: submission.id, pending: true as const };
+      }
+
       const criteria = await db.listCriterionResults(grade.id);
       const question = await db.getQuestionWithRubric(submission.question_id);
       const nameByKey = Object.fromEntries((question?.criteria ?? []).map((c: any) => [c.key, c.name]));
@@ -59,8 +68,9 @@ export default async function StudentFeedbackPage() {
 
       return {
         submissionId: submission.id,
+        pending: false as const,
         feedbackId: (feedback as any).id,
-        total: grade.total_recommended,
+        total: (finalGrade as any).total,
         maxTotal: grade.max_total,
         criteria: criteria.map((c: any) => ({
           name: nameByKey[c.criterion_key] ?? c.criterion_key,
@@ -100,7 +110,15 @@ export default async function StudentFeedbackPage() {
 
       {visible.length === 0 && <p className="text-body-md text-muted">No feedback yet.</p>}
 
-      {visible.map((c) => (
+      {visible.map((c) =>
+        c.pending ? (
+          <div key={c.submissionId} className="flex flex-col gap-xs border-t border-hairline pt-xl">
+            <p className="text-body-md text-muted">
+              Your submission has been graded by Practica and is waiting on your teacher's review. Feedback
+              will appear here once it's approved.
+            </p>
+          </div>
+        ) : (
         <div key={c.submissionId} className="flex flex-col gap-xl border-t border-hairline pt-xl">
           <div className="flex items-baseline justify-between">
             <span className="font-serif text-display-md tabular-nums text-ink">
@@ -199,7 +217,8 @@ export default async function StudentFeedbackPage() {
 
           <FeedbackFlagButton feedbackId={c.feedbackId} />
         </div>
-      ))}
+        )
+      )}
     </main>
   );
 }

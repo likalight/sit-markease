@@ -5,6 +5,6 @@ numpy
 sympy
 antlr4-python3-runtime==4.11
 sentence-transformers
-pdf2image
+pypdfium2
 python-multipart
 pydantic

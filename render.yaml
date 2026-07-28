@@ -1,0 +1,16 @@
+# Render Blueprint — deploys the Python sidecar (line detection, symbolic
+# verification, embeddings) as an always-on web service. The Next.js app
+# itself is hosted separately on Vercel; this is only the piece Vercel's
+# serverless functions are the wrong shape for (persistent model loading,
+# heavier CPU work).
+services:
+  - type: web
+    name: practica-sidecar
+    runtime: docker
+    dockerfilePath: ./sidecar/Dockerfile
+    dockerContext: ./sidecar
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8000

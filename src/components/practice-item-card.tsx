@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MathText } from "./math";
 
 interface Props {
+  itemId: string;
   position: number;
   difficulty: "scaffold" | "target" | "extension";
   promptLatex: string;
@@ -12,20 +13,55 @@ interface Props {
   targetsBecause: string;
   provenance: { type: "retrieved" | "variant_of"; source_label: string };
   verifiedBy: "sympy" | "llm" | "unverified";
+  initialAttempt?: { response: string | null; hintsUsed: number; outcome: "correct" | "partial" | "incorrect" | null };
 }
 
 const DIFFICULTY_ORDER = ["scaffold", "target", "extension"] as const;
 
 // docs/DESIGN.md §3 `practice-item` — difficulty ramp, hint ladder,
-// solution gated behind an attempt, verification badge. Attempts aren't
-// persisted (§4.2 P1 — mastery model), purely client-side gating here.
+// solution gated behind an attempt, verification badge. Attempts persist
+// per (item, student) via /api/practice-items/:id/attempt — revisiting the
+// page restores where you left off instead of resetting to blank.
 export function PracticeItemCard(props: Props) {
-  const [attempt, setAttempt] = useState("");
-  const [hintsRevealed, setHintsRevealed] = useState(0);
-  const [showSolution, setShowSolution] = useState(false);
+  const [attempt, setAttempt] = useState(props.initialAttempt?.response ?? "");
+  const [hintsRevealed, setHintsRevealed] = useState(props.initialAttempt?.hintsUsed ?? 0);
+  const [showSolution, setShowSolution] = useState(!!props.initialAttempt?.outcome || (props.initialAttempt?.hintsUsed ?? 0) >= props.hintLadder.length && !!props.initialAttempt?.response);
+  const [outcome, setOutcome] = useState(props.initialAttempt?.outcome ?? null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hasAttempted = attempt.trim().length > 0;
   const filledSegments = DIFFICULTY_ORDER.indexOf(props.difficulty) + 1;
+
+  function save(patch: { response?: string; hintsUsed?: number; outcome?: "correct" | "partial" | "incorrect" | null }) {
+    fetch(`/api/practice-items/${props.itemId}/attempt`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }).catch(() => {}); // best-effort — losing a save shouldn't break the practice flow
+  }
+
+  function onAttemptChange(value: string) {
+    setAttempt(value);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => save({ response: value }), 600);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, []);
+
+  function revealHint() {
+    const next = Math.min(hintsRevealed + 1, props.hintLadder.length);
+    setHintsRevealed(next);
+    save({ hintsUsed: next });
+  }
+
+  function reportOutcome(next: "correct" | "partial" | "incorrect") {
+    setOutcome(next);
+    save({ outcome: next });
+  }
 
   return (
     <div className="flex flex-col gap-sm rounded-lg border border-hairline bg-canvas p-lg">
@@ -48,14 +84,14 @@ export function PracticeItemCard(props: Props) {
 
       <textarea
         value={attempt}
-        onChange={(e) => setAttempt(e.target.value)}
+        onChange={(e) => onAttemptChange(e.target.value)}
         placeholder="Try it here before revealing hints or the solution..."
         className="min-h-16 rounded-sm border border-hairline bg-canvas px-sm py-xs text-body-sm"
       />
 
       <div className="flex flex-wrap items-center gap-xs">
         <button
-          onClick={() => setHintsRevealed((n) => Math.min(n + 1, props.hintLadder.length))}
+          onClick={revealHint}
           disabled={hintsRevealed >= props.hintLadder.length}
           className="rounded-sm border border-hairline px-sm py-xs text-caption disabled:opacity-40"
         >
@@ -89,6 +125,21 @@ export function PracticeItemCard(props: Props) {
           <span className="inline-flex w-fit items-center gap-xxs rounded-pill bg-verified-soft px-xs py-[1px] text-caption text-verified">
             ✓ Checked {props.verifiedBy === "sympy" ? "symbolically" : props.verifiedBy === "llm" ? "by model" : ""}
           </span>
+
+          <div className="flex items-center gap-xs pt-xs">
+            <span className="text-caption text-muted-soft">How did you do?</span>
+            {(["correct", "partial", "incorrect"] as const).map((o) => (
+              <button
+                key={o}
+                onClick={() => reportOutcome(o)}
+                className={`rounded-pill border px-xs py-[1px] text-caption capitalize ${
+                  outcome === o ? "border-ink bg-ink text-on-dark" : "border-hairline text-muted"
+                }`}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

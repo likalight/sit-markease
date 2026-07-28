@@ -18,18 +18,29 @@ export default async function DashboardPage() {
 
       {user.role === "educator" && (
         <div className="flex flex-col gap-2">
-          <Link href="/setup" className="text-body-sm text-body underline">
-            Upload a submission →
-          </Link>
           <Link href="/review" className="text-body-sm text-body underline">
-            Review queue →
+            Review queue (uncertain cases only) →
+          </Link>
+          <Link href="/assignments" className="text-body-sm text-body underline">
+            Assignments you've issued →
+          </Link>
+          <Link href="/insights" className="text-body-sm text-body underline">
+            Class insights →
           </Link>
         </div>
       )}
       {user.role === "student" && (
-        <Link href="/feedback" className="text-body-sm text-body underline">
-          My feedback →
-        </Link>
+        <div className="flex flex-col gap-2">
+          <Link href="/submit" className="text-body-sm text-body underline">
+            Submit your work →
+          </Link>
+          <Link href="/feedback" className="text-body-sm text-body underline">
+            My feedback →
+          </Link>
+          <Link href="/exam-prep" className="text-body-sm text-body underline">
+            Exam prep →
+          </Link>
+        </div>
       )}
 
       <form action={signOutAction}>

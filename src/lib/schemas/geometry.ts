@@ -21,3 +21,9 @@ export const DetectLinesResponseSchema = z.object({
   source: z.enum(["opencv", "paddle", "commercial"]),
 });
 export type DetectLinesResponse = z.infer<typeof DetectLinesResponseSchema>;
+
+export const PdfToImagesResponseSchema = z.object({
+  images_b64: z.array(z.string()),
+  page_count: z.number(),
+});
+export type PdfToImagesResponse = z.infer<typeof PdfToImagesResponseSchema>;

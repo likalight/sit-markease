@@ -33,6 +33,7 @@ export interface StoreSchema {
   resource_chunks: any[];
   practice_sets: any[];
   practice_items: any[];
+  practice_attempts: any[];
   stage_runs: any[];
   audit_log: any[];
 }
@@ -60,6 +61,7 @@ const TABLES: (keyof StoreSchema)[] = [
   "resource_chunks",
   "practice_sets",
   "practice_items",
+  "practice_attempts",
   "stage_runs",
   "audit_log",
 ];

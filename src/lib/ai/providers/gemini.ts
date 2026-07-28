@@ -55,9 +55,13 @@ export class GeminiClient implements LLMClient {
     const latencyMs = Date.now() - start;
 
     const text = result.response.text();
+    // responseSchema doesn't always stop the model wrapping output in a
+    // markdown code fence (observed in practice on gemini-flash-latest) —
+    // strip that before parsing rather than trusting the schema alone.
+    const stripped = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
     let parsedJson: unknown;
     try {
-      parsedJson = JSON.parse(text);
+      parsedJson = JSON.parse(stripped);
     } catch (err) {
       throw new ModelCallError(`Gemini returned non-JSON despite responseSchema: ${text.slice(0, 200)}`, err);
     }

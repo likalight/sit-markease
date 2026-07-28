@@ -12,7 +12,6 @@
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { localFiles } from "../src/lib/storage/local-files";
 import { db } from "../src/lib/db/facade";
 import { sidecar } from "../src/lib/sidecar/client";
 import { aiCache, cacheKey, hashImage } from "../src/lib/ai/cache";
@@ -38,11 +37,17 @@ import type { Assessment } from "../src/lib/schemas/assessment";
 import type { Diagnosis } from "../src/lib/schemas/diagnosis";
 import type { Feedback } from "../src/lib/schemas/feedback";
 import type { PracticeGeneration } from "../src/lib/schemas/practice";
-import { DEFAULT_MODEL as GEMINI_DEFAULT_MODEL } from "../src/lib/ai/providers/gemini";
-import { DEFAULT_MODEL as GROQ_DEFAULT_MODEL } from "../src/lib/ai/providers/groq";
+import { providerNameForRole, defaultModelFor } from "../src/lib/ai/client";
 
-const GEMINI_MODEL = process.env.AIMS_GEMINI_MODEL ?? GEMINI_DEFAULT_MODEL;
-const GROQ_MODEL = process.env.AIMS_GROQ_MODEL ?? GROQ_DEFAULT_MODEL;
+// Computed from the same role->provider resolution the real pipeline uses
+// (src/lib/ai/client.ts), not hardcoded — a hardcoded copy is exactly what
+// silently broke this fixture cache the last time the default providers
+// changed (see docs/DECISIONS.md). S2 read A / S4 / S6 / S7 all run on the
+// `primary` role; S2 read B / S5 run on `fast`.
+const PRIMARY_PROVIDER = providerNameForRole("primary");
+const PRIMARY_MODEL = defaultModelFor(PRIMARY_PROVIDER);
+const FAST_PROVIDER = providerNameForRole("fast");
+const FAST_MODEL = defaultModelFor(FAST_PROVIDER);
 const GOLD_DIR = path.join(process.cwd(), "eval", "gold");
 const LINE_COUNT = 4;
 
@@ -343,21 +348,23 @@ async function main() {
       continue;
     }
 
-    const processedBytes = localFiles.read(`${ids.submissionId}/processed.png`);
+    const pages = await db.listSubmissionPages(ids.submissionId);
+    const firstPage = pages.find((p: any) => p.page_index === 0) ?? pages[0];
+    const processedBytes = await db.downloadImage(firstPage.processed_path);
     const imageHash = hashImage(processedBytes.toString("base64"));
 
     const readASystem = s2ReadASystemPrompt();
     const readAPrompt = s2ReadAUserPrompt(LINE_COUNT);
     const keyA = cacheKey({
       promptVersion: PROMPT_VERSIONS.s2ReadA,
-      provider: "gemini",
-      model: GEMINI_MODEL,
+      provider: PRIMARY_PROVIDER,
+      model: PRIMARY_MODEL,
       system: readASystem,
       prompt: readAPrompt,
       imageHashes: [imageHash],
     });
     aiCache.seed(
-      { promptVersion: PROMPT_VERSIONS.s2ReadA, provider: "gemini", model: GEMINI_MODEL, system: readASystem, prompt: readAPrompt, imageHashes: [imageHash] },
+      { promptVersion: PROMPT_VERSIONS.s2ReadA, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system: readASystem, prompt: readAPrompt, imageHashes: [imageHash] },
       fixture.readA
     );
 
@@ -365,14 +372,14 @@ async function main() {
     const readBPrompt = s2ReadBUserPrompt(LINE_COUNT);
     const keyB = cacheKey({
       promptVersion: PROMPT_VERSIONS.s2ReadB,
-      provider: "groq",
-      model: GROQ_MODEL,
+      provider: FAST_PROVIDER,
+      model: FAST_MODEL,
       system: readBSystem,
       prompt: readBPrompt,
       imageHashes: [imageHash],
     });
     aiCache.seed(
-      { promptVersion: PROMPT_VERSIONS.s2ReadB, provider: "groq", model: GROQ_MODEL, system: readBSystem, prompt: readBPrompt, imageHashes: [imageHash] },
+      { promptVersion: PROMPT_VERSIONS.s2ReadB, provider: FAST_PROVIDER, model: FAST_MODEL, system: readBSystem, prompt: readBPrompt, imageHashes: [imageHash] },
       fixture.readB
     );
 
@@ -409,8 +416,8 @@ async function main() {
       symbolicCheck,
     });
 
-    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: "gemini", model: GEMINI_MODEL, system, prompt });
-    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: "gemini", model: GEMINI_MODEL, system, prompt }, assessment);
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt }, assessment);
     console.log(`  seeded S4 fixture for ${goldId} (symbolic=${symbolicCheck}, key ${key.slice(0, 8)}…)`);
   }
 
@@ -438,8 +445,8 @@ async function main() {
       taxonomy: taxonomy.map((t: any) => ({ key: t.key, name: t.name, typical_signature: t.typical_signature, description: t.description })),
     });
 
-    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s5Diagnose, provider: "groq", model: GROQ_MODEL, system, prompt });
-    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s5Diagnose, provider: "groq", model: GROQ_MODEL, system, prompt }, diagnosis);
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s5Diagnose, provider: FAST_PROVIDER, model: FAST_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s5Diagnose, provider: FAST_PROVIDER, model: FAST_MODEL, system, prompt }, diagnosis);
     console.log(`  seeded S5 fixture for ${goldId} (${diagnosis.detected.length} detected, key ${key.slice(0, 8)}…)`);
   }
 
@@ -478,8 +485,8 @@ async function main() {
       tone: "supportive",
     });
 
-    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: "gemini", model: GEMINI_MODEL, system, prompt });
-    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: "gemini", model: GEMINI_MODEL, system, prompt }, feedback);
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt }, feedback);
     console.log(`  seeded S6 fixture for ${goldId} (key ${key.slice(0, 8)}…)`);
   }
 
@@ -507,7 +514,7 @@ async function main() {
     const resourceLabelById = new Map(resources.map((r: any) => [r.id, r.label]));
 
     const retrievalQuery = `${misconception.description} ${topTag.observed_signature} ${(question.topic_tags ?? []).join(" ")}`;
-    const retrieved = retrieveChunks(retrievalQuery, chunks, 4);
+    const retrieved = await retrieveChunks(retrievalQuery, chunks, 4);
 
     const system = s7PracticeSystemPrompt();
     const prompt = s7PracticeUserPrompt({
@@ -518,8 +525,8 @@ async function main() {
       retrievedItems: retrieved.map((c: any) => ({ label: resourceLabelById.get(c.resource_id) ?? "unknown source", content: c.content })),
     });
 
-    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s7Practice, provider: "gemini", model: GEMINI_MODEL, system, prompt });
-    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s7Practice, provider: "gemini", model: GEMINI_MODEL, system, prompt }, generation);
+    const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s7Practice, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt });
+    aiCache.seed({ promptVersion: PROMPT_VERSIONS.s7Practice, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt }, generation);
     console.log(`  seeded S7 fixture for ${goldId} (${generation.items.length} items, key ${key.slice(0, 8)}…)`);
   }
 

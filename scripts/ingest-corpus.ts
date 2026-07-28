@@ -10,8 +10,8 @@
  * Run with `npm run ingest-corpus`. Idempotent — safe to re-run.
  */
 import "dotenv/config";
-import { localStore } from "../src/lib/db/local-store";
 import { db } from "../src/lib/db/facade";
+import { sidecar } from "../src/lib/sidecar/client";
 
 const CHUNKS = [
   {
@@ -68,7 +68,7 @@ const CHUNKS = [
 ];
 
 async function main() {
-  const module_ = localStore.findOne("modules", (m: any) => m.code === "ENG1001");
+  const module_ = await db.findModuleByCode("ENG1001");
   if (!module_) {
     throw new Error("no seeded module found — run `npm run seed` first");
   }
@@ -79,7 +79,18 @@ async function main() {
     return;
   }
 
-  for (const chunk of CHUNKS) {
+  let embeddings: number[][] | null = null;
+  try {
+    const result = await sidecar.embed(CHUNKS.map((c) => c.content));
+    embeddings = result.vectors;
+  } catch (err) {
+    // Degrade, don't block ingestion — src/lib/rag/retrieve.ts falls back to
+    // keyword scoring for chunks with no stored embedding, and will embed
+    // them lazily on first retrieval anyway if the sidecar comes back up.
+    console.warn(`  embedding failed (${err instanceof Error ? err.message : err}) — storing chunks without vectors`);
+  }
+
+  for (const [i, chunk] of CHUNKS.entries()) {
     const resource = await db.insertResource({
       module_id: module_.id,
       kind: chunk.kind,
@@ -94,7 +105,7 @@ async function main() {
         chunk_index: 0,
         content: chunk.content,
         concepts_required: chunk.concepts_required,
-        embedding: null,
+        embedding: embeddings ? embeddings[i] : null,
       },
     ]);
     console.log(`  ingested "${chunk.label}" (${chunk.difficulty})`);

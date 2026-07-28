@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Box } from "@/lib/schemas/geometry";
 
 type UploadResult = {
@@ -10,30 +11,35 @@ type UploadResult = {
   skewDeg: number;
   qualityScore: number;
   detector: string;
+  pageCount: number;
+  pipeline: {
+    status: string;
+    assess: { status: string };
+    diagnose: { status: string };
+    autoReleased: boolean;
+  };
 };
 
-// M1 acceptance-criterion viewer: upload a photo, show the deskewed result's
-// line boxes overlaid on the original image. This is not the full E3 review
-// console (that's M5) — just enough to prove S1/S1b work end-to-end.
+// Student self-submit viewer: upload a photo, show the deskewed result's
+// line boxes, then run the rest of the pipeline (S2-S7, see the upload
+// route) which auto-releases the grade if it's confident enough — no
+// waiting on an educator unless the two reads actually disagreed.
 export function UploadAndViewer({ questionId }: { questionId: string }) {
+  const router = useRouter();
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function submitFile(file: File | undefined) {
+    if (!file) {
+      setError("choose a photo or file first");
+      return;
+    }
     setError(null);
     setLoading(true);
     setResult(null);
-
-    const form = e.currentTarget;
-    const fileInput = form.elements.namedItem("file") as HTMLInputElement;
-    const file = fileInput.files?.[0];
-    if (!file) {
-      setError("choose an image first");
-      setLoading(false);
-      return;
-    }
 
     const body = new FormData();
     body.append("file", file);
@@ -55,18 +61,51 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
     }
   }
 
+  const pipelineStatus = result?.pipeline?.status;
+  const needsHumanTranscription = pipelineStatus === "needs_human_transcription";
+  const pipelineFailed = pipelineStatus === "failed";
+  const autoReleased = !!result?.pipeline?.autoReleased;
+  const needsEducatorReview = !!result && !needsHumanTranscription && !pipelineFailed && !autoReleased;
+
   return (
     <div className="flex flex-col gap-lg">
-      <form onSubmit={handleSubmit} className="flex items-center gap-sm">
-        <input type="file" name="file" accept="image/*" className="text-body-sm" />
+      <div className="flex flex-wrap items-center gap-sm">
+        {/* capture="environment" opens the camera directly on a phone,
+            instead of the OS's generic file picker. Desktop browsers ignore
+            capture, so this button just opens a normal file dialog there. */}
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => submitFile(e.target.files?.[0])}
+        />
         <button
-          type="submit"
+          type="button"
           disabled={loading}
+          onClick={() => cameraInputRef.current?.click()}
           className="rounded-sm bg-ink px-sm py-xs text-body-sm font-medium text-on-dark disabled:opacity-50"
         >
-          {loading ? "Processing…" : "Upload"}
+          {loading ? "Processing…" : "Take a photo"}
         </button>
-      </form>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,application/pdf"
+          className="hidden"
+          onChange={(e) => submitFile(e.target.files?.[0])}
+        />
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => fileInputRef.current?.click()}
+          className="rounded-sm border border-hairline px-sm py-xs text-body-sm text-body disabled:opacity-50"
+        >
+          Upload a file instead
+        </button>
+      </div>
 
       {error && (
         <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
@@ -75,10 +114,11 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
       )}
 
       {result && (
-        <div className="flex flex-col gap-xs">
+        <div className="flex flex-col gap-sm">
           <p className="text-body-sm text-muted">
             skew: {result.skewDeg.toFixed(2)}° · quality: {result.qualityScore.toFixed(2)} ·
             detector: {result.detector} · {result.boxes.length} line(s) detected
+            {result.pageCount > 1 && ` · ${result.pageCount} pages uploaded (grading currently uses page 1)`}
           </p>
           <div className="relative inline-block rounded-lg bg-surface-dark p-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -96,6 +136,40 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
               />
             ))}
           </div>
+
+          {autoReleased && (
+            <div className="flex items-center gap-sm rounded-sm border border-verified/30 bg-verified-soft px-sm py-xs">
+              <p className="text-body-sm text-verified">Graded instantly — both reads agreed.</p>
+              <button
+                type="button"
+                onClick={() => router.push("/feedback")}
+                className="rounded-sm bg-ink px-sm py-xs text-body-sm font-medium text-on-dark"
+              >
+                See your feedback
+              </button>
+            </div>
+          )}
+
+          {needsEducatorReview && (
+            <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
+              The two reads disagreed, so this one needs a quick educator check before it's released. You'll
+              see it on your feedback page as soon as that's done.
+            </p>
+          )}
+
+          {needsHumanTranscription && (
+            <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
+              The two transcription reads disagreed too much to trust automatically — this submission needs a
+              human to transcribe it before it can be graded.
+            </p>
+          )}
+
+          {pipelineFailed && (
+            <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
+              Processing failed after transcription — check stage_runs for details. The submission was still
+              saved.
+            </p>
+          )}
         </div>
       )}
     </div>

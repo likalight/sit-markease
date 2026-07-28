@@ -41,7 +41,11 @@ export default {
         "neutral-low": "var(--color-neutral-low)",
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Newsreader", "serif"],
+        // NOTE: the `serif` key is a naming holdover from design-system v1.
+        // --font-serif now loads Space Grotesk (bold/geometric), not a serif
+        // — kept as-is rather than renaming across every component that
+        // already uses `font-serif` for display headlines.
+        serif: ["var(--font-serif)", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
@@ -70,17 +74,18 @@ export default {
         section: "80px",
       },
       borderRadius: {
-        xs: "4px",
-        sm: "6px",
-        md: "8px",
-        lg: "12px",
-        xl: "16px",
+        // Tighter than v1 — blockier, matching the squared-off SIT mark.
+        xs: "2px",
+        sm: "3px",
+        md: "4px",
+        lg: "6px",
+        xl: "8px",
         pill: "9999px",
       },
       boxShadow: {
         flat: "none",
-        raised: "0 1px 2px rgba(21,20,15,0.06)",
-        overlay: "0 8px 24px rgba(21,20,15,0.12)",
+        raised: "0 1px 2px rgba(11,11,12,0.08)",
+        overlay: "0 8px 24px rgba(11,11,12,0.18)",
       },
     },
   },

@@ -50,6 +50,18 @@ export interface TranscribeResult {
  * Degrades rather than throws (CLAUDE.md rule 8) — on failure the submission
  * is marked 'failed' and a stage_runs row records why. */
 export async function transcribeSubmission(submissionId: string): Promise<TranscribeResult> {
+  // Idempotency guard: re-running this on a submission that already has a
+  // transcription must not create a second row — Supabase's .maybeSingle()
+  // correctly errors on 2+ matches (the local JSON store silently didn't,
+  // which is how this went unnoticed until real duplicate rows surfaced in
+  // Supabase). Callers that want a fresh re-transcription should delete the
+  // existing row first, not rely on this function to do it implicitly.
+  const existing = await db.getTranscription(submissionId);
+  if (existing) {
+    const submission = await db.getSubmission(submissionId);
+    return { status: (submission?.status as TranscribeResult["status"]) ?? "ready_for_review", transcriptionId: (existing as any).id };
+  }
+
   const pages = await db.listSubmissionPages(submissionId);
   const page = pages[0];
   if (!page) {

@@ -15,7 +15,6 @@
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { localStore } from "../src/lib/db/local-store";
 import { db } from "../src/lib/db/facade";
 import { ingestSubmission } from "../src/lib/pipeline/s1-ingest";
 import { transcribeSubmission } from "../src/lib/pipeline/s2-transcribe";
@@ -129,11 +128,11 @@ async function runDualReadAblation(results: GoldResult[]): Promise<string[]> {
 }
 
 async function main() {
-  const question = localStore.findOne("questions", (q: any) => q.position === 1);
+  const question = await db.getFirstQuestion();
   if (!question) {
     throw new Error("no seeded question found — run `npm run seed` first");
   }
-  const student = localStore.findOne("users", (u: any) => u.role === "student");
+  const student = await db.findUserByRole("student");
   const module_ = await db.getModuleForQuestion(question.id);
   const resources = module_ ? await db.listResources(module_.id) : [];
   if (resources.length === 0) {

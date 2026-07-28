@@ -10,17 +10,17 @@
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { localStore } from "../src/lib/db/local-store";
+import { db } from "../src/lib/db/facade";
 import { ingestSubmission } from "../src/lib/pipeline/s1-ingest";
 
 const GOLD_DIR = path.join(process.cwd(), "eval", "gold");
 
 async function main() {
-  const question = localStore.findOne("questions", (q: any) => q.position === 1);
+  const question = await db.getFirstQuestion();
   if (!question) {
     throw new Error("no seeded question found — run `npm run seed` first");
   }
-  const student = localStore.findOne("users", (u: any) => u.role === "student");
+  const student = await db.findUserByRole("student");
 
   const goldFiles = fs.readdirSync(GOLD_DIR).filter((f) => f.endsWith(".json") && f !== "submission-ids.json");
   const mapping: Record<string, { submissionId: string; pageId: string }> = {};

@@ -5,21 +5,38 @@ import { ModelCallError } from "./types";
 import type { CompleteOptions, ImageInput, LLMClient } from "./types";
 import { GeminiClient, DEFAULT_MODEL as GEMINI_DEFAULT_MODEL } from "./providers/gemini";
 import { GroqClient, DEFAULT_MODEL as GROQ_DEFAULT_MODEL } from "./providers/groq";
+import { OpenAIClient, DEFAULT_MODEL as OPENAI_DEFAULT_MODEL } from "./providers/openai";
 import type { ZodType } from "zod";
 
 // The single seam every pipeline stage calls through. Provider selection is
 // an env-var lookup; nothing above this file ever imports a vendor SDK.
-// docs/DECISIONS.md "M2 — free-tier providers".
+// docs/DECISIONS.md "M2 — free-tier providers" / later entry: OpenAI added
+// as the `primary` role once a real key was available, replacing Groq as
+// the second dual-read vendor — Gemini now covers `fast`. Groq's client
+// stays in the codebase (still usable via env var) but is no longer the
+// default anywhere.
 
 export type ModelRole = "primary" | "fast" | "adjudicator";
 
-function providerNameForRole(role: ModelRole): string {
+// Exported so anything that needs to compute a cache key exactly as the
+// real pipeline would (scripts/seed-ai-fixtures.ts) reads it from here
+// instead of re-hardcoding provider names — a hardcoded copy is exactly
+// what silently broke the gold-script demo cache the last time the default
+// providers changed (docs/DECISIONS.md).
+export function providerNameForRole(role: ModelRole): string {
   const key = {
     primary: "AIMS_PROVIDER_PRIMARY",
     fast: "AIMS_PROVIDER_FAST",
     adjudicator: "AIMS_PROVIDER_ADJUDICATOR",
   }[role];
-  return process.env[key] ?? (role === "fast" ? "groq" : "gemini");
+  return process.env[key] ?? (role === "fast" ? "gemini" : "openai");
+}
+
+export function defaultModelFor(providerName: string): string {
+  if (providerName === "gemini") return process.env.AIMS_GEMINI_MODEL ?? GEMINI_DEFAULT_MODEL;
+  if (providerName === "groq") return process.env.AIMS_GROQ_MODEL ?? GROQ_DEFAULT_MODEL;
+  if (providerName === "openai") return process.env.AIMS_OPENAI_MODEL ?? OPENAI_DEFAULT_MODEL;
+  throw new ModelCallError(`unknown provider "${providerName}" — check AIMS_PROVIDER_* env vars`);
 }
 
 let cachedClients: Partial<Record<string, LLMClient>> = {};
@@ -37,6 +54,10 @@ function getClient(role: ModelRole): LLMClient {
     const apiKey = process.env.AIMS_GROQ_API_KEY;
     if (!apiKey) throw new ModelCallError("AIMS_GROQ_API_KEY is not set");
     client = new GroqClient(apiKey, process.env.AIMS_GROQ_MODEL, numEnv("AIMS_GROQ_RPM", 25));
+  } else if (providerName === "openai") {
+    const apiKey = process.env.AIMS_OPENAI_API_KEY;
+    if (!apiKey) throw new ModelCallError("AIMS_OPENAI_API_KEY is not set");
+    client = new OpenAIClient(apiKey, process.env.AIMS_OPENAI_MODEL, numEnv("AIMS_OPENAI_RPM", 60));
   } else {
     throw new ModelCallError(`unknown provider "${providerName}" — check AIMS_PROVIDER_* env vars`);
   }
@@ -69,10 +90,7 @@ export async function callStructured<T>(args: CallStructuredArgs<T>): Promise<T>
   // Resolve provider/model WITHOUT constructing a client — that needs an API
   // key, and a cache hit (or fixture-mode miss) must not require one.
   const providerName = providerNameForRole(args.role);
-  const model =
-    providerName === "gemini"
-      ? (process.env.AIMS_GEMINI_MODEL ?? GEMINI_DEFAULT_MODEL)
-      : (process.env.AIMS_GROQ_MODEL ?? GROQ_DEFAULT_MODEL);
+  const model = defaultModelFor(providerName);
 
   const imageHashes = (args.images ?? []).map((img) => hashImage(img.base64));
   const key = cacheKey({
@@ -100,8 +118,8 @@ export async function callStructured<T>(args: CallStructuredArgs<T>): Promise<T>
     return cached.data as T;
   }
 
-  if (env.isFixtureMode()) {
-    const message = `fixture mode: no cached response for stage=${args.stage} promptVersion=${args.promptVersion} (key ${key.slice(0, 12)}…) — seed local-data/ai-cache first`;
+  if (!env.isAiLive()) {
+    const message = `AIMS_AI_LIVE is not set: no cached response for stage=${args.stage} promptVersion=${args.promptVersion} (key ${key.slice(0, 12)}…) — seed local-data/ai-cache, or set AIMS_AI_LIVE=true with real provider keys`;
     await db.logStageRun({
       submissionId: args.submissionId,
       stage: args.stage,

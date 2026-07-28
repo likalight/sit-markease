@@ -44,6 +44,14 @@ export interface AssessResult {
  * throws (CLAUDE.md rule 8) — on failure the submission is left as-is and a
  * stage_runs row records why; a human can still assess manually. */
 export async function assessSubmission(submissionId: string): Promise<AssessResult> {
+  // Idempotency guard — see s2-transcribe.ts's identical guard for why this
+  // matters against Supabase specifically (.maybeSingle() errors on 2+ rows,
+  // where the local store silently didn't).
+  const existingGrade = await db.getGradeRecommendation(submissionId);
+  if (existingGrade) {
+    return { status: "assessed", gradeRecommendationId: (existingGrade as any).id };
+  }
+
   const submission = await db.getSubmission(submissionId);
   if (!submission) {
     await db.logStageRun({ submissionId, stage: "S4_assess", status: "failed", error: "submission not found" });

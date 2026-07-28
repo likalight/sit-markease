@@ -13,7 +13,11 @@ export const localFiles = {
   },
 
   read(relativePath: string): Buffer {
-    return fs.readFileSync(path.join(UPLOADS_DIR, relativePath));
+    const fullPath = path.resolve(UPLOADS_DIR, relativePath);
+    if (fullPath !== UPLOADS_DIR && !fullPath.startsWith(UPLOADS_DIR + path.sep)) {
+      throw new Error("path escapes uploads directory");
+    }
+    return fs.readFileSync(fullPath);
   },
 
   // Served via src/app/api/local-files/[...path]/route.ts

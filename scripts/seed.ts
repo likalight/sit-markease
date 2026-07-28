@@ -299,6 +299,16 @@ async function seedSupabase() {
     console.log(`  rubric already exists (${existingRubric.id})`);
   }
 
+  const { data: existingTaxonomy } = await admin.from("misconceptions").select("id").eq("module_id", moduleId);
+  if (!existingTaxonomy || existingTaxonomy.length === 0) {
+    const taxonomy = MISCONCEPTION_TAXONOMY.map((m) => ({ module_id: moduleId, status: "active", ...m }));
+    const { error } = await admin.from("misconceptions").insert(taxonomy);
+    if (error) throw error;
+    console.log(`  seeded ${taxonomy.length} misconceptions (§13 taxonomy)`);
+  } else {
+    console.log(`  misconception taxonomy already seeded (${existingTaxonomy.length} entries)`);
+  }
+
   console.log("\nSeed complete (Supabase).");
 }
 

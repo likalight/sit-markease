@@ -1,32 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { transcribeSubmission } from "@/lib/pipeline/s2-transcribe";
-import { assessSubmission } from "@/lib/pipeline/s4-assess";
-import { diagnoseSubmission } from "@/lib/pipeline/s5-diagnose";
-import { generateFeedback } from "@/lib/pipeline/s6-feedback";
-import { generatePracticeSet } from "@/lib/pipeline/s7-practice";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { runFullPipeline } from "@/lib/pipeline/orchestrator";
 
 // §10 — POST /api/submissions/:id/process
 // Runs S2 (dual-read) + S3 (reconcile) + S4 (assess) + S5 (diagnose) + S6
 // (feedback) + S7 (targeted practice).
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id: submissionId } = await params;
-  const transcribeResult = await transcribeSubmission(submissionId);
-
-  if (transcribeResult.status === "needs_human_transcription" || transcribeResult.status === "failed") {
-    return NextResponse.json(transcribeResult);
+  const user = await getCurrentUser();
+  if (!user || user.role !== "educator") {
+    return NextResponse.json({ error: { code: "FORBIDDEN", message: "educator role required" } }, { status: 403 });
   }
 
-  const assessResult = await assessSubmission(submissionId);
-  const diagnoseResult = assessResult.status === "assessed" ? await diagnoseSubmission(submissionId) : { status: "failed" };
-  const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId) : { status: "failed" };
-  const practiceResult =
-    diagnoseResult.status === "diagnosed" ? await generatePracticeSet(submissionId) : { status: "failed" };
-
-  return NextResponse.json({
-    ...transcribeResult,
-    assess: assessResult,
-    diagnose: diagnoseResult,
-    feedback: feedbackResult,
-    practice: practiceResult,
-  });
+  const { id: submissionId } = await params;
+  const result = await runFullPipeline(submissionId);
+  return NextResponse.json(result);
 }

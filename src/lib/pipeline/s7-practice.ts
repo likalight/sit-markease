@@ -43,6 +43,13 @@ async function verifyGeneratedItem(item: PracticeItem, submissionId: string): Pr
 }
 
 export async function generatePracticeSet(submissionId: string): Promise<PracticeResult> {
+  // Idempotency guard — see s2-transcribe.ts's identical guard.
+  const existingSet = await db.getPracticeSetForSubmission(submissionId);
+  if (existingSet) {
+    const items = await db.listPracticeItems((existingSet as any).id);
+    return { status: "generated", itemCount: items.length, discardedCount: 0 };
+  }
+
   const submission = await db.getSubmission(submissionId);
   if (!submission) {
     await db.logStageRun({ submissionId, stage: "S7_practice", status: "failed", error: "submission not found" });
@@ -78,7 +85,7 @@ export async function generatePracticeSet(submissionId: string): Promise<Practic
   const resourceLabelById = new Map(resources.map((r: any) => [r.id, r.label]));
 
   const retrievalQuery = `${misconception.description} ${topTag.observed_signature} ${(question?.topic_tags ?? []).join(" ")}`;
-  const retrieved = retrieveChunks(retrievalQuery, chunks, 4);
+  const retrieved = await retrieveChunks(retrievalQuery, chunks, 4);
 
   let generation;
   try {

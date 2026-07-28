@@ -8,8 +8,11 @@ the demo (`npm run sidecar:dev`).
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+import base64
+
 import cv
 import embed as embed_module
+import pdf as pdf_module
 import symbolic
 
 app = FastAPI(title="AIMS sidecar")
@@ -67,6 +70,22 @@ class VerifyItemRequest(BaseModel):
 @app.post("/math/verify-item")
 def math_verify_item(req: VerifyItemRequest):
     return symbolic.verify_item(req.prompt, req.solution)
+
+
+class PdfToImagesRequest(BaseModel):
+    pdf_b64: str
+
+
+@app.post("/pdf/to-images")
+def pdf_to_images(req: PdfToImagesRequest):
+    try:
+        pdf_bytes = base64.b64decode(req.pdf_b64)
+        images_b64 = pdf_module.pdf_to_page_images_b64(pdf_bytes)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"pdf conversion failed: {e}")
+    if not images_b64:
+        raise HTTPException(status_code=400, detail="pdf had no pages")
+    return {"images_b64": images_b64, "page_count": len(images_b64)}
 
 
 class EmbedRequest(BaseModel):

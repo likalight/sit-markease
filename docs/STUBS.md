@@ -2,6 +2,23 @@
 
 Anything not fully implemented, listed immediately as it's introduced.
 
+## Post-M9 — went live (current, as of the OpenAI/Gemini/Supabase migration)
+
+Several stubs below are now stale — corrected here rather than rewritten in place, so the log stays an honest record of what was true when written:
+- **M2's "no live keys" and "Supabase untouched/unverified"** (below) no longer apply: OpenAI + Gemini are both live (`AIMS_AI_LIVE=true`), and Supabase is a real, running project — schema, storage, and Auth all verified directly, not assumed.
+- **M7's "retrieval is keyword-only, no embeddings"** (below) no longer applies: `sentence-transformers` is installed and `src/lib/rag/retrieve.ts` ranks by real cosine similarity, with keyword scoring only as a failure fallback.
+- **M1's "PDF ingestion is not wired"** (below) no longer applies: PDF upload works via `pypdfium2` — see docs/DECISIONS.md. Still true: only the first page of a multi-page PDF is graded.
+- **M8's "practice attempts are purely client-side, nothing persisted"** (below) no longer applies: `practice_attempts` is wired end-to-end (`db.upsertPracticeAttempt`, `PUT /api/practice-items/:id/attempt`).
+
+Genuinely still open:
+- **Multi-page grading.** Every PDF page is stored, but transcription/assessment only ever reads page 0. A real multi-page submission needs the transcription layer to pass every page's image into one dual-read call — not done.
+- **No automatic tie-breaker.** The `adjudicator` role exists in `src/lib/ai/client.ts`'s role type and env vars but nothing ever calls it — every dual-read disagreement goes straight to the educator queue with no automated attempt to resolve it first.
+- **Educators can't author questions/rubrics/taxonomies through the app.** Everything is seeded via `scripts/seed.ts`/`ingest-corpus.ts`. The §4.1 E1 "paste a rubric, AI structures it" screen still doesn't exist (see the M9-era entry below — still true).
+- **`diagnoseSubmission` isn't idempotency-guarded** the way the other four stages now are (see docs/DECISIONS.md) — it inserts an array rather than reading with `.single()`, so a re-run doesn't crash, but it does double up `misconception_tags` rows rather than being a safe no-op.
+- **No rate limiting on signup or submission endpoints.** Nothing stops repeated hits beyond the AI provider's own per-provider RPM throttle.
+- **No accessibility or narrow-viewport pass** on the new design system or dashboards (assignments/insights/exam-prep) — never audited for contrast, keyboard nav, focus states, or a phone-width layout.
+- **`eval/run.ts`'s M10 (pipeline latency) caveat is now stale-worded** ("would need live provider keys" — it has them now), but the harness still runs against the AI cache for reproducibility, so it still doesn't report real network latency. Would need a separate, explicitly-uncached run to measure that honestly.
+
 ## Rebrand + design system (docs/DESIGN.md)
 
 - The `/demo` and `/demo/student` instant-demo routes only auto-authenticate in `AIMS_FIXTURE_MODE=true` (they redirect to `/login` otherwise) — there's no safe way to auto-create a real Supabase session without real credentials. Their "instant, pre-populated" guarantee also depends on `npm run seed && npm run ingest-corpus && npm run seed-gold && npm run seed-ai-fixtures` having already been run at least once (README documents this) — on a truly empty environment (no seeded question at all) `/demo` throws rather than degrading gracefully, since there's nothing sensible to show. Graceful degradation only covers the case where the module/question exists but no submission has been processed yet (it ingests+processes the gold `dropped_c` script on the fly).

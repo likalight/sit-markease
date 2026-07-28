@@ -177,7 +177,7 @@ export function ReviewConsole(props: {
   );
 
   return (
-    <div className="grid h-screen grid-cols-[1fr_1fr_1fr] bg-canvas">
+    <div className="grid h-full grid-cols-[1fr_1fr_1fr] bg-canvas">
       {/* Left: script-viewer */}
       <div className="overflow-auto border-r border-hairline p-lg">
         <h2 className="mb-sm text-caption-caps text-muted-soft">Original script</h2>
