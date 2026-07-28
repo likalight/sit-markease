@@ -10,9 +10,14 @@ Several stubs below are now stale — corrected here rather than rewritten in pl
 - **M1's "PDF ingestion is not wired"** (below) no longer applies: PDF upload works via `pypdfium2` — see docs/DECISIONS.md. Still true: only the first page of a multi-page PDF is graded.
 - **M8's "practice attempts are purely client-side, nothing persisted"** (below) no longer applies: `practice_attempts` is wired end-to-end (`db.upsertPracticeAttempt`, `PUT /api/practice-items/:id/attempt`).
 
+Corrected again (post single-model migration, see docs/DECISIONS.md):
+- **The dual-read design described below no longer exists.** S2 is now one model call (`src/lib/pipeline/s2-transcribe.ts`), not two independent-vendor reads reconciled against each other. Every "dual-read"/"reconciliation"/"cross-provider agreement" reference below is historical — accurate for when it was written, not for the current pipeline.
+- **The `adjudicator` role tie-breaker item below no longer applies.** There's nothing to adjudicate between — a single read either meets the confidence threshold or it doesn't.
+
 Genuinely still open:
-- **Multi-page grading.** Every PDF page is stored, but transcription/assessment only ever reads page 0. A real multi-page submission needs the transcription layer to pass every page's image into one dual-read call — not done.
-- **No automatic tie-breaker.** The `adjudicator` role exists in `src/lib/ai/client.ts`'s role type and env vars but nothing ever calls it — every dual-read disagreement goes straight to the educator queue with no automated attempt to resolve it first.
+- **No live handwriting has ever been tested.** Every real submission run through this pipeline so far — including the single-model migration's verification — used rendered, computer-generated "handwriting-style" images, not an actual photographed script. Real accuracy against genuinely messy handwriting is unmeasured. CLAUDE.md: "Do not claim coverage or accuracy the eval harness hasn't measured."
+- **No rate limiting on the public entry points.** `/enter/student` accepts any of 3 fixed IDs with no throttle, and every accepted submission now triggers real, billed OpenAI calls (no free-tier cache to fall back to). An open, public link with no rate limit and a guessable 3-digit code is a real cost-exposure risk, not just an abuse one.
+- **Multi-page grading.** Every PDF page is stored, but transcription/assessment only ever reads page 0. A real multi-page submission needs the transcription layer to pass every page's image into one read call — not done.
 - **Educators can't author questions/rubrics/taxonomies through the app.** Everything is seeded via `scripts/seed.ts`/`ingest-corpus.ts`. The §4.1 E1 "paste a rubric, AI structures it" screen still doesn't exist (see the M9-era entry below — still true).
 - **`diagnoseSubmission` isn't idempotency-guarded** the way the other four stages now are (see docs/DECISIONS.md) — it inserts an array rather than reading with `.single()`, so a re-run doesn't crash, but it does double up `misconception_tags` rows rather than being a safe no-op.
 - **No rate limiting on signup or submission endpoints.** Nothing stops repeated hits beyond the AI provider's own per-provider RPM throttle.

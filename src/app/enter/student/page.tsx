@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { SubmitButton } from "@/components/submit-button";
 import { enterAsStudentAction } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -41,12 +42,7 @@ export default async function EnterStudentPage({
           autoFocus
           className="rounded-sm border border-hairline px-md py-sm text-center text-title-lg tracking-[0.4em] text-ink"
         />
-        <button
-          type="submit"
-          className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary"
-        >
-          Continue
-        </button>
+        <SubmitButton pendingLabel="Checking…">Continue</SubmitButton>
       </form>
 
       <Link href="/" className="text-center text-body-sm text-muted underline">

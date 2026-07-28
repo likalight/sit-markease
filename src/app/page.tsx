@@ -3,6 +3,7 @@ import { Logo } from "@/components/logo";
 import { TechCarousel } from "@/components/tech-carousel";
 import { JourneyExplorer } from "@/components/journey-explorer";
 import { enterAsEducatorAction } from "@/app/enter/actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -41,12 +42,12 @@ export default function LandingPage() {
             I'm a student
           </Link>
           <form action={enterAsEducatorAction}>
-            <button
-              type="submit"
+            <SubmitButton
+              pendingLabel="Signing in…"
               className="rounded-sm border border-hairline px-lg py-sm text-title-sm text-body"
             >
               I'm an educator
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </section>
@@ -165,12 +166,12 @@ export default function LandingPage() {
             I'm a student
           </Link>
           <form action={enterAsEducatorAction}>
-            <button
-              type="submit"
+            <SubmitButton
+              pendingLabel="Signing in…"
               className="rounded-sm border border-hairline px-lg py-sm text-title-sm text-body"
             >
               I'm an educator
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </section>
