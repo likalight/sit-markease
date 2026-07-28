@@ -23,7 +23,7 @@ type UploadResult = {
 // Student self-submit viewer: upload a photo, show the deskewed result's
 // line boxes, then run the rest of the pipeline (S2-S7, see the upload
 // route) which auto-releases the grade if it's confident enough — no
-// waiting on an educator unless the two reads actually disagreed.
+// waiting on an educator unless the read's own confidence was too low.
 export function UploadAndViewer({ questionId }: { questionId: string }) {
   const router = useRouter();
   const [result, setResult] = useState<UploadResult | null>(null);
@@ -139,7 +139,7 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
 
           {autoReleased && (
             <div className="flex items-center gap-sm rounded-sm border border-verified/30 bg-verified-soft px-sm py-xs">
-              <p className="text-body-sm text-verified">Graded instantly — both reads agreed.</p>
+              <p className="text-body-sm text-verified">Graded instantly — the read was confident.</p>
               <button
                 type="button"
                 onClick={() => router.push("/feedback")}
@@ -152,14 +152,14 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
 
           {needsEducatorReview && (
             <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
-              The two reads disagreed, so this one needs a quick educator check before it's released. You'll
-              see it on your feedback page as soon as that's done.
+              The read wasn't confident enough to trust automatically, so this one needs a quick educator
+              check before it's released. You'll see it on your feedback page as soon as that's done.
             </p>
           )}
 
           {needsHumanTranscription && (
             <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
-              The two transcription reads disagreed too much to trust automatically — this submission needs a
+              The transcription confidence was too low to trust automatically — this submission needs a
               human to transcribe it before it can be graded.
             </p>
           )}

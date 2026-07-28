@@ -4,9 +4,9 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { ingestSubmission } from "@/lib/pipeline/s1-ingest";
 import { runFullPipeline } from "@/lib/pipeline/orchestrator";
 
-// S2-S7 is 7+ sequential real network calls (two transcription reads, a
-// reconcile, assess, diagnose, feedback, then practice generation with
-// per-item verification) — found live to reliably exceed Vercel's default
+// S2-S7 is several sequential real network calls (a transcription read,
+// assess, diagnose, feedback, then practice generation with per-item
+// verification) — found live to reliably exceed Vercel's default
 // serverless timeout, which silently kills the function mid-pipeline with
 // no error ever reaching stage_runs (S7 in particular never even got a
 // "failed" row logged — the request was simply cut off before it got

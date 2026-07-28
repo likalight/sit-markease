@@ -61,7 +61,7 @@ export async function ingestSubmission(
   // page 0 — the rest of the pipeline is single-page-aware end to end, so a
   // multi-page PDF's later pages are preserved but not yet graded. Fixing
   // that is a transcription-layer change (concatenating multiple images
-  // into one dual-read call), not an ingest one.
+  // into one read call), not an ingest one.
   let pageByteSets: { bytes: Buffer; contentType: string }[];
   if (contentType === "application/pdf") {
     let converted;

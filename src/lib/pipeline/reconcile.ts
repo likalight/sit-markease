@@ -1,10 +1,13 @@
-import { sidecar } from "@/lib/sidecar/client";
-import type { ReadA, ReadB } from "@/lib/schemas/transcription";
+import type { TranscriptionRead } from "@/lib/schemas/transcription";
 
-// §7.4 S3 — Reconciliation. Deterministic code + one sidecar call, not a
-// model call. Not implemented as an LLM stage per the PRD.
+// §7.4 S3 — was cross-read reconciliation between two independent AI reads;
+// now a single model reads once, so there's nothing to reconcile against.
+// Trust instead comes from the model's own reported per-step confidence and
+// overall_legibility, same thresholds as before (docs/DECISIONS.md — the
+// official brief never required two independent AI reads, only "multimodal
+// LLMs" as a technology).
 
-export interface ReconciledStep {
+export interface AssessedStep {
   step_index: number;
   line_indices: number[];
   latex: string;
@@ -15,112 +18,40 @@ export interface ReconciledStep {
   source: "reconciled";
 }
 
-export interface ReconcileResult {
-  steps: ReconciledStep[];
+export interface AssessReadResult {
+  steps: AssessedStep[];
   transcription_agreement: number;
   routing: "reconciled" | "needs_human_review" | "needs_human_transcription";
 }
 
-// §7.4 step 1: normalise whitespace, \frac vs /, \cdot vs *, \left\right, brackets.
-export function normalizeLatex(input: string): string {
-  return input
-    .replace(/\\left|\\right/g, "")
-    .replace(/\\cdot/g, "*")
-    .replace(/\\times/g, "*")
-    .replace(/\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, "($1)/($2)")
-    .replace(/[[\](){}]/g, "")
-    .replace(/\s+/g, "")
-    .toLowerCase()
-    .trim();
-}
+export async function assessRead(read: TranscriptionRead, confidenceThreshold = 0.85): Promise<AssessReadResult> {
+  const steps: AssessedStep[] = read.steps.map((s) => ({
+    step_index: s.step_index,
+    line_indices: s.line_indices,
+    latex: s.latex,
+    plain_text: s.plain_text,
+    role: s.role,
+    confidence: s.confidence,
+    agreement: s.confidence,
+    source: "reconciled" as const,
+  }));
 
-function levenshtein(a: string, b: string): number {
-  const m = a.length;
-  const n = b.length;
-  if (m === 0) return n;
-  if (n === 0) return m;
-  const dp = new Array(n + 1);
-  for (let j = 0; j <= n; j++) dp[j] = j;
-  for (let i = 1; i <= m; i++) {
-    let prev = dp[0];
-    dp[0] = i;
-    for (let j = 1; j <= n; j++) {
-      const temp = dp[j];
-      dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
-      prev = temp;
-    }
-  }
-  return dp[n];
-}
+  const totalWeight = steps.reduce((sum, s) => sum + Math.max(s.latex.length, 1), 0);
+  const weightedConfidence =
+    totalWeight > 0
+      ? steps.reduce((sum, s) => sum + s.confidence * Math.max(s.latex.length, 1), 0) / totalWeight
+      : 1.0;
 
-function levenshteinRatio(a: string, b: string): number {
-  const maxLen = Math.max(a.length, b.length);
-  if (maxLen === 0) return 1;
-  return 1 - levenshtein(a, b) / maxLen;
-}
-
-async function stepAgreement(aText: string, bText: string): Promise<number> {
-  const normA = normalizeLatex(aText);
-  const normB = normalizeLatex(bText);
-  if (normA === normB) return 1.0;
-
-  try {
-    const result = await sidecar.mathEquivalent(aText, bText);
-    if (result.parsed) return result.equivalent ? 0.95 : 0.0;
-  } catch {
-    // sidecar unreachable — fall through to the text-similarity fallback
-    // rather than crash (CLAUDE.md rule 8).
-  }
-
-  return levenshteinRatio(normA, normB);
-}
-
-export async function reconcile(
-  readA: ReadA,
-  readB: ReadB,
-  agreementThreshold = 0.85
-): Promise<ReconcileResult> {
-  const linesByIndex = new Map(readA.lines.map((l) => [l.line_index, l]));
-
-  const steps: ReconciledStep[] = [];
-  let weightedSum = 0;
-  let totalWeight = 0;
-
-  for (const step of readB.steps) {
-    const aText = step.line_indices
-      .map((idx) => linesByIndex.get(idx)?.latex ?? "")
-      .join(" ");
-    const bText = step.latex;
-
-    const agreement = await stepAgreement(aText, bText);
-    const weight = Math.max(bText.length, 1);
-    weightedSum += agreement * weight;
-    totalWeight += weight;
-
-    steps.push({
-      step_index: step.step_index,
-      line_indices: step.line_indices,
-      latex: step.latex,
-      plain_text: step.plain_text,
-      role: step.role,
-      confidence: step.confidence,
-      agreement,
-      source: "reconciled",
-    });
-  }
-
-  const transcriptionAgreement = totalWeight > 0 ? weightedSum / totalWeight : 1.0;
-
-  let routing: ReconcileResult["routing"];
-  if (readA.overall_legibility < 0.5) {
+  let routing: AssessReadResult["routing"];
+  if (read.overall_legibility < 0.5) {
     routing = "needs_human_transcription";
-  } else if (transcriptionAgreement < 0.6) {
+  } else if (weightedConfidence < 0.6) {
     routing = "needs_human_transcription";
-  } else if (transcriptionAgreement < agreementThreshold) {
+  } else if (weightedConfidence < confidenceThreshold || read.overall_legibility < confidenceThreshold) {
     routing = "needs_human_review";
   } else {
     routing = "reconciled";
   }
 
-  return { steps, transcription_agreement: transcriptionAgreement, routing };
+  return { steps, transcription_agreement: weightedConfidence, routing };
 }

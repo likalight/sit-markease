@@ -23,8 +23,7 @@ function loadPrompt(filename: string): string {
 }
 
 export const PROMPT_VERSIONS = {
-  s2ReadA: "s2_read_a_literal.v1",
-  s2ReadB: "s2_read_b_semantic.v1",
+  s2Read: "s2_read_single.v1",
   s4Assess: "s4_assess.v1",
   s5Diagnose: "s5_diagnose.v1",
   s6Feedback: "s6_feedback.v1",
@@ -33,29 +32,11 @@ export const PROMPT_VERSIONS = {
   rubricStructure: "rubric_structure.v1",
 } as const;
 
-export function s2ReadASystemPrompt(): string {
-  return loadPrompt("s2_read_a_literal.v1.md");
+export function s2ReadSystemPrompt(): string {
+  return loadPrompt("s2_read_single.v1.md");
 }
 
-const S2_READ_A_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
-{
-  "lines": [
-    { "line_index": 1, "latex": "<transcribed line as LaTeX>", "confidence": 0.0-1.0, "illegible": false }
-  ],
-  "student_identifier": "<string or null>",
-  "overall_legibility": 0.0-1.0
-}
-One entry in "lines" per detected line region, in order. "illegible" is true only if you genuinely cannot read that line — set "latex" to "[ILLEGIBLE]" in that case.`;
-
-export function s2ReadAUserPrompt(lineCount: number): string {
-  return `The image has ${lineCount} detected line region(s), indexed 1 to ${lineCount} from top to bottom. Transcribe each one.\n\n${S2_READ_A_SHAPE}`;
-}
-
-export function s2ReadBSystemPrompt(): string {
-  return loadPrompt("s2_read_b_semantic.v1.md");
-}
-
-const S2_READ_B_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
+const S2_READ_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
 {
   "steps": [
     {
@@ -68,12 +49,14 @@ const S2_READ_B_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, 
     }
   ],
   "final_answer": { "latex": "<final answer as LaTeX, or empty string>", "present": true|false },
-  "flags": ["<short_snake_case_flag>"]
+  "flags": ["<short_snake_case_flag>"],
+  "student_identifier": "<string or null>",
+  "overall_legibility": 0.0-1.0
 }
-"role" must be exactly one of the five listed values — no others. "flags" is a list of short machine-readable tags (e.g. "constant_of_integration_missing"), not prose; use an empty array if there are none.`;
+"role" must be exactly one of the five listed values — no others. "flags" is a list of short machine-readable tags (e.g. "constant_of_integration_missing"), not prose; use an empty array if there are none. Any line region that doesn't fit an identifiable step still counts toward "overall_legibility" — mark truly unreadable regions "[ILLEGIBLE]" inside the nearest step's "latex" rather than dropping them.`;
 
-export function s2ReadBUserPrompt(lineCount: number): string {
-  return `The image has ${lineCount} detected line region(s), indexed 1 to ${lineCount} from top to bottom. Identify the solution steps and which line indices each spans.\n\n${S2_READ_B_SHAPE}`;
+export function s2ReadUserPrompt(lineCount: number): string {
+  return `The image has ${lineCount} detected line region(s), indexed 1 to ${lineCount} from top to bottom. Transcribe the work and identify the solution steps and which line indices each spans.\n\n${S2_READ_SHAPE}`;
 }
 
 export function s4AssessSystemPrompt(): string {

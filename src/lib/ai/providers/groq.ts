@@ -2,12 +2,12 @@ import type { CompleteOptions, CompleteResult, LLMClient } from "../types";
 import { ModelCallError } from "../types";
 import { throttle, withBackoff } from "../rate-limit";
 
-// Groq free tier — OpenAI-compatible REST, no SDK. Used as the *second*,
-// different-provider read in S2's dual-read (docs/DECISIONS.md "M2 —
-// free-tier providers": cross-provider disagreement is stronger evidence
-// than same-family disagreement). No native structured-output mode here —
-// JSON-object mode + Zod validation, with the retry-once-on-failure policy
-// applied by src/lib/ai/client.ts (CLAUDE.md rule 2).
+// Groq free tier — OpenAI-compatible REST, no SDK. Kept in the codebase as a
+// swappable provider (set AIMS_PROVIDER_PRIMARY/FAST=groq to use it) even
+// though the default pipeline runs single-model on OpenAI now
+// (docs/DECISIONS.md). No native structured-output mode here — JSON-object
+// mode + Zod validation, with the retry-once-on-failure policy applied by
+// src/lib/ai/client.ts (CLAUDE.md rule 2).
 export const DEFAULT_MODEL = "llama-3.2-11b-vision-preview";
 const DEFAULT_RPM = 25;
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";

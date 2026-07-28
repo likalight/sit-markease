@@ -16,10 +16,10 @@ const STUDENT_STEPS: Step[] = [
       "No waiting on a teacher to scan or upload anything on your behalf. Open Practica, take a photo or upload a file, and it's already on its way to being graded.",
   },
   {
-    title: "Two AI models read it",
-    short: "Independently, so a mistake by one doesn't become your grade.",
+    title: "An AI reads it",
+    short: "It rates its own confidence on every step, not just a final guess.",
     detail:
-      "One model reading messy handwriting can be confidently wrong. Practica always uses two, from different companies, and checks whether they actually agree before trusting either of them.",
+      "A multimodal model transcribes your work line by line and reports how legible and confident it is at each step — that self-reported confidence, not a blind guess, is what decides whether your grade is safe to release automatically.",
   },
   {
     title: "The answer is verified",
@@ -29,9 +29,9 @@ const STUDENT_STEPS: Step[] = [
   },
   {
     title: "Most of the time, you're done in seconds",
-    short: "Confident, agreeing, verified results release immediately.",
+    short: "Confident, verified results release immediately.",
     detail:
-      "If both reads agree and the answer checks out, there's no queue, no waiting for a teacher — your mark and feedback are ready right away.",
+      "If the read is confident and the answer checks out symbolically, there's no queue, no waiting for a teacher — your mark and feedback are ready right away.",
   },
   {
     title: "You see exactly where it broke down",
@@ -58,13 +58,13 @@ const EDUCATOR_STEPS: Step[] = [
     title: "Most submissions never reach you",
     short: "Confident, verified results release on their own.",
     detail:
-      "Every submission still goes through the exact same rubric-graded, symbolically-verified pipeline. The ones where two independent AI reads agree and the maths checks out just release automatically, with a full audit trail either way.",
+      "Every submission still goes through the exact same rubric-graded, symbolically-verified pipeline. The ones where the read is confident and the maths checks out just release automatically, with a full audit trail either way.",
   },
   {
     title: "Only the uncertain ones land in your queue",
     short: "Sorted lowest-confidence-first.",
     detail:
-      "Disagreement between the two reads, illegible handwriting, or an ambiguous misconception — these are the only submissions that ever ask for your attention, and they're sorted so the ones that need it most come first.",
+      "Low-confidence transcription, illegible handwriting, or an ambiguous misconception — these are the only submissions that ever ask for your attention, and they're sorted so the ones that need it most come first.",
   },
   {
     title: "Review in three panes",

@@ -2,6 +2,14 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Post-M9 — dropped the dual-vendor cross-read transcription design
+
+`docs/PRD.md` §7.3 specified two independently-framed transcription reads from two different AI vendors, cross-checked for agreement, as the trust mechanism deciding auto-release vs. human review. On review, **the actual official brief the user was graded against never states this** — it names "multimodal LLMs" as a technology (plural, but not a requirement for cross-verification), not a two-independent-reads-must-agree mechanism. That design was elaborated into the PRD by an earlier session on top of the real brief, not handed down by it.
+
+Given that, and given the real operational cost of running two vendors (Gemini's free tier caps at 20 requests/day — a hard wall hit during testing; Groq's open vision models read messy handwriting less reliably than proprietary ones, so a second read risked flagging correct work as disagreement rather than actually catching errors), the pipeline is now **single-model**: one multimodal LLM call (OpenAI) does literal transcription + step segmentation in one pass, reporting per-step confidence and overall legibility. Auto-release vs. human-review routing now uses that self-reported confidence plus S4's symbolic answer verification (unchanged) — CLAUDE.md rule 6 ("two systems must agree") is relaxed to "the read is confident and, where checkable, the answer verifies symbolically," which is still a real, degrade-never-crash trust gate, just not a cross-vendor one.
+
+Changed: `src/lib/schemas/transcription.ts` (merged ReadA/ReadB into one `TranscriptionReadSchema`), `src/lib/pipeline/s2-transcribe.ts` (one `readTranscription()` call instead of `readA`+`readB`), `src/lib/pipeline/reconcile.ts` (renamed conceptually to quality assessment — `assessRead()` computes routing from confidence/legibility instead of cross-read agreement), `prompts/s2_read_single.v1.md` (merged prompt), `src/lib/ai/client.ts` (`fast` role now defaults to the same provider as `primary` — no more silent Gemini fallback), landing page + `journey-explorer.tsx` copy (no longer claims "two AI models"). `docs/PRD.md` itself is left as-is (historical planning doc); this entry is the record of the deviation from it.
+
 ## Post-M9 — three live-only bugs found by actually running the deployed app end to end
 
 Every one of these was invisible in local dev and passed typecheck cleanly; only a real submission through the real Vercel deployment surfaced them.

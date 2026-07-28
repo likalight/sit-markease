@@ -6,29 +6,7 @@ import { SchemaType } from "@google/generative-ai";
 // and a generic converter would be fragile — one literal per stage is more
 // reliable for the handful of shapes this build needs.
 
-export const readANativeSchema = {
-  type: SchemaType.OBJECT,
-  properties: {
-    lines: {
-      type: SchemaType.ARRAY,
-      items: {
-        type: SchemaType.OBJECT,
-        properties: {
-          line_index: { type: SchemaType.INTEGER },
-          latex: { type: SchemaType.STRING },
-          confidence: { type: SchemaType.NUMBER },
-          illegible: { type: SchemaType.BOOLEAN },
-        },
-        required: ["line_index", "latex", "confidence", "illegible"],
-      },
-    },
-    student_identifier: { type: SchemaType.STRING, nullable: true },
-    overall_legibility: { type: SchemaType.NUMBER },
-  },
-  required: ["lines", "overall_legibility"],
-};
-
-export const readBNativeSchema = {
+export const s2ReadNativeSchema = {
   type: SchemaType.OBJECT,
   properties: {
     steps: {
@@ -55,8 +33,10 @@ export const readBNativeSchema = {
       required: ["latex", "present"],
     },
     flags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+    student_identifier: { type: SchemaType.STRING, nullable: true },
+    overall_legibility: { type: SchemaType.NUMBER },
   },
-  required: ["steps", "final_answer", "flags"],
+  required: ["steps", "final_answer", "flags", "overall_legibility"],
 };
 
 export const assessNativeSchema = {

@@ -30,7 +30,7 @@ export default function LandingPage() {
         </h1>
         <p className="mx-auto max-w-xl text-body-md text-muted">
           Any subject with a checkable answer — engineering, accounting, dosage maths, not just numbers on
-          a page. Two AI models read it, the answer gets verified for real, and you see exactly which step
+          a page. An AI reads it, the answer gets verified for real, and you see exactly which step
           went wrong.
         </p>
         <div className="mx-auto flex flex-wrap items-center justify-center gap-sm pt-sm">
@@ -61,7 +61,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 gap-lg sm:grid-cols-4">
             {[
               { step: "1", title: "Take a photo", body: "Submit your own work, straight from your phone or a PDF." },
-              { step: "2", title: "Two AI models read it", body: "Independently. If they disagree, a human checks it." },
+              { step: "2", title: "An AI reads it", body: "Line by line, with a confidence score on every step." },
               { step: "3", title: "The answer gets verified", body: "Checked for real, like a calculator — not an opinion." },
               { step: "4", title: "Instant grade + feedback", body: "A mark, the exact step that broke, and practice for that gap." },
             ].map((s) => (
@@ -93,10 +93,10 @@ export default function LandingPage() {
           <h2 className="mb-md font-serif text-display-sm text-on-dark">Why you can trust the grade</h2>
           <div className="grid grid-cols-1 gap-lg sm:grid-cols-3">
             <div>
-              <h3 className="mb-xs text-title-md text-on-dark">Never just one model's word</h3>
+              <h3 className="mb-xs text-title-md text-on-dark">Confidence is measured, not assumed</h3>
               <p className="text-body-sm text-on-dark-soft">
-                One AI reading handwriting can be confidently wrong. Two agreeing is real evidence.
-                Disagreeing goes to a person, not a guess.
+                The model reports how legible and confident it is on every step, not just a final
+                answer. Low confidence goes to a person, not a guess.
               </p>
             </div>
             <div>

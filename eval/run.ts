@@ -1,12 +1,12 @@
 /**
  * §14 evaluation harness. Runs the full S1-S7 pipeline fresh against the
- * gold set (eval/gold/*.json) and prints the §3.3 metrics table, a failure
- * taxonomy, and an ablation section.
+ * gold set (eval/gold/*.json) and prints the §3.3 metrics table and a
+ * failure taxonomy.
  *
  * Prerequisites: `npm run seed`, `npm run ingest-corpus`, and
  * `npm run seed-ai-fixtures` (fixture mode — see docs/DECISIONS.md "M2 —
- * free-tier providers") or real AIMS_GEMINI_API_KEY/AIMS_GROQ_API_KEY.
- * The sidecar must be running (`npm run sidecar:dev`).
+ * free-tier providers") or a real AIMS_OPENAI_API_KEY. The sidecar must be
+ * running (`npm run sidecar:dev`).
  *
  * Safe to re-run: every model call is cached by (prompt_version, model,
  * input_hash) regardless of the (fresh, random) submission id each run
@@ -83,7 +83,7 @@ async function runGoldScript(
   let failureCause: string | null = null;
   if (aiTotal !== null && Math.abs(aiTotal - humanTotal) > 0) {
     if (transcription && transcription.transcription_agreement < 0.85) {
-      failureCause = "transcription disagreement (below agreement threshold)";
+      failureCause = "low self-reported transcription confidence (below threshold)";
     } else if (grade?.needs_human_review) {
       failureCause = "unusual/partial method — model and human plausibly differ on partial credit";
     } else {
@@ -108,23 +108,6 @@ async function runGoldScript(
     },
     failureCause,
   };
-}
-
-async function runDualReadAblation(results: GoldResult[]): Promise<string[]> {
-  // Real, mechanically-computed ablation: a single read trivially agrees
-  // with itself (agreement = 1.0, always routes "reconciled"). Comparing
-  // that against each script's REAL (already-persisted) dual-read agreement
-  // shows exactly what dual-read catches that a single read would miss.
-  return results.map((r) => {
-    const realAgreement = r.transcriptionAgreement ?? 1;
-    const realRouting = realAgreement < 0.6 ? "needs_human_transcription" : realAgreement < 0.85 ? "needs_human_review" : "reconciled";
-    const wouldHaveMissedFlag = realRouting !== "reconciled";
-    return (
-      `  ${r.goldId}: real dual-read agreement ${realAgreement.toFixed(2)} (routing: ${realRouting}) ` +
-      `vs. single-read-only agreement 1.00 (always "reconciled")` +
-      (wouldHaveMissedFlag ? " — dual-read is the ONLY reason this script was flagged for review" : "")
-    );
-  });
 }
 
 async function main() {
@@ -179,7 +162,7 @@ async function main() {
   console.log(`M3  Score QWK                            : ${qwk !== null ? qwk.toFixed(2) : "n/a"} (target >=0.70 — NOT statistically meaningful at n=${results.length}; §3.3 targets a 20-script gold set)`);
   console.log(`M4  Misconception precision / recall     : ${precision !== null ? precision.toFixed(2) : "n/a"} / ${recall !== null ? recall.toFixed(2) : "n/a"} (target precision >=0.80)`);
   console.log(`M5  Line-detection accuracy               : 100% (4/4 lines detected on all ${results.length} scripts — clean synthetic text, not evidence of real-handwriting accuracy)`);
-  console.log(`M6  Inter-read agreement rate (>=0.85)    : ${(agreementRate * 100).toFixed(0)}% (target >=80%)`);
+  console.log(`M6  Self-reported read confidence (>=0.85): ${(agreementRate * 100).toFixed(0)}% (single-model pipeline — no second independent read to cross-check; see docs/DECISIONS.md)`);
   console.log(`M7  Human escalation rate                 : ${(escalationRate * 100).toFixed(0)}% (target <=20% — small N; one flagged script here is already 33%)`);
   console.log(`M8  Symbolic verification coverage        : ${(symbolicCoverage * 100).toFixed(0)}% (report actual, no target)`);
   console.log(`M9  Educator time per script               : not measured live — one real approval in M5 testing recorded 42s, not a timed study`);
@@ -201,10 +184,8 @@ async function main() {
   console.log("\n" + "=".repeat(72));
   console.log("ABLATION");
   console.log("=".repeat(72));
-  console.log("Dual-read disabled (real, mechanically computed — a single read trivially agrees with itself):");
-  for (const line of await runDualReadAblation(results)) console.log(line);
   console.log(
-    "\nSymbolic verification disabled: not independently re-scoreable in fixture mode (the S4 fixtures already " +
+    "Symbolic verification disabled: not independently re-scoreable in fixture mode (the S4 fixtures already " +
       "bake in the symbolic_check value as an input fact, per §7.5 — there is no live model to re-query without it). " +
       "Structural evidence instead: symbolic_check is 'equivalent' on 'dropped_c' and independently confirms the final " +
       "answer is correct even though the method is unsound — without it, S4 has no authoritative signal distinguishing " +

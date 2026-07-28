@@ -10,10 +10,13 @@ import type { ZodType } from "zod";
 
 // The single seam every pipeline stage calls through. Provider selection is
 // an env-var lookup; nothing above this file ever imports a vendor SDK.
-// docs/DECISIONS.md "M2 — free-tier providers" / later entry: OpenAI added
-// as the `primary` role once a real key was available, replacing Groq as
-// the second dual-read vendor — Gemini now covers `fast`. Groq's client
-// stays in the codebase (still usable via env var) but is no longer the
+// docs/DECISIONS.md: the dual-vendor cross-read design (Gemini `fast` +
+// OpenAI `primary`) was dropped — the official brief never required two
+// independent AI reads, only "multimodal LLMs" as a technology, and the
+// second vendor's free-tier quota (20 req/day) was a real operational wall.
+// `fast` now defaults to the same provider as `primary` (OpenAI) so the
+// whole pipeline runs on one paid, quota-free provider. Gemini/Groq clients
+// stay in the codebase (still usable via env var) but are no longer the
 // default anywhere.
 
 export type ModelRole = "primary" | "fast" | "adjudicator";
@@ -29,7 +32,7 @@ export function providerNameForRole(role: ModelRole): string {
     fast: "AIMS_PROVIDER_FAST",
     adjudicator: "AIMS_PROVIDER_ADJUDICATOR",
   }[role];
-  return process.env[key] ?? (role === "fast" ? "gemini" : "openai");
+  return process.env[key] ?? "openai";
 }
 
 export function defaultModelFor(providerName: string): string {
