@@ -128,6 +128,7 @@ export async function assessSubmission(submissionId: string): Promise<AssessResu
     assessment.criterion_results.map((c) => ({
       grade_recommendation_id: (gradeRecommendation as any).id,
       criterion_id: criteriaByKey.get(c.criterion_key)?.id ?? null,
+      criterion_key: c.criterion_key,
       level: c.level,
       score: c.score,
       max_score: c.max_score,
