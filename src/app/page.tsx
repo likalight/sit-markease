@@ -1,48 +1,14 @@
 import Link from "next/link";
-import { db } from "@/lib/db/facade";
-import { getMostRecentRealSubmission } from "@/lib/pipeline/featured-submission";
-import { ScriptViewer } from "@/components/script-viewer";
-import { stepState } from "@/lib/design/step-state";
 import { Logo } from "@/components/logo";
 import { TechCarousel } from "@/components/tech-carousel";
+import { JourneyExplorer } from "@/components/journey-explorer";
 
-// Public landing page. Plain, linear, no jargon: what it is, how it works,
-// why you can trust it, a real example, done.
+// Public landing page. Comprehensive by design: the full brief, an
+// interactive walk-through of both roles, and a clear line from problem to
+// mechanism — not a trimmed-down teaser.
 export const dynamic = "force-dynamic";
 
-const SHOW_LIVE_EMBED = false;
-
-export default async function LandingPage() {
-  let embed: { imageUrl: string; boxes: any[] } | null = null;
-  try {
-    const submissionId = await getMostRecentRealSubmission();
-    const pages = submissionId ? await db.listSubmissionPages(submissionId) : [];
-    const page = pages[0];
-    if (submissionId && page) {
-      const imageUrl = await db.getImageUrl(page.storage_path);
-      const lines = await db.listDetectedLines(page.id);
-      const transcription = await db.getTranscription(submissionId);
-      const steps = transcription ? await db.listSolutionSteps(transcription.id) : [];
-      const tags = await db.listMisconceptionTags(submissionId);
-      const misconceptionStepIndices = new Set<number>(tags.flatMap((t: any) => t.evidence_step_indices));
-      if (imageUrl) {
-        embed = {
-          imageUrl,
-          boxes: lines.map((l: any) => {
-            const step = steps.find((s: any) => s.line_indices.includes(l.line_index));
-            return {
-              lineIndex: l.line_index,
-              box: l.box,
-              state: step ? stepState(step.agreement, misconceptionStepIndices.has(step.step_index)) : "neutral",
-            };
-          }),
-        };
-      }
-    }
-  } catch {
-    embed = null;
-  }
-
+export default function LandingPage() {
   return (
     <main className="flex flex-col">
       {/* Nav */}
@@ -83,43 +49,81 @@ export default async function LandingPage() {
       {/* Tech-stack marquee */}
       <TechCarousel className="mx-auto w-full max-w-[1160px] px-6 pb-lg" />
 
-      {/* Real example — proof first. Disabled by SHOW_LIVE_EMBED: every
-          submission in the database right now is synthetic test data
-          (computer-rendered text for pipeline testing, not a real
-          handwriting photo) — showing it while claiming "actual output, not
-          a mockup" would be misleading. Flip back on once a genuine
-          photographed submission exists. */}
-      {SHOW_LIVE_EMBED && embed && (
-        <section className="w-full bg-surface-soft">
-          <div className="mx-auto max-w-[1160px] px-6 py-section">
-            <h2 className="mb-xs text-center font-serif text-display-sm text-ink">A real script, graded</h2>
-            <p className="mb-lg text-center text-body-sm text-muted">
-              Actual output from this build. Color shows where the two AI reads agreed.
-            </p>
-            <div className="mx-auto max-w-2xl">
-              <ScriptViewer imageUrl={embed.imageUrl} boxes={embed.boxes} />
-            </div>
-          </div>
-        </section>
-      )}
+      {/* The brief — the real problem this was built against, verbatim */}
+      <section className="w-full bg-surface-soft">
+        <div className="mx-auto max-w-[1160px] px-6 py-section">
+          <p className="mb-xs text-center text-caption-caps text-muted-soft">The brief</p>
+          <h2 className="mb-lg text-center font-serif text-display-sm text-ink">
+            The problem this was built to solve
+          </h2>
 
-      {/* How it works */}
-      <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
-        <h2 className="mb-lg text-center font-serif text-display-sm text-ink">How it works</h2>
-        <div className="grid grid-cols-1 gap-lg sm:grid-cols-4">
-          {[
-            { step: "1", title: "Take a photo", body: "Students submit their own work, straight from their phone." },
-            { step: "2", title: "Two AI models read it", body: "Independently. If they disagree, a human checks it." },
-            { step: "3", title: "The answer gets verified", body: "Checked for real, like a calculator — not an opinion." },
-            { step: "4", title: "Instant grade + feedback", body: "A mark, the exact step that broke, and practice for that gap." },
-          ].map((s) => (
-            <div key={s.step} className="flex flex-col gap-xs">
-              <span className="text-caption-caps text-muted-soft">Step {s.step}</span>
-              <h3 className="text-title-md text-body-strong">{s.title}</h3>
-              <p className="text-body-sm text-muted">{s.body}</p>
-            </div>
-          ))}
+          <div className="mx-auto max-w-3xl rounded-lg border border-hairline bg-surface p-lg">
+            <p className="mb-xxs text-caption-caps text-muted-soft">Project</p>
+            <p className="mb-md text-title-md text-body-strong">
+              AI-Assisted Framework for Scalable Feedback and Targeted Practice in Open-Ended Assessments
+            </p>
+
+            <p className="mb-xxs text-caption-caps text-muted-soft">Problem statement</p>
+            <p className="mb-sm text-body-md text-body">
+              Large-enrolment modules cannot provide timely, individualised feedback on open-ended
+              assessments. Two failures compound.
+            </p>
+            <p className="mb-sm text-body-md text-body">
+              <span className="font-medium text-body-strong">Educator side.</span> Marking multi-step
+              derivations is slow and cognitively expensive. 280 students × 6 questions = 1,680 artefacts
+              per assessment. Under time pressure, feedback collapses into a mark and a tick, or a recycled
+              generic comment. Consistency drifts across multiple TAs. By the time scripts are returned,
+              teaching has moved on and the feedback is inert.
+            </p>
+            <p className="mb-md text-body-md text-body">
+              <span className="font-medium text-body-strong">Student side.</span> Even with a mark, a
+              student cannot answer the only question that matters: what exactly do I not understand, and
+              what should I practise next? They get a chapter, not the four problems targeting their
+              specific error. Self-directed practice becomes undirected practice.
+            </p>
+            <p className="mb-lg rounded-sm border border-primary bg-primary-soft px-md py-sm text-body-md font-medium text-body-strong">
+              The gap is not that marking is hard. It is that diagnosis does not scale — and without
+              diagnosis, practice cannot be targeted.
+            </p>
+
+            <p className="mb-xxs text-caption-caps text-muted-soft">Proposed AI solution</p>
+            <p className="mb-md text-body-md text-body">
+              A pipeline that reads a photographed script the way a human marker would — line by line,
+              cross-checked by two independent AI models rather than one — grades it against a real rubric
+              with cited evidence for every mark, names the specific misconception behind each mistake, and
+              generates fresh, verified practice problems targeting that exact gap. A human always makes the
+              final call on anything the system isn't confident about; nothing reaches a student without
+              either strong agreement between the two independent reads or explicit educator approval.
+            </p>
+
+            <p className="mb-xxs text-caption-caps text-muted-soft">Expected impact</p>
+            <ul className="flex flex-col gap-xxs text-body-md text-body">
+              <li>• Educator time per script cut from minutes to under a minute — reviewing, not marking from scratch.</li>
+              <li>• Feedback that's specific and actionable: it cites the student's own step and names the misconception, not a generic comment.</li>
+              <li>• A closed loop — diagnosis leads straight into targeted practice, not a chapter to re-read.</li>
+              <li>• Every mark stays human-accountable and auditable, and the same mechanism generalises to any rubric-graded subject, not just maths.</li>
+            </ul>
+          </div>
+
+          <p className="mx-auto mt-lg max-w-2xl text-center text-body-md text-muted">
+            <span className="font-medium text-body-strong">How Practica bridges it:</span> the mechanism
+            below is that pipeline, built and running. Two independent AI reads instead of one, a real
+            symbolic check on the final answer instead of a guess, and a human reviewing only the cases that
+            are actually uncertain — so grading finally scales without losing what made it trustworthy.
+          </p>
         </div>
+      </section>
+
+      {/* Interactive: how the relationship works */}
+      <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
+        <p className="mb-xs text-center text-caption-caps text-muted-soft">See it from both sides</p>
+        <h2 className="mb-xs text-center font-serif text-display-sm text-ink">
+          How the student–educator loop works
+        </h2>
+        <p className="mx-auto mb-lg max-w-xl text-center text-body-sm text-muted">
+          Same submission, two very different jobs. Toggle roles and step through what actually happens.
+        </p>
+        <JourneyExplorer />
       </section>
 
       {/* Why you can trust it */}
@@ -152,50 +156,63 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* For students / for educators */}
-      <section className="w-full bg-surface-soft">
-        <div className="mx-auto max-w-[1160px] px-6 py-section">
-          <div className="grid grid-cols-1 gap-xl sm:grid-cols-2">
-            <div>
-              <h2 className="mb-md font-serif text-display-sm text-ink">If you're a student</h2>
-              <ul className="flex flex-col gap-sm text-body-md text-body">
-                <li>• Submit your own work, no waiting on a teacher.</li>
-                <li>• Grade and feedback, usually in seconds.</li>
-                <li>• The exact step that went wrong, in plain English.</li>
-                <li>• Practice built for your specific mistake.</li>
-              </ul>
+      {/* What this is not */}
+      <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
+        <h2 className="mb-xs text-center font-serif text-display-sm text-ink">What this isn't</h2>
+        <p className="mx-auto mb-lg max-w-xl text-center text-body-sm text-muted">
+          Just as important as what it does.
+        </p>
+        <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
+          {[
+            { title: "Not autonomous grading", body: "No mark is ever released without either strong two-model agreement or explicit educator approval." },
+            { title: "Not proctoring or AI-detection", body: "It doesn't watch for cheating or flag AI-written answers — it grades the work it's given." },
+            { title: "Not an LMS replacement", body: "It's a grading and diagnosis layer, not a place to run a whole course." },
+            { title: "Not a chatbot tutor", body: "It generates verified practice problems for a specific gap — it doesn't hold open-ended conversations." },
+          ].map((n) => (
+            <div key={n.title} className="rounded-sm border border-hairline px-md py-sm">
+              <p className="mb-xxs text-title-sm text-body-strong">{n.title}</p>
+              <p className="text-body-sm text-muted">{n.body}</p>
             </div>
-            <div>
-              <h2 className="mb-md font-serif text-display-sm text-ink">If you're an educator</h2>
-              <ul className="flex flex-col gap-sm text-body-md text-body">
-                <li>• Set up a question and rubric once.</li>
-                <li>• Most submissions never reach your desk.</li>
-                <li>• You only see the ones the AI wasn't sure about.</li>
-                <li>• See which problems your whole class is getting wrong.</li>
-              </ul>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Where this applies */}
-      <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
-        <h2 className="mb-xs text-center font-serif text-display-sm text-ink">Not just one subject</h2>
-        <p className="mx-auto mb-lg max-w-xl text-center text-body-sm text-muted">
-          Any question with a correct, checkable answer. Same pipeline, different rubric.
+      <section className="w-full bg-surface-soft">
+        <div className="mx-auto max-w-[1160px] px-6 py-section">
+          <h2 className="mb-xs text-center font-serif text-display-sm text-ink">Not just one subject</h2>
+          <p className="mx-auto mb-lg max-w-xl text-center text-body-sm text-muted">
+            Any question with a correct, checkable answer. Same pipeline, different rubric.
+          </p>
+          <div className="grid grid-cols-1 gap-md sm:grid-cols-4">
+            {[
+              { school: "Engineering", example: "Find the reaction forces on this loaded beam." },
+              { school: "Computing", example: "Derive the time complexity of this recursion." },
+              { school: "Business", example: "Prepare the adjusting entries and net income." },
+              { school: "Health Sciences", example: "Calculate the correct IV drip rate." },
+            ].map((s) => (
+              <div key={s.school} className="rounded-sm border border-hairline bg-surface px-md py-sm">
+                <p className="mb-xxs text-caption-caps text-muted-soft">{s.school}</p>
+                <p className="text-body-sm text-body">{s.example}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="mx-auto w-full max-w-[1160px] px-6 py-section text-center">
+        <h2 className="mb-xs font-serif text-display-sm text-ink">Ready to try it?</h2>
+        <p className="mx-auto mb-lg max-w-xl text-body-sm text-muted">
+          Sign up, submit a real photo or PDF of handwritten work, and see the grade come back.
         </p>
-        <div className="grid grid-cols-1 gap-md sm:grid-cols-4">
-          {[
-            { school: "Engineering", example: "Find the reaction forces on this loaded beam." },
-            { school: "Computing", example: "Derive the time complexity of this recursion." },
-            { school: "Business", example: "Prepare the adjusting entries and net income." },
-            { school: "Health Sciences", example: "Calculate the correct IV drip rate." },
-          ].map((s) => (
-            <div key={s.school} className="rounded-sm border border-hairline px-md py-sm">
-              <p className="mb-xxs text-caption-caps text-muted-soft">{s.school}</p>
-              <p className="text-body-sm text-body">{s.example}</p>
-            </div>
-          ))}
+        <div className="flex flex-wrap items-center justify-center gap-sm">
+          <a href="/login" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
+            I'm a student
+          </a>
+          <a href="/login" className="rounded-sm border border-hairline px-lg py-sm text-title-sm text-body">
+            I'm an educator
+          </a>
         </div>
       </section>
 
