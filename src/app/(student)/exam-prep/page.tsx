@@ -44,6 +44,16 @@ export default async function ExamPrepPage() {
   const attempts = await db.listPracticeAttemptsForItems(allItemIds, user.id);
   const attemptByItemId = new Map(attempts.map((a: any) => [a.practice_item_id, a]));
 
+  // Mastery status: a misconception only counts as overcome once every
+  // practice item generated for it has been attempted correctly — a single
+  // lucky guess on one item while others sit unattempted isn't "mastered."
+  function masteryStatus(items: any[]): "mastered" | "in_progress" | "not_started" {
+    const outcomes = items.map((i) => attemptByItemId.get(i.id)?.outcome ?? null);
+    if (outcomes.every((o) => o === null)) return "not_started";
+    if (outcomes.every((o) => o === "correct")) return "mastered";
+    return "in_progress";
+  }
+
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-xl px-6 py-section">
       <div>
@@ -59,11 +69,26 @@ export default async function ExamPrepPage() {
           up here.
         </p>
       ) : (
-        groups.map((g) => (
+        groups.map((g) => {
+          const status = masteryStatus(g.items);
+          return (
           <div key={g.name} className="flex flex-col gap-md border-t border-hairline pt-lg">
-            <div>
-              <h2 className="font-serif text-display-sm text-ink">{g.name}</h2>
-              <p className="text-caption-caps text-muted-soft">{g.severity}</p>
+            <div className="flex items-baseline justify-between">
+              <div>
+                <h2 className="font-serif text-display-sm text-ink">{g.name}</h2>
+                <p className="text-caption-caps text-muted-soft">{g.severity}</p>
+              </div>
+              <span
+                className={`text-caption-caps ${
+                  status === "mastered"
+                    ? "text-verified"
+                    : status === "in_progress"
+                      ? "text-attention"
+                      : "text-muted-soft"
+                }`}
+              >
+                {status === "mastered" ? "mastered" : status === "in_progress" ? "still working on it" : "not started"}
+              </span>
             </div>
             <div className="flex flex-col gap-lg">
               {g.items.map((item: any, i: number) => {
@@ -86,7 +111,8 @@ export default async function ExamPrepPage() {
               })}
             </div>
           </div>
-        ))
+          );
+        })
       )}
     </main>
   );
