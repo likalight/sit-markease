@@ -1,61 +1,103 @@
-# Practica
+<p align="center">
+  <img src=".github/assets/banner.png" alt="Practica" width="100%" />
+</p>
 
-AI-assisted assessment diagnosis, built at SIT for the AIMS project (**AIMS —
-AI for Individualised Mastery Support**). See `docs/PRD.md` for the full spec,
-`docs/DESIGN.md` for the original design system (superseded — see
-`docs/DECISIONS.md` "Post-M9 — went live" for the current one), and
-`CLAUDE.md` for working rules.
+<p align="center">
+  <a href="https://practica-aims.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-practica--aims.vercel.app-E61432?style=flat-square"></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-black?style=flat-square"></a>
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ECF8E?style=flat-square&logo=supabase&logoColor=white">
+  <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-vision-412991?style=flat-square&logo=openai&logoColor=white">
+  <img alt="Python" src="https://img.shields.io/badge/sidecar-FastAPI%20%2B%20SymPy-009688?style=flat-square&logo=fastapi&logoColor=white">
+</p>
 
-## Current state: live
+<p align="center">
+  <b>AI for Individualised Mastery Support (AIMS)</b> — an AI-assisted framework for scalable feedback<br/>
+  and targeted practice in open-ended, handwritten assessments. Built at SIT.
+</p>
 
-This build runs against real infrastructure, not fixtures:
-- **OpenAI + Gemini** as the two independent AI readers (`AIMS_AI_LIVE=true`)
-- **Real Supabase** — Postgres schema, Storage, and Auth (`AIMS_FIXTURE_MODE=false`)
+<p align="center">
+  <img src=".github/assets/landing.png" alt="Practica landing page" width="90%" />
+</p>
 
-Every model call still caches to disk by (provider, model, prompt, image hash)
-regardless of live/fixture mode — re-running the same input never re-spends
-quota. See `docs/DECISIONS.md`'s "Post-M9 — went live" entry for exactly what
-changed and why.
+---
+
+## The problem
+
+Large-enrolment modules can't give timely, individual feedback on open-ended assessments — grading
+1,680 handwritten scripts a term doesn't scale, so feedback collapses into a mark and a tick. Students
+get a number, not a reason, and no way to find practice targeting their actual gap.
+
+## What Practica does
+
+A student photographs (or uploads a PDF of) their handwritten working. From there:
+
+- 🔍 **OCR + line detection** (OpenCV) finds each line of work in the image
+- 🧠 **A multimodal LLM transcribes it** — literally, errors and all, with a confidence score per step
+- ✅ **The final answer is verified symbolically** (SymPy) wherever it's checkable — not just "looks right"
+- 📋 **Graded against a real rubric**, with every mark citing the exact step that earned it
+- 🎯 **Misconceptions are named**, not just marked wrong — "you exponentiated before applying the initial condition," not "incorrect"
+- 📚 **Fresh practice problems are generated via RAG**, targeting that specific gap, verified correct before they're ever shown
+- 👩‍🏫 **A human always signs off** — confident, verified results release automatically; anything uncertain waits for an educator, logged either way
+
+Any subject with a checkable answer works — this isn't a math tool with a rubric bolted on. Engineering,
+accounting, nursing dosage calculations, and plain-math problems all run through the identical pipeline;
+only the rubric changes. Educators can create a new question end-to-end — paste the question, a model
+solution, and rough rubric notes, and AI structures a weighted rubric from it.
+
+## Try it live
+
+**[practica-aims.vercel.app](https://practica-aims.vercel.app)**
+
+- **Student** → enter one of the demo IDs (`111`, `222`, `333`) → straight into the submit screen
+- **Educator** → one click → straight into the review queue
+
+## Architecture
+
+| Layer | Tech |
+|---|---|
+| App + API | Next.js 15 (App Router), TypeScript, Tailwind |
+| Database, Auth, Storage | Supabase (Postgres + pgvector) |
+| AI | OpenAI (vision, structured outputs) — provider-agnostic seam, swappable per role |
+| Image processing + symbolic verification | Python sidecar (FastAPI, OpenCV, SymPy), deployed separately on Render |
+| Retrieval-augmented practice generation | Local embeddings over an ingested course corpus |
+
+Every model call is schema-validated (Zod), cached by input hash, and logged with token/cost/latency —
+see [`docs/DECISIONS.md`](./docs/DECISIONS.md) for the full history of what changed and why, and
+[`docs/STUBS.md`](./docs/STUBS.md) for what's intentionally not built yet.
 
 ## Local setup
 
-1. `npm install`
-2. Copy `.env.example` to `.env`.
-3. Fill in `AIMS_OPENAI_API_KEY`, `AIMS_GEMINI_API_KEY`, and a real Supabase
-   project's `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` /
-   `SUPABASE_SERVICE_ROLE_KEY`.
-4. Run `supabase/migrations/0001_init.sql` against that project (paste it
-   into the Supabase SQL Editor — no CLI/DB-password access needed) and
-   create a private Storage bucket named `submissions`.
-5. `npm run seed` — seeds the demo module/assessment/question/rubric/taxonomy
-   and two demo accounts as real Supabase Auth users.
-6. `npm run ingest-corpus` — seeds the module's practice-item corpus with
-   real embeddings (needs `sentence-transformers` installed in the sidecar
-   venv, see below).
-7. In a second terminal: `python -m venv sidecar/.venv`, activate it,
-   `pip install -r sidecar/requirements.txt`, then `npm run sidecar:dev` —
-   FastAPI on `localhost:8000`.
-8. `npm run dev` — Next.js app on `localhost:3100` (or whichever port you
-   pass via `-p`).
+```bash
+git clone https://github.com/likalight/practica.git
+cd practica
+npm install
+cp .env.example .env
+```
+
+1. Fill in `AIMS_OPENAI_API_KEY` and a real Supabase project's `NEXT_PUBLIC_SUPABASE_URL` /
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
+2. Run `supabase/migrations/*.sql` against that project, in order, via the Supabase SQL Editor — no
+   CLI or DB password needed. Create a private Storage bucket named `submissions`.
+3. `npm run seed` — seeds a demo module/question/rubric/taxonomy and two demo accounts.
+4. `npm run ingest-corpus` — seeds the module's RAG corpus with real embeddings.
+5. In a second terminal: `python -m venv sidecar/.venv`, activate it, `pip install -r sidecar/requirements.txt`,
+   then `npm run sidecar:dev` — FastAPI on `localhost:8000`.
+6. `npm run dev` — the app on `localhost:3000`.
 
 ### Fixture mode (no keys, no Supabase project)
 
-Set `AIMS_FIXTURE_MODE=true` and `AIMS_AI_LIVE=false` to run entirely on a
-local JSON file store and cached AI responses instead — useful for offline
-development or CI. `npm run seed-gold` then `npm run seed-ai-fixtures` seeds
-the 3 synthetic gold scripts' AI responses into the cache in that mode. See
-`docs/DECISIONS.md` "M2 — local JSON store + fixture-mode auth" for why this
-path exists and what it trades off.
+Set `AIMS_FIXTURE_MODE=true` and `AIMS_AI_LIVE=false` to run entirely on a local JSON store and cached
+AI responses — useful for offline development. `npm run seed-gold` then `npm run seed-ai-fixtures` seeds
+a synthetic gold set into the cache for this mode.
 
-## Repository layout
+## Evaluation
 
-See PRD §16.
+`npm run eval` runs the full pipeline against a gold set and prints the metrics table (score MAE/QWK vs.
+human marks, misconception precision/recall, escalation rate, symbolic verification coverage) — see
+`docs/PRD.md` §3.3 for target values.
 
-## Status
+## License
 
-M0 through M9 (§17) were built and verified against a 3-script synthetic gold
-set, then migrated to live providers and a real database post-M9 — see
-`docs/STUBS.md` for what's intentionally not implemented, `docs/DECISIONS.md`
-for every deviation from the PRD, and `npm run eval` for the §3.3 metrics
-table (currently run against the AI cache for reproducibility, not raw
-network latency).
+[MIT](./LICENSE)
