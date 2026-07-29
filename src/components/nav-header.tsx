@@ -50,6 +50,9 @@ export async function NavHeader() {
               <Link href="/exam-prep" className="whitespace-nowrap hover:text-body">
                 Exam prep
               </Link>
+              <Link href="/settings" className="whitespace-nowrap hover:text-body">
+                Settings
+              </Link>
             </>
           )}
         </nav>

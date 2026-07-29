@@ -182,6 +182,12 @@ export const db = {
     return data;
   },
 
+  async updateUserFeedbackTone(userId: string, tone: "supportive" | "concise" | "socratic") {
+    if (fx()) return localStore.update("users", userId, { feedback_tone: tone });
+    const { error } = await supabaseAdmin().from("users").update({ feedback_tone: tone }).eq("id", userId);
+    if (error) throw error;
+  },
+
   async listAllQuestions() {
     if (fx()) return localStore.all("questions");
     const { data } = await supabaseAdmin().from("questions").select("*");

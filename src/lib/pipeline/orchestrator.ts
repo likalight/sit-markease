@@ -21,7 +21,14 @@ export async function runFullPipeline(submissionId: string) {
 
   const assessResult = await assessSubmission(submissionId);
   const diagnoseResult = assessResult.status === "assessed" ? await diagnoseSubmission(submissionId) : { status: "failed" as const, detectedCount: 0 };
-  const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId) : { status: "failed" as const };
+
+  let preferredTone: "supportive" | "concise" | "socratic" = "supportive";
+  if (assessResult.status === "assessed") {
+    const submission = await db.getSubmission(submissionId);
+    const student = submission?.student_id ? await db.getUser(submission.student_id) : null;
+    preferredTone = (student as any)?.feedback_tone ?? "supportive";
+  }
+  const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId, preferredTone) : { status: "failed" as const };
   const practiceResult =
     diagnoseResult.status === "diagnosed" && diagnoseResult.detectedCount > 0
       ? await generatePracticeSet(submissionId)
