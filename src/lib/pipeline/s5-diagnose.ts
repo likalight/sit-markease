@@ -19,6 +19,18 @@ export interface DiagnoseResult {
  * later (§7.6 growth loop — the queue UI itself is stretch, not core to
  * M6). Degrades rather than throws (CLAUDE.md rule 8). */
 export async function diagnoseSubmission(submissionId: string): Promise<DiagnoseResult> {
+  // Idempotency guard — see s2-transcribe.ts's identical guard for why this
+  // matters against Supabase specifically. Unlike the other guarded stages,
+  // S5's own artifact (misconception_tags) can legitimately be empty for a
+  // fully correct submission, so "no rows" doesn't mean "never ran" — check
+  // stage_runs for a prior success instead of the data it produced.
+  const priorRuns = await db.listStageRuns(submissionId);
+  const alreadySucceeded = priorRuns.some((r: any) => r.stage === "S5_diagnose" && r.status === "succeeded");
+  if (alreadySucceeded) {
+    const existingTags = await db.listMisconceptionTags(submissionId);
+    return { status: "diagnosed", detectedCount: existingTags.length, novelCandidateCount: 0 };
+  }
+
   const submission = await db.getSubmission(submissionId);
   if (!submission) {
     await db.logStageRun({ submissionId, stage: "S5_diagnose", status: "failed", error: "submission not found" });

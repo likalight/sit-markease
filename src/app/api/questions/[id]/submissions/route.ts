@@ -21,10 +21,31 @@ export const maxDuration = 300;
 // it's confident. Batch upload is later work (see docs/STUBS.md). Persists
 // through src/lib/db/facade.ts, which branches on AIMS_FIXTURE_MODE
 // (docs/DECISIONS.md "M2 — free-tier providers").
+// Every accepted submission triggers real, billed OpenAI calls with no
+// free-tier fallback — the public 3-ID student gate had no throttle at
+// all (docs/STUBS.md), which is a real cost-exposure risk, not just an
+// abuse one. A generous per-student rolling window keeps real testing
+// unaffected while capping runaway/malicious submission spam.
+const RATE_LIMIT_MAX_PER_HOUR = Number(process.env.AIMS_SUBMIT_RATE_LIMIT_PER_HOUR ?? 20);
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") {
     return NextResponse.json({ error: { code: "FORBIDDEN", message: "student role required" } }, { status: 403 });
+  }
+
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const recentCount = await db.countSubmissionsSince(user.id, oneHourAgo);
+  if (recentCount >= RATE_LIMIT_MAX_PER_HOUR) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "RATE_LIMITED",
+          message: `You've submitted ${recentCount} times in the last hour — please wait before submitting again.`,
+        },
+      },
+      { status: 429 }
+    );
   }
 
   const { id: questionId } = await params;

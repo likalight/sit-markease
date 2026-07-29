@@ -53,9 +53,14 @@ export default async function AssignmentsPage() {
           <h1 className="text-title-lg text-body-strong">Assignments</h1>
           <p className="text-body-sm text-muted">Every question you've issued, and how it's going.</p>
         </div>
-        <Link href="/assignments/new" className="rounded-sm bg-primary px-md py-xs text-body-sm font-medium text-on-primary">
-          + New question
-        </Link>
+        <div className="flex items-center gap-sm">
+          <Link href="/assignments/resources" className="rounded-sm border border-hairline px-md py-xs text-body-sm text-body">
+            Reference material
+          </Link>
+          <Link href="/assignments/new" className="rounded-sm bg-primary px-md py-xs text-body-sm font-medium text-on-primary">
+            + New question
+          </Link>
+        </div>
       </div>
 
       {rows.length === 0 ? (

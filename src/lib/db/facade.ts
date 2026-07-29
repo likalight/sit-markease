@@ -263,6 +263,24 @@ export const db = {
     return data ?? [];
   },
 
+  // Rate limiting: every accepted submission triggers real, billed AI calls
+  // with no free-tier fallback (docs/STUBS.md) — the public 3-ID student
+  // gate had no throttle at all. Counts a student's submissions in a
+  // rolling window so the upload route can reject past a threshold.
+  async countSubmissionsSince(studentId: string, sinceIso: string) {
+    if (fx()) {
+      return localStore
+        .find("submissions", (s: any) => s.student_id === studentId && s.submitted_at >= sinceIso)
+        .length;
+    }
+    const { count } = await supabaseAdmin()
+      .from("submissions")
+      .select("*", { count: "exact", head: true })
+      .eq("student_id", studentId)
+      .gte("submitted_at", sinceIso);
+    return count ?? 0;
+  },
+
   async listSubmissionsForQuestion(questionId: string) {
     if (fx()) return localStore.find("submissions", (s: any) => s.question_id === questionId);
     const { data } = await supabaseAdmin().from("submissions").select("*").eq("question_id", questionId);
