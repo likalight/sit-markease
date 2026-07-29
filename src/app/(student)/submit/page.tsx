@@ -11,13 +11,13 @@ export default async function SubmitPage() {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
 
-  const question = await db.getFirstQuestion();
+  const question = await db.getCurrentQuestion();
 
   if (!question) {
     return (
       <main className="mx-auto max-w-2xl px-6 py-xl">
         <p className="text-body-sm text-muted">
-          No seeded question found — run <code>npm run seed</code> first.
+          No question set up yet — an educator needs to create one first.
         </p>
       </main>
     );

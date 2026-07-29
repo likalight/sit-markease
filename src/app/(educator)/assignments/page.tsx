@@ -48,13 +48,20 @@ export default async function AssignmentsPage() {
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-lg px-6 py-xl">
-      <div>
-        <h1 className="text-title-lg text-body-strong">Assignments</h1>
-        <p className="text-body-sm text-muted">Every question you've issued, and how it's going.</p>
+      <div className="flex items-baseline justify-between">
+        <div>
+          <h1 className="text-title-lg text-body-strong">Assignments</h1>
+          <p className="text-body-sm text-muted">Every question you've issued, and how it's going.</p>
+        </div>
+        <Link href="/assignments/new" className="rounded-sm bg-primary px-md py-xs text-body-sm font-medium text-on-primary">
+          + New question
+        </Link>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-body-sm text-muted">No questions seeded yet — run <code>npm run seed</code>.</p>
+        <p className="text-body-sm text-muted">
+          No questions yet — <Link href="/assignments/new" className="underline">create one</Link>.
+        </p>
       ) : (
         <ul className="flex flex-col divide-y divide-hairline border border-hairline">
           {rows.map((r) => (

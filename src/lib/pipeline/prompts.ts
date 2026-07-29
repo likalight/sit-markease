@@ -250,3 +250,41 @@ export function s7PracticeUserPrompt(args: {
     S7_PRACTICE_SHAPE,
   ].join("\n");
 }
+
+export function rubricStructureSystemPrompt(): string {
+  return loadPrompt("rubric_structure.v1.md");
+}
+
+const RUBRIC_STRUCTURE_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
+{
+  "criteria": [
+    {
+      "key": "<short_snake_case_key>",
+      "name": "<human-readable criterion name>",
+      "weight": <number, all criteria weights must sum to 100>,
+      "max_score": <number>,
+      "levels": [
+        { "level": "<e.g. novice>", "score": <number>, "descriptor": "<one sentence>" }
+      ]
+    }
+  ]
+}
+Every criterion needs at least 2 levels. Weights across all criteria must sum to exactly 100.`;
+
+export function rubricStructureUserPrompt(args: {
+  promptText: string;
+  modelSolution: string;
+  maxScore: number;
+  rawRubricNotes: string;
+}): string {
+  return [
+    `QUESTION: ${args.promptText}`,
+    `MODEL SOLUTION: ${args.modelSolution}`,
+    `TOTAL POINTS AVAILABLE: ${args.maxScore}`,
+    ``,
+    `EDUCATOR'S RUBRIC NOTES (may be rough or partial):`,
+    args.rawRubricNotes,
+    ``,
+    RUBRIC_STRUCTURE_SHAPE,
+  ].join("\n");
+}

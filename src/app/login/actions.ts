@@ -93,10 +93,10 @@ export async function signUpAction(formData: FormData) {
 export async function signOutAction() {
   if (env.isFixtureMode()) {
     await clearLocalSession();
-    redirect("/login");
+    redirect("/");
   }
 
   const supabase = await supabaseServer();
   await supabase.auth.signOut();
-  redirect("/login");
+  redirect("/");
 }

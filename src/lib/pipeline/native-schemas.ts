@@ -161,3 +161,35 @@ export const practiceNativeSchema = {
   },
   required: ["items"],
 };
+
+export const rubricStructureNativeSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    criteria: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          key: { type: SchemaType.STRING },
+          name: { type: SchemaType.STRING },
+          weight: { type: SchemaType.NUMBER },
+          max_score: { type: SchemaType.NUMBER },
+          levels: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                level: { type: SchemaType.STRING },
+                score: { type: SchemaType.NUMBER },
+                descriptor: { type: SchemaType.STRING },
+              },
+              required: ["level", "score", "descriptor"],
+            },
+          },
+        },
+        required: ["key", "name", "weight", "max_score", "levels"],
+      },
+    },
+  },
+  required: ["criteria"],
+};

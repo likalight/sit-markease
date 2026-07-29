@@ -1,7 +1,12 @@
+import Link from "next/link";
 import { env } from "@/lib/db/env";
 import { signInAction, signInAsEducatorAction, signUpAction } from "./actions";
 import { Logo } from "@/components/logo";
 
+// Full email/password account creation — for onboarding real students beyond
+// the 3 fixed test IDs on /enter/student. Most testing right now should use
+// that quicker gate instead; this page exists for the eventual real-class
+// rollout, not as the primary entry point.
 export default async function LoginPage({
   searchParams,
 }: {
@@ -15,7 +20,13 @@ export default async function LoginPage({
       <div>
         <Logo className="mb-sm h-12 w-12" />
         <h1 className="font-serif text-display-sm text-ink">Practica</h1>
-        <p className="text-body-sm text-muted">Students submit and get graded here. Sign in to continue.</p>
+        <p className="text-body-sm text-muted">
+          Full account sign-up — for a real class, not the 3-ID test gate.
+        </p>
+        <p className="mt-xs text-body-sm text-muted">
+          Just testing? <Link href="/enter/student" className="underline">Use the quick student ID entry</Link> or{" "}
+          <Link href="/" className="underline">go to the homepage</Link> for one-click educator access.
+        </p>
       </div>
 
       {error && (

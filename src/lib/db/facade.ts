@@ -42,6 +42,112 @@ export const db = {
     return data;
   },
 
+  // The question students currently submit against — the most recently
+  // created one, not always the original seeded one. This is what makes
+  // "an educator creates a new question in any subject" actually change
+  // what students see, instead of the app being permanently locked to
+  // question #1 (docs/DECISIONS.md).
+  async getCurrentQuestion() {
+    if (fx()) {
+      // Array push order == insertion order — the last element is the most
+      // recently created question, regardless of which assessment it's in.
+      const all = localStore.all("questions") as any[];
+      return all[all.length - 1] ?? null;
+    }
+    // `position` is scoped per-assessment (each restarts at 1), so it can't
+    // tell two different assessments' questions apart by recency — order by
+    // created_at instead (supabase/migrations/0003_add_question_created_at.sql).
+    const { data } = await supabaseAdmin().from("questions").select("*").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    return data;
+  },
+
+  // Every new question needs a module + assessment container. Rather than
+  // building full module/assessment management UI, every educator-created
+  // question attaches to one shared default module/assessment pair,
+  // created lazily on first use.
+  async findOrCreateDefaultModule(ownerId: string) {
+    const code = "GENERAL";
+    if (fx()) {
+      const existing = localStore.findOne("modules", (m: any) => m.code === code);
+      if (existing) return existing;
+      return localStore.insert("modules", { code, title: "General", owner_id: ownerId, notation_glossary: null });
+    }
+    const admin = supabaseAdmin();
+    const { data: existing } = await admin.from("modules").select("*").eq("code", code).maybeSingle();
+    if (existing) return existing;
+    const { data, error } = await admin
+      .from("modules")
+      .insert({ code, title: "General", owner_id: ownerId })
+      .select("*")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async findOrCreateDefaultAssessment(moduleId: string) {
+    if (fx()) {
+      const existing = localStore.findOne("assessments", (a: any) => a.module_id === moduleId);
+      if (existing) return existing;
+      return localStore.insert("assessments", { module_id: moduleId, title: "General assessment" });
+    }
+    const admin = supabaseAdmin();
+    const { data: existing } = await admin.from("assessments").select("*").eq("module_id", moduleId).limit(1).maybeSingle();
+    if (existing) return existing;
+    const { data, error } = await admin
+      .from("assessments")
+      .insert({ module_id: moduleId, title: "General assessment" })
+      .select("*")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async countQuestionsForAssessment(assessmentId: string) {
+    if (fx()) return localStore.find("questions", (q: any) => q.assessment_id === assessmentId).length;
+    const { count } = await supabaseAdmin()
+      .from("questions")
+      .select("*", { count: "exact", head: true })
+      .eq("assessment_id", assessmentId);
+    return count ?? 0;
+  },
+
+  async createQuestion(row: {
+    assessment_id: string;
+    position: number;
+    prompt_text: string;
+    prompt_latex: string | null;
+    model_solution: string;
+    expected_answer_latex: string | null;
+    topic_tags: string[];
+    max_score: number;
+  }) {
+    if (fx()) return localStore.insert("questions", row);
+    const { data, error } = await supabaseAdmin().from("questions").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async createRubric(questionId: string) {
+    if (fx()) return localStore.insert("rubrics", { question_id: questionId, version: 1 });
+    const { data, error } = await supabaseAdmin()
+      .from("rubrics")
+      .insert({ question_id: questionId, version: 1 })
+      .select("*")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async insertRubricCriteria(
+    rows: { rubric_id: string; key: string; name: string; weight: number; max_score: number; levels: unknown }[]
+  ) {
+    if (rows.length === 0) return [];
+    if (fx()) return localStore.insertMany("rubric_criteria", rows);
+    const { data, error } = await supabaseAdmin().from("rubric_criteria").insert(rows).select("*");
+    if (error) throw error;
+    return data ?? [];
+  },
+
   async findUserByRole(role: "educator" | "student") {
     if (fx()) return localStore.findOne("users", (u: any) => u.role === role);
     const { data } = await supabaseAdmin().from("users").select("*").eq("role", role).limit(1).maybeSingle();
