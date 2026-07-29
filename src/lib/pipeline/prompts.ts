@@ -23,7 +23,7 @@ function loadPrompt(filename: string): string {
 }
 
 export const PROMPT_VERSIONS = {
-  s2Read: "s2_read_single.v1",
+  s2Read: "s2_read_single.v2",
   s4Assess: "s4_assess.v1",
   s5Diagnose: "s5_diagnose.v1",
   s6Feedback: "s6_feedback.v1",
@@ -33,7 +33,7 @@ export const PROMPT_VERSIONS = {
 } as const;
 
 export function s2ReadSystemPrompt(): string {
-  return loadPrompt("s2_read_single.v1.md");
+  return loadPrompt("s2_read_single.v2.md");
 }
 
 const S2_READ_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
