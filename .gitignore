@@ -13,3 +13,6 @@ local-data/
 
 .vercel
 .env*
+
+# ad-hoc test scripts/artifacts — never meant to be committed
+scratch-*
