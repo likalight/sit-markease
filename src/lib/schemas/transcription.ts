@@ -26,3 +26,19 @@ export const TranscriptionReadSchema = z.object({
   overall_legibility: z.number().min(0).max(1),
 });
 export type TranscriptionRead = z.infer<typeof TranscriptionReadSchema>;
+
+// Objective 1 (brief) — typed LaTeX input carries zero transcription risk,
+// so the AI's only job is naming what operation each already-exact step
+// performs, not reading anything. No confidence/legibility fields: those
+// describe OCR risk that doesn't exist here.
+export const TypedStepAnnotationSchema = z.object({
+  step_index: z.number().int(),
+  role: TranscriptionStepRole,
+  plain_text: z.string(),
+});
+
+export const TypedReadSchema = z.object({
+  steps: z.array(TypedStepAnnotationSchema),
+  final_answer: z.object({ latex: z.string(), present: z.boolean() }),
+});
+export type TypedRead = z.infer<typeof TypedReadSchema>;

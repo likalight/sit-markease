@@ -233,18 +233,24 @@ export const db = {
   },
 
   // --- submissions / pipeline state ---
-  async createSubmission(row: { questionId: string; studentId: string | null; status: string }) {
+  async createSubmission(row: { questionId: string; studentId: string | null; status: string; inputMethod?: "photo" | "typed" }) {
     if (fx()) {
       return localStore.insert("submissions", {
         question_id: row.questionId,
         student_id: row.studentId,
         status: row.status,
+        input_method: row.inputMethod ?? "photo",
         submitted_at: new Date().toISOString(),
       });
     }
     const { data, error } = await supabaseAdmin()
       .from("submissions")
-      .insert({ question_id: row.questionId, student_id: row.studentId, status: row.status })
+      .insert({
+        question_id: row.questionId,
+        student_id: row.studentId,
+        status: row.status,
+        input_method: row.inputMethod ?? "photo",
+      })
       .select("*")
       .single();
     if (error) throw error;

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
-import { UploadAndViewer } from "@/components/upload-and-viewer";
+import { SubmitModeToggle } from "@/components/submit-mode-toggle";
 
 // Student self-submit: photograph handwritten working, submit it directly
 // against a question. Replaces the earlier educator-uploads-on-your-behalf
@@ -29,7 +29,7 @@ export default async function SubmitPage() {
         <h1 className="text-title-lg text-body-strong">Submit your work</h1>
         <p className="text-body-sm text-muted">{question.prompt_text}</p>
       </div>
-      <UploadAndViewer questionId={question.id} />
+      <SubmitModeToggle questionId={question.id} />
     </main>
   );
 }

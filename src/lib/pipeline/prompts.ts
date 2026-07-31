@@ -24,6 +24,7 @@ function loadPrompt(filename: string): string {
 
 export const PROMPT_VERSIONS = {
   s2Read: "s2_read_single.v2",
+  s2ReadTyped: "s2_read_typed.v1",
   s4Assess: "s4_assess.v1",
   s5Diagnose: "s5_diagnose.v1",
   s6Feedback: "s6_feedback.v1",
@@ -57,6 +58,28 @@ const S2_READ_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no
 
 export function s2ReadUserPrompt(lineCount: number): string {
   return `The image has ${lineCount} detected line region(s), indexed 1 to ${lineCount} from top to bottom. Transcribe the work and identify the solution steps and which line indices each spans.\n\n${S2_READ_SHAPE}`;
+}
+
+export function s2ReadTypedSystemPrompt(): string {
+  return loadPrompt("s2_read_typed.v1.md");
+}
+
+const S2_READ_TYPED_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
+{
+  "steps": [
+    { "step_index": 1, "role": "setup" | "substitution" | "rule_application" | "simplification" | "result", "plain_text": "<one-sentence plain-English description of this step>" }
+  ],
+  "final_answer": { "latex": "<final answer as LaTeX, exactly as the student wrote it, or empty string>", "present": true|false }
+}
+"role" must be exactly one of the five listed values — no others. Include exactly one entry per step given below, in the same order.`;
+
+export function s2ReadTypedUserPrompt(steps: { step_index: number; latex: string }[]): string {
+  return [
+    `The student typed these steps directly (no image, no OCR):`,
+    ...steps.map((s) => `Step ${s.step_index}: ${s.latex}`),
+    ``,
+    S2_READ_TYPED_SHAPE,
+  ].join("\n");
 }
 
 export function s4AssessSystemPrompt(): string {

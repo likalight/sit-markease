@@ -39,6 +39,33 @@ export const s2ReadNativeSchema = {
   required: ["steps", "final_answer", "flags", "overall_legibility"],
 };
 
+export const s2ReadTypedNativeSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    steps: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          step_index: { type: SchemaType.INTEGER },
+          role: {
+            type: SchemaType.STRING,
+            enum: ["setup", "substitution", "rule_application", "simplification", "result"],
+          },
+          plain_text: { type: SchemaType.STRING },
+        },
+        required: ["step_index", "role", "plain_text"],
+      },
+    },
+    final_answer: {
+      type: SchemaType.OBJECT,
+      properties: { latex: { type: SchemaType.STRING }, present: { type: SchemaType.BOOLEAN } },
+      required: ["latex", "present"],
+    },
+  },
+  required: ["steps", "final_answer"],
+};
+
 export const assessNativeSchema = {
   type: SchemaType.OBJECT,
   properties: {
