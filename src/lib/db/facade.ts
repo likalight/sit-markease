@@ -43,21 +43,33 @@ export const db = {
   },
 
   // The question students currently submit against — the most recently
-  // created one, not always the original seeded one. This is what makes
-  // "an educator creates a new question in any subject" actually change
-  // what students see, instead of the app being permanently locked to
-  // question #1 (docs/DECISIONS.md).
+  // created question belonging to an assessment an educator has actually
+  // opened for submissions (assessments.status = 'open'). A "draft"
+  // assignment's question is not submittable, even if it's the most
+  // recently created one overall — this is what makes "open for
+  // submissions" a real gate instead of dead schema (docs/DECISIONS.md).
   async getCurrentQuestion() {
     if (fx()) {
-      // Array push order == insertion order — the last element is the most
-      // recently created question, regardless of which assessment it's in.
-      const all = localStore.all("questions") as any[];
-      return all[all.length - 1] ?? null;
+      const openAssessmentIds = new Set(
+        (localStore.all("assessments") as any[]).filter((a) => a.status === "open").map((a) => a.id)
+      );
+      const open = (localStore.all("questions") as any[]).filter((q) => openAssessmentIds.has(q.assessment_id));
+      return open[open.length - 1] ?? null;
     }
+    const admin = supabaseAdmin();
+    const { data: openAssessments } = await admin.from("assessments").select("id").eq("status", "open");
+    const openIds = (openAssessments ?? []).map((a: any) => a.id);
+    if (openIds.length === 0) return null;
     // `position` is scoped per-assessment (each restarts at 1), so it can't
     // tell two different assessments' questions apart by recency — order by
     // created_at instead (supabase/migrations/0003_add_question_created_at.sql).
-    const { data } = await supabaseAdmin().from("questions").select("*").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const { data } = await admin
+      .from("questions")
+      .select("*")
+      .in("assessment_id", openIds)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
     return data;
   },
 
@@ -99,6 +111,60 @@ export const db = {
       .select("*")
       .single();
     if (error) throw error;
+    return data;
+  },
+
+  // Real, educator-named assignment — replaces findOrCreateDefaultAssessment
+  // for the "create assignment" flow (that one stays for anything that still
+  // needs a bare default container). New assessments start "draft" (schema
+  // default) — not submittable until updateAssessmentStatus opens them.
+  async createAssessment(moduleId: string, title: string) {
+    if (fx()) {
+      return localStore.insert("assessments", { module_id: moduleId, title, status: "draft" });
+    }
+    const { data, error } = await supabaseAdmin()
+      .from("assessments")
+      .insert({ module_id: moduleId, title, status: "draft" })
+      .select("*")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async listAssessmentsForOwner(ownerId: string) {
+    if (fx()) {
+      const moduleIds = new Set(
+        (localStore.all("modules") as any[]).filter((m: any) => m.owner_id === ownerId).map((m: any) => m.id)
+      );
+      return (localStore.all("assessments") as any[])
+        .filter((a: any) => moduleIds.has(a.module_id))
+        .slice()
+        .reverse();
+    }
+    const admin = supabaseAdmin();
+    const { data: modules } = await admin.from("modules").select("id").eq("owner_id", ownerId);
+    const moduleIds = (modules ?? []).map((m: any) => m.id);
+    if (moduleIds.length === 0) return [];
+    const { data } = await admin
+      .from("assessments")
+      .select("*")
+      .in("module_id", moduleIds)
+      .order("created_at", { ascending: false });
+    return data ?? [];
+  },
+
+  async updateAssessmentStatus(id: string, status: "draft" | "open" | "marking" | "released") {
+    if (fx()) {
+      return localStore.update("assessments", id, { status });
+    }
+    const { data, error } = await supabaseAdmin().from("assessments").update({ status }).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getAssessment(id: string) {
+    if (fx()) return localStore.get("assessments", id);
+    const { data } = await supabaseAdmin().from("assessments").select("*").eq("id", id).maybeSingle();
     return data;
   },
 

@@ -220,3 +220,15 @@ export const rubricStructureNativeSchema = {
   },
   required: ["criteria"],
 };
+
+export const documentExtractNativeSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    prompt_text: { type: SchemaType.STRING },
+    model_solution: { type: SchemaType.STRING },
+    expected_answer_latex: { type: SchemaType.STRING },
+    max_score: { type: SchemaType.NUMBER },
+    raw_rubric_notes: { type: SchemaType.STRING },
+  },
+  required: ["prompt_text", "model_solution", "expected_answer_latex", "max_score", "raw_rubric_notes"],
+};

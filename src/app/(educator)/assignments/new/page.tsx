@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { SubmitButton } from "@/components/submit-button";
+import { DocumentUploadField } from "@/components/document-upload-field";
 import { createQuestionAction } from "./actions";
 
 export default async function NewQuestionPage({
@@ -20,10 +21,11 @@ export default async function NewQuestionPage({
         <Link href="/assignments" className="text-body-sm text-muted underline">
           ← Back to assignments
         </Link>
-        <h1 className="mt-xs text-title-lg text-body-strong">New question</h1>
+        <h1 className="mt-xs text-title-lg text-body-strong">New assignment</h1>
         <p className="text-body-sm text-muted">
-          Any subject with a checkable answer works — this isn't limited to math. Paste your rubric
-          notes as-is; the AI structures them into weighted, leveled grading criteria.
+          Any subject with a checkable answer works — this isn't limited to math. Upload a real marking
+          scheme, or paste your rubric notes as-is — the AI structures them into weighted, leveled
+          grading criteria either way.
         </p>
       </div>
 
@@ -34,6 +36,18 @@ export default async function NewQuestionPage({
       )}
 
       <form action={createQuestionAction} className="flex flex-col gap-md">
+        <label className="flex flex-col gap-xs text-body-sm text-body">
+          Assignment name
+          <input
+            name="assignmentName"
+            required
+            placeholder="e.g. Math Tutorial 1"
+            className="rounded-sm border border-hairline px-md py-sm"
+          />
+        </label>
+
+        <DocumentUploadField />
+
         <label className="flex flex-col gap-xs text-body-sm text-body">
           Question
           <textarea
@@ -101,7 +115,7 @@ export default async function NewQuestionPage({
           />
         </label>
 
-        <SubmitButton pendingLabel="Structuring rubric with AI…">Create question</SubmitButton>
+        <SubmitButton pendingLabel="Structuring rubric with AI…">Create assignment</SubmitButton>
       </form>
     </main>
   );

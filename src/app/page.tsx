@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import { Logo } from "@/components/logo";
-import { TechCarousel } from "@/components/tech-carousel";
-import { JourneyExplorer } from "@/components/journey-explorer";
-import { PipelineFlow } from "@/components/pipeline-flow";
-import { enterAsEducatorAction } from "@/app/enter/actions";
+import { enterAsStudentAction, enterAsEducatorAction } from "@/app/enter/actions";
 import { SubmitButton } from "@/components/submit-button";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +42,70 @@ function ShapeAccent({ className = "" }: { className?: string }) {
   );
 }
 
-export default function LandingPage() {
+// The real 8-step journey (docs/DECISIONS.md, aims-deck.html) — replaces
+// the old generic "how it works" diagram + interactive toggle with the
+// actual pipeline, actual tool names, in actual order. Every line here is
+// something the app genuinely does today, not aspirational copy.
+const JOURNEY = [
+  {
+    n: 1,
+    title: "Student submits",
+    body: "A photo, a PDF, or typed LaTeX of their handwritten working.",
+    tools: null,
+  },
+  {
+    n: 2,
+    title: "AI reads & scores",
+    body: "pix2text and AWS Textract each independently read the script; the grading model transcribes it for real, grounded by RAG retrieval over the module's own worked examples.",
+    tools: "pix2text · Textract · RAG · OpenAI",
+  },
+  {
+    n: 3,
+    title: "Instructor reviews",
+    body: "The script sits beside the AI's transcription and reasoning, on one screen.",
+    tools: null,
+  },
+  {
+    n: 4,
+    title: "Instructor approves & releases",
+    body: "Nothing reaches a student without this explicit action — every time, no exceptions, logged to an audit trail.",
+    tools: null,
+  },
+  {
+    n: 5,
+    title: "Student sees the gap",
+    body: "The exact misconception, named — not just a mark taken off.",
+    tools: null,
+  },
+  {
+    n: 6,
+    title: "Requests revision",
+    body: "RAG retrieves relevant material for that specific gap; the AI generates a fresh practice question from it.",
+    tools: "RAG · OpenAI",
+  },
+  {
+    n: 7,
+    title: "Verified before it ships",
+    body: "SymPy checks it symbolically first, an LLM as fallback — anything that fails is discarded, never shown.",
+    tools: "SymPy · OpenAI",
+  },
+  {
+    n: 8,
+    title: "Walks in exam-ready",
+    body: "Weak points already practised — not discovered for the first time on the day.",
+    tools: null,
+  },
+];
+
+const STACK = ["Next.js", "Supabase", "OpenAI", "pix2text", "AWS Textract", "RAG", "SymPy", "Python / FastAPI"];
+
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+
   return (
     <main
       className={`landing-theme flex flex-col overflow-x-clip bg-canvas ${landingSerif.variable} ${landingSans.variable} ${landingMono.variable}`}
@@ -61,138 +121,101 @@ export default function LandingPage() {
         </Link>
       </nav>
 
-      {/* Hero */}
-      <section className="relative mx-auto flex w-full max-w-[1160px] flex-col gap-md px-6 py-section text-center">
+      {/* Hero + embedded entry */}
+      <section className="relative mx-auto flex w-full max-w-[1160px] flex-col gap-lg px-6 py-section">
         <ShapeAccent className="-right-16 -top-10 h-56 w-56 rotate-12" />
         <ShapeAccent className="-left-20 top-24 h-40 w-40 -rotate-6" />
-        <p className="relative mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Built at SIT</p>
-        <h1 className="relative mx-auto max-w-2xl font-serif text-display-xl text-ink">
-          Photograph it. Get graded in seconds.
-        </h1>
-        <p className="relative mx-auto max-w-lg text-body-md text-muted">
-          Any subject with a checkable answer. An AI reads your work, verifies the answer for real, and
-          shows you exactly which step went wrong.
-        </p>
-        <div className="relative mx-auto flex flex-wrap items-center justify-center gap-sm pt-sm">
-          <Link
-            href="/enter/student"
-            className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary"
+
+        <div className="relative flex flex-col gap-md text-center">
+          <p className="mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Built at SIT</p>
+          <h1 className="mx-auto max-w-2xl font-serif text-display-xl text-ink">
+            Photograph it. Get graded — and taught.
+          </h1>
+          <p className="mx-auto max-w-lg text-body-md text-muted">
+            Any subject with a checkable answer. An AI reads the work, verifies the answer for real, names
+            the exact misconception, and hands back practice targeting it.
+          </p>
+        </div>
+
+        {error && (
+          <p className="relative mx-auto max-w-md rounded-sm border border-disputed/30 bg-disputed-soft px-md py-sm text-center text-body-sm text-disputed">
+            {error}
+          </p>
+        )}
+
+        <div className="relative mx-auto grid w-full max-w-2xl gap-md sm:grid-cols-2">
+          <form
+            action={enterAsStudentAction}
+            className="flex flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
           >
-            I'm a student
-          </Link>
-          <form action={enterAsEducatorAction}>
-            <SubmitButton
-              pendingLabel="Signing in…"
-              className="rounded-sm border border-hairline px-lg py-sm text-title-sm text-body"
-            >
-              I'm an educator
+            <p className="font-serif text-title-md text-ink">I'm a student</p>
+            <p className="text-body-sm text-muted">Enter your 3-digit demo ID.</p>
+            <input
+              name="studentId"
+              inputMode="numeric"
+              maxLength={3}
+              required
+              placeholder="111"
+              className="rounded-sm border border-hairline bg-canvas px-md py-sm text-center text-title-md tabular-nums tracking-widest"
+            />
+            <SubmitButton pendingLabel="Signing in…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
+              Submit work
+            </SubmitButton>
+          </form>
+
+          <form
+            action={enterAsEducatorAction}
+            className="flex flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
+          >
+            <p className="font-serif text-title-md text-ink">I'm an educator</p>
+            <p className="text-body-sm text-muted">One click into the review queue — no setup needed for the demo.</p>
+            <div className="flex-1" />
+            <SubmitButton pendingLabel="Signing in…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
+              Review submissions
             </SubmitButton>
           </form>
         </div>
       </section>
 
-      {/* Tech-stack marquee */}
-      <TechCarousel className="mx-auto w-full max-w-[1160px] px-6 pb-lg" />
-
-      {/* How it works — interactive flow, not a text grid */}
+      {/* The real journey */}
       <section className="w-full bg-surface-soft">
         <div className="mx-auto max-w-[720px] px-6 py-section">
-          <h2 className="mb-lg text-center font-serif text-display-sm text-ink">How it works</h2>
-          <PipelineFlow />
-        </div>
-      </section>
-
-      {/* Interactive: how the relationship works */}
-      <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
-        <h2 className="mb-xs text-center font-serif text-display-sm text-ink">
-          Student, meet educator
-        </h2>
-        <p className="mx-auto mb-lg max-w-md text-center text-body-sm text-muted">
-          Same submission, two jobs. Toggle roles below.
-        </p>
-        <JourneyExplorer />
-      </section>
-
-      {/* Why you can trust it */}
-      <section className="w-full bg-surface-dark">
-        <div className="mx-auto max-w-[1160px] px-6 py-section">
-          <h2 className="mb-md font-serif text-display-sm text-on-dark">Why you can trust the grade</h2>
-          <div className="grid grid-cols-1 gap-lg sm:grid-cols-3">
-            {[
-              { title: "Confidence, measured", body: "Not just a final guess — every step is scored." },
-              { title: "Answers, verified", body: "Checked like a calculator, not an opinion." },
-              { title: "A person, when it matters", body: "Anything uncertain waits for a teacher." },
-            ].map((c) => (
-              <div key={c.title} className="rounded-lg border border-white/10 px-md py-md">
-                <h3 className="mb-xxs text-title-md text-on-dark">{c.title}</h3>
-                <p className="text-body-sm text-on-dark-soft">{c.body}</p>
-              </div>
+          <h2 className="mb-xxs text-center font-serif text-display-sm text-ink">One script's journey</h2>
+          <p className="mb-lg text-center text-body-sm text-muted">
+            Student → AI → instructor → student again, repeating weekly, consolidating for the exam.
+          </p>
+          <ol className="flex flex-col gap-md">
+            {JOURNEY.map((step) => (
+              <li key={step.n} className="flex gap-md rounded-lg border border-hairline bg-surface-card px-lg py-md">
+                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-pill bg-primary font-sans text-body-sm font-bold text-on-primary">
+                  {step.n}
+                </span>
+                <div className="flex flex-col gap-xxs">
+                  <div className="flex flex-wrap items-baseline gap-sm">
+                    <p className="text-title-sm font-semibold text-body-strong">{step.title}</p>
+                    {step.tools && (
+                      <span className="rounded-sm border border-primary/30 px-xs py-[1px] font-mono text-caption text-primary">
+                        {step.tools}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-body-sm text-muted">{step.body}</p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* Why this exists — two shapes, not a paragraph */}
+      {/* Built with — real stack, plain list */}
       <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
-        <h2 className="mb-lg text-center font-serif text-display-sm text-ink">Why this exists</h2>
-        <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
-          <div className="rounded-lg border-l-4 border-l-hairline bg-surface-soft px-lg py-lg">
-            <p className="mb-xs font-mono text-caption-caps text-muted-soft">The problem</p>
-            <p className="text-body-md text-body">
-              Large classes can't get fast, individual feedback. Students get a mark, not a reason.
-            </p>
-          </div>
-          <div className="rounded-lg border-l-4 border-l-primary bg-surface-soft px-lg py-lg">
-            <p className="mb-xs font-mono text-caption-caps text-muted-soft">The fix</p>
-            <p className="text-body-md text-body">
-              Real diagnosis at scale — a person still signs off on every grade.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Where this applies */}
-      <section className="w-full bg-surface-soft">
-        <div className="mx-auto max-w-[1160px] px-6 py-section">
-          <h2 className="mb-lg text-center font-serif text-display-sm text-ink">Not just one subject</h2>
-          <div className="grid grid-cols-2 gap-md sm:grid-cols-4">
-            {[
-              { school: "Engineering", example: "Reaction forces on a loaded beam." },
-              { school: "Computing", example: "Time complexity of a recursion." },
-              { school: "Business", example: "Adjusting entries and net income." },
-              { school: "Health Sciences", example: "The correct IV drip rate." },
-            ].map((s, i) => (
-              <div
-                key={s.school}
-                className={`rounded-lg border border-hairline bg-surface-card px-md py-md ${i % 2 === 0 ? "rotate-1" : "-rotate-1"}`}
-              >
-                <p className="mb-xxs font-mono text-caption-caps text-muted-soft">{s.school}</p>
-                <p className="text-body-sm text-body">{s.example}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="relative mx-auto w-full max-w-[1160px] px-6 py-section text-center">
-        <ShapeAccent className="-bottom-10 left-1/2 h-48 w-48 -translate-x-1/2 rotate-45" />
-        <h2 className="relative mb-lg font-serif text-display-sm text-ink">Ready to try it?</h2>
-        <div className="relative flex flex-wrap items-center justify-center gap-sm">
-          <Link
-            href="/enter/student"
-            className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary"
-          >
-            I'm a student
-          </Link>
-          <form action={enterAsEducatorAction}>
-            <SubmitButton
-              pendingLabel="Signing in…"
-              className="rounded-sm border border-hairline px-lg py-sm text-title-sm text-body"
-            >
-              I'm an educator
-            </SubmitButton>
-          </form>
+        <h2 className="mb-md text-center font-serif text-display-sm text-ink">Built with</h2>
+        <div className="flex flex-wrap items-center justify-center gap-sm">
+          {STACK.map((tool) => (
+            <span key={tool} className="rounded-pill border border-hairline px-md py-xs font-mono text-caption text-body">
+              {tool}
+            </span>
+          ))}
         </div>
       </section>
 

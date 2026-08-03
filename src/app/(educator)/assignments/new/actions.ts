@@ -17,6 +17,7 @@ export async function createQuestionAction(formData: FormData) {
     redirect("/login");
   }
 
+  const assignmentName = String(formData.get("assignmentName") ?? "").trim();
   const promptText = String(formData.get("promptText") ?? "").trim();
   const modelSolution = String(formData.get("modelSolution") ?? "").trim();
   const expectedAnswerLatex = String(formData.get("expectedAnswerLatex") ?? "").trim();
@@ -24,8 +25,12 @@ export async function createQuestionAction(formData: FormData) {
   const rawRubricNotes = String(formData.get("rubricNotes") ?? "").trim();
   const topicTagsRaw = String(formData.get("topicTags") ?? "").trim();
 
-  if (!promptText || !modelSolution || !rawRubricNotes || !maxScore || maxScore <= 0) {
-    redirect(`/assignments/new?error=${encodeURIComponent("fill in the question, model solution, total points, and rubric notes")}`);
+  if (!assignmentName || !promptText || !modelSolution || !rawRubricNotes || !maxScore || maxScore <= 0) {
+    redirect(
+      `/assignments/new?error=${encodeURIComponent(
+        "fill in the assignment name, question, model solution, total points, and rubric notes"
+      )}`
+    );
   }
 
   const topicTags = topicTagsRaw
@@ -44,7 +49,7 @@ export async function createQuestionAction(formData: FormData) {
   }
 
   const module_ = await db.findOrCreateDefaultModule(user!.id);
-  const assessment = await db.findOrCreateDefaultAssessment((module_ as any).id);
+  const assessment = await db.createAssessment((module_ as any).id, assignmentName);
   const existingCount = await db.countQuestionsForAssessment((assessment as any).id);
 
   const question = await db.createQuestion({

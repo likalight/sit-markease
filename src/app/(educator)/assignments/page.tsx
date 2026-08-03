@@ -2,11 +2,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
+import { SubmitButton } from "@/components/submit-button";
+import { setAssessmentStatusAction } from "./actions";
 
-// Assignments the educator has issued — a lightweight overview so the
-// educator's job is "see what's happening across my questions," not
-// "upload work on a student's behalf" (that moved to the student's own
-// /submit page once submissions became self-serve).
 export default async function AssignmentsPage() {
   const user = await getCurrentUser();
   if (!user || user.role !== "educator") redirect("/login");
@@ -15,7 +13,7 @@ export default async function AssignmentsPage() {
 
   const rows = await Promise.all(
     questions.map(async (q: any) => {
-      const module_ = await db.getModuleForQuestion(q.id);
+      const assessment = await db.getAssessment(q.assessment_id);
       const submissions = await db.listSubmissionsForQuestion(q.id);
       let released = 0;
       let pending = 0;
@@ -34,8 +32,9 @@ export default async function AssignmentsPage() {
       }
       return {
         id: q.id,
-        moduleCode: module_?.code ?? "—",
-        moduleTitle: module_?.title ?? "Unknown module",
+        assessmentId: q.assessment_id,
+        assignmentName: assessment?.title ?? "Untitled assignment",
+        status: assessment?.status ?? "draft",
         promptText: q.prompt_text,
         maxScore: q.max_score,
         submissionCount: submissions.length,
@@ -51,28 +50,28 @@ export default async function AssignmentsPage() {
       <div className="flex items-baseline justify-between">
         <div>
           <h1 className="text-title-lg text-body-strong">Assignments</h1>
-          <p className="text-body-sm text-muted">Every question you've issued, and how it's going.</p>
+          <p className="text-body-sm text-muted">Every assignment you've issued, and how it's going.</p>
         </div>
         <div className="flex items-center gap-sm">
           <Link href="/assignments/resources" className="rounded-sm border border-hairline px-md py-xs text-body-sm text-body">
             Reference material
           </Link>
           <Link href="/assignments/new" className="rounded-sm bg-primary px-md py-xs text-body-sm font-medium text-on-primary">
-            + New question
+            + New assignment
           </Link>
         </div>
       </div>
 
       {rows.length === 0 ? (
         <p className="text-body-sm text-muted">
-          No questions yet — <Link href="/assignments/new" className="underline">create one</Link>.
+          No assignments yet — <Link href="/assignments/new" className="underline">create one</Link>.
         </p>
       ) : (
         <ul className="flex flex-col divide-y divide-hairline border border-hairline">
           {rows.map((r) => (
             <li key={r.id} className="flex flex-col gap-xs px-md py-sm">
               <div className="flex items-baseline justify-between">
-                <span className="text-caption-caps text-muted-soft">{r.moduleCode} — {r.moduleTitle}</span>
+                <span className="text-caption-caps text-muted-soft">{r.assignmentName}</span>
                 {r.avgScore !== null && (
                   <span className="text-data-sm tabular-nums text-body-strong">
                     avg {r.avgScore.toFixed(1)}/{r.maxScore}
@@ -80,14 +79,35 @@ export default async function AssignmentsPage() {
                 )}
               </div>
               <p className="text-body-sm text-body">{r.promptText}</p>
-              <div className="flex items-center gap-md text-caption text-muted">
-                <span>{r.submissionCount} submitted</span>
-                <span className="text-verified">{r.released} auto/reviewed & released</span>
-                {r.pending > 0 && (
-                  <Link href="/review" className="text-disputed underline">
-                    {r.pending} awaiting your review →
-                  </Link>
-                )}
+              <div className="flex items-center justify-between gap-md">
+                <div className="flex items-center gap-md text-caption text-muted">
+                  <span>{r.submissionCount} submitted</span>
+                  <span className="text-verified">{r.released} reviewed &amp; released</span>
+                  {r.pending > 0 && (
+                    <Link href="/review" className="text-disputed underline">
+                      {r.pending} awaiting your review →
+                    </Link>
+                  )}
+                </div>
+                <form action={setAssessmentStatusAction}>
+                  <input type="hidden" name="assessmentId" value={r.assessmentId} />
+                  <input type="hidden" name="status" value={r.status === "open" ? "draft" : "open"} />
+                  {r.status === "open" ? (
+                    <SubmitButton
+                      pendingLabel="Closing…"
+                      className="rounded-sm border border-verified/40 bg-verified-soft px-sm py-xxs text-caption font-medium text-verified"
+                    >
+                      Open for submissions — close
+                    </SubmitButton>
+                  ) : (
+                    <SubmitButton
+                      pendingLabel="Opening…"
+                      className="rounded-sm border border-hairline px-sm py-xxs text-caption font-medium text-body"
+                    >
+                      Draft — open for submissions
+                    </SubmitButton>
+                  )}
+                </form>
               </div>
             </li>
           ))}

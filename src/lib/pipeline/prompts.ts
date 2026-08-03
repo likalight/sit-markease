@@ -32,6 +32,7 @@ export const PROMPT_VERSIONS = {
   s7Practice: "s7_practice.v1",
   s7Verify: "s7_verify.v1",
   rubricStructure: "rubric_structure.v1",
+  documentExtract: "document_extract.v1",
 } as const;
 
 export function s2ReadSystemPrompt(): string {
@@ -359,4 +360,24 @@ export function rubricStructureUserPrompt(args: {
     ``,
     RUBRIC_STRUCTURE_SHAPE,
   ].join("\n");
+}
+
+export function documentExtractSystemPrompt(): string {
+  return loadPrompt("document_extract.v1.md");
+}
+
+const DOCUMENT_EXTRACT_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
+{
+  "prompt_text": "<the question exactly as written, plain text>",
+  "model_solution": "<a correct worked solution — transcribed from the document if a model answer is shown, otherwise your own correct solution to the stated question>",
+  "expected_answer_latex": "<the final answer as LaTeX, or an empty string if the document doesn't state one>",
+  "max_score": <total points available, as a number>,
+  "raw_rubric_notes": "<the marking scheme / point breakdown, transcribed as plain text, one criterion per line>"
+}`;
+
+export function documentExtractUserPrompt(ocrHint?: string): string {
+  const instructions =
+    "This image is a real marking scheme / rubric document for a course assignment. It typically contains the question, a model answer or expected result, and a point breakdown, all mixed together. Extract each field separately.";
+  const body = ocrHint ? `${ocrHint}\n\n${instructions}` : instructions;
+  return `${body}\n\n${DOCUMENT_EXTRACT_SHAPE}`;
 }
