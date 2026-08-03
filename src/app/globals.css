@@ -55,7 +55,7 @@
    feedback page — the two surfaces where a human actually looks at a
    graded submission, matching the deck's dashboard mockup), each paired
    with page-local Newsreader/Archivo/IBM Plex Mono font loads, rather than
-   changed globally — every other authenticated page (dashboard, insights,
+   changed globally — every other authenticated page (dashboard,
    exam-prep, settings) still uses the black/white/red system above
    unchanged. See docs/DECISIONS.md for why these systems now deliberately
    diverge. Semantic status colors (verified/attention/disputed) are

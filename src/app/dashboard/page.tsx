@@ -24,9 +24,6 @@ export default async function DashboardPage() {
           <Link href="/assignments" className="text-body-sm text-body underline">
             Assignments you've issued →
           </Link>
-          <Link href="/insights" className="text-body-sm text-body underline">
-            Class insights →
-          </Link>
         </div>
       )}
       {user.role === "student" && (

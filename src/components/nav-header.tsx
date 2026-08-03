@@ -34,9 +34,6 @@ export async function NavHeader() {
               <Link href="/assignments" className="whitespace-nowrap hover:text-body">
                 Assignments
               </Link>
-              <Link href="/insights" className="whitespace-nowrap hover:text-body">
-                Class insights
-              </Link>
             </>
           )}
           {user.role === "student" && (
