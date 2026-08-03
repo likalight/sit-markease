@@ -9,6 +9,7 @@
   <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ECF8E?style=flat-square&logo=supabase&logoColor=white">
   <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-vision-412991?style=flat-square&logo=openai&logoColor=white">
   <img alt="Python" src="https://img.shields.io/badge/sidecar-FastAPI%20%2B%20SymPy-009688?style=flat-square&logo=fastapi&logoColor=white">
+  <img alt="OCR" src="https://img.shields.io/badge/OCR-pix2text%20%2B%20Textract-880D1E?style=flat-square">
 </p>
 
 <p align="center">
@@ -30,15 +31,24 @@ get a number, not a reason, and no way to find practice targeting their actual g
 
 ## What SIT MarkEase does
 
-A student photographs (or uploads a PDF of) their handwritten working. From there:
+One script's journey, from a photo to walking into an exam already practiced:
 
-- 🔍 **OCR + line detection** (OpenCV) finds each line of work in the image
-- 🧠 **A multimodal LLM transcribes it** — literally, errors and all, with a confidence score per step
-- ✅ **The final answer is verified symbolically** (SymPy) wherever it's checkable — not just "looks right"
-- 📋 **Graded against a real rubric**, with every mark citing the exact step that earned it
-- 🎯 **Misconceptions are named**, not just marked wrong — "you exponentiated before applying the initial condition," not "incorrect"
-- 📚 **Fresh practice problems are generated via RAG**, targeting that specific gap, verified correct before they're ever shown
-- 👩‍🏫 **A human always signs off** — nothing releases to a student without an explicit educator approval, logged to an audit trail every time
+1. 📸 **Student submits** a photo or PDF of their handwritten working (or types it as LaTeX directly).
+2. 🔍🧠 **AI reads & scores it** — OpenCV finds each line, **pix2text** and **AWS Textract** each
+   independently pre-transcribe it as a hint, then a multimodal LLM does the real transcription
+   (literally, errors and all, confidence per step) and grades it against the rubric, **grounded by RAG
+   retrieval** over the module's own worked-example corpus. The final answer is verified symbolically
+   (SymPy) wherever it's checkable — not just "looks right."
+3. 👩‍🏫 **Instructor reviews** — script beside the transcription and the AI's reasoning, one screen.
+4. ✅ **Instructor approves & releases** — nothing reaches a student without this explicit action, logged
+   to an audit trail every time. No auto-release, ever.
+5. 🎯 **Student sees the gap** — misconceptions are named, not just marked wrong ("you exponentiated
+   before applying the initial condition," not "incorrect") — and can **request revision** on demand.
+6. 📚 **RAG retrieves & AI generates** a fresh practice set targeting that specific gap.
+7. 🛡️ **Practice items are verified** — SymPy first, LLM fallback, failures discarded — before anything
+   ships, as its own distinct, logged step.
+8. 🎓 Repeating weekly, the student **walks into the exam already practiced** on their actual weak points,
+   not discovering them on the day.
 
 Any subject with a checkable answer works — this isn't a math tool with a rubric bolted on. Engineering,
 accounting, nursing dosage calculations, and plain-math problems all run through the identical pipeline;
@@ -60,12 +70,15 @@ Live deployment is being moved to this repo — link coming shortly. In the mean
 | App + API | Next.js 15 (App Router), TypeScript, Tailwind |
 | Database, Auth, Storage | Supabase (Postgres + pgvector) |
 | AI | OpenAI (vision, structured outputs) — provider-agnostic seam, swappable per role |
+| OCR pre-transcription hints | pix2text (local, self-hosted) + AWS Textract — both feed the vision call, neither replaces it; the image stays ground truth |
 | Image processing + symbolic verification | Python sidecar (FastAPI, OpenCV, SymPy), deployed separately on Render |
-| Retrieval-augmented practice generation | Local embeddings over an ingested course corpus |
+| Retrieval-augmented grounding | Local embeddings over an ingested course corpus — used in both rubric scoring and practice generation |
 
 Every model call is schema-validated (Zod), cached by input hash, and logged with token/cost/latency —
 see [`docs/DECISIONS.md`](./docs/DECISIONS.md) for the full history of what changed and why, and
-[`docs/STUBS.md`](./docs/STUBS.md) for what's intentionally not built yet.
+[`docs/STUBS.md`](./docs/STUBS.md) for what's intentionally not built yet. **Textract is currently
+disabled** (commented out in `.env`, pending a subscribed AWS payment method) — pix2text alone is the
+live OCR hint until that's sorted; the code needs no changes to re-enable it.
 
 ## Local setup
 
