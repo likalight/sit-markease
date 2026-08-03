@@ -2,6 +2,18 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Real named assignments with an actual open/close gate; document-upload OCR; landing page rebuild
+
+Walking through the real instructor/student journey turned up two gaps: (1) `assessments.status` existed in the schema (`draft`/`open`/`marking`/`released`) but nothing ever read or wrote it — every educator-created question got shoved into one hardcoded module/assessment pair (`findOrCreateDefaultModule`/`findOrCreateDefaultAssessment`), and `getCurrentQuestion()` just served the globally most-recent question regardless of status. "Open for submissions" wasn't a real switch. (2) The landing page had drifted into generic template-feeling sections (a "why trust it" 3-card grid, generic subject tiles) instead of describing what the app actually does.
+
+**Fixed the open/close gate**: added `createAssessment`/`listAssessmentsForOwner`/`updateAssessmentStatus`/`getAssessment` to `src/lib/db/facade.ts`; `getCurrentQuestion()` now only serves questions whose assessment is `status = 'open'`. Consequence found immediately on testing: the *existing* seeded assessment ("Assignment 1") had also silently never been opened — it worked before only because nothing checked status. Manually opened it (and the older unused "General assessment" row) so the demo baseline keeps working; new assignments now start `draft` and need an explicit click.
+
+**Added document-upload OCR for creating a question**: `src/lib/pipeline/document-extract.ts` — an educator can upload a photo/PDF of a real marking-scheme document (which usually contains the question, model answer, and point breakdown together) instead of retyping it. Reuses S2's OCR-hint pattern (pix2text + Textract) and one new vision AI call to separate the document into `{prompt_text, model_solution, expected_answer_latex, max_score, raw_rubric_notes}`, which feeds the existing, unchanged `structureRubric()`. Deliberately did **not** reuse `s1-ingest.ts`'s `ingestSubmission()` — that function unconditionally creates a `submissions` row, which doesn't fit a reference-document upload. Paste-as-text stays as the alternative.
+
+**Landing page rebuilt**, not edited: real 8-step journey with real tool names per step (replacing the generic sections), demo login (student 3-digit ID + educator one-click) embedded directly in the hero instead of linking out to a separate page. Deleted `tech-carousel.tsx`/`journey-explorer.tsx`/`pipeline-flow.tsx` — confirmed unused anywhere else.
+
+Verified live: created a named draft assignment, confirmed it's invisible to students, opened it, confirmed it immediately appears; tested the upload-extraction endpoint against a real image (real 200, real structured JSON back); logged in as both roles through the new embedded landing forms.
+
 ## Fixed: practice verification didn't degrade when the sidecar was unreachable
 
 Found live while testing the S7 split above: `verifyGeneratedItem()` (`src/lib/pipeline/s7-practice.ts`) called `sidecar.verifyItem()` (SymPy) with no try/catch — only the LLM fallback path was guarded. A sidecar outage surfaced as the whole `S7_verify` stage_run failing with a raw `"fetch failed"` error instead of degrading to LLM judgement, violating CLAUDE.md rule 8. Wrapped the SymPy call the same way the LLM call already was; a sidecar failure now falls through to LLM verification instead of failing the stage. Verified live: stopped the sidecar, re-ran practice generation on a real gold submission, confirmed `S7_verify` now succeeds (LLM-verified items) instead of failing with `fetch failed`.
