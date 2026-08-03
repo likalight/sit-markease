@@ -3,7 +3,6 @@
 </p>
 
 <p align="center">
-  <a href="https://practica-aims.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-practica--aims.vercel.app-E61432?style=flat-square"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-black?style=flat-square"></a>
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white">
@@ -39,7 +38,7 @@ A student photographs (or uploads a PDF of) their handwritten working. From ther
 - 📋 **Graded against a real rubric**, with every mark citing the exact step that earned it
 - 🎯 **Misconceptions are named**, not just marked wrong — "you exponentiated before applying the initial condition," not "incorrect"
 - 📚 **Fresh practice problems are generated via RAG**, targeting that specific gap, verified correct before they're ever shown
-- 👩‍🏫 **A human always signs off** — confident, verified results release automatically; anything uncertain waits for an educator, logged either way
+- 👩‍🏫 **A human always signs off** — nothing releases to a student without an explicit educator approval, logged to an audit trail every time
 
 Any subject with a checkable answer works — this isn't a math tool with a rubric bolted on. Engineering,
 accounting, nursing dosage calculations, and plain-math problems all run through the identical pipeline;
@@ -48,7 +47,8 @@ solution, and rough rubric notes, and AI structures a weighted rubric from it.
 
 ## Try it live
 
-**[practica-aims.vercel.app](https://practica-aims.vercel.app)**
+Live deployment is being moved to this repo — link coming shortly. In the meantime, see
+[Local setup](#local-setup) below.
 
 - **Student** → enter one of the demo IDs (`111`, `222`, `333`) → straight into the submit screen
 - **Educator** → one click → straight into the review queue
@@ -70,8 +70,8 @@ see [`docs/DECISIONS.md`](./docs/DECISIONS.md) for the full history of what chan
 ## Local setup
 
 ```bash
-git clone https://github.com/likalight/practica.git
-cd practica
+git clone https://github.com/likalight/sit-markease.git
+cd sit-markease
 npm install
 cp .env.example .env
 ```

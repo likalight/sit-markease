@@ -1,4 +1,4 @@
-"""AIMS Python sidecar — FastAPI. §8.
+"""SIT MarkEase Python sidecar — FastAPI. §8.
 
 Consolidates everything that isn't TypeScript-native: OpenCV line geometry,
 SymPy verification, local embeddings. Run locally; no deployment needed for
@@ -16,7 +16,7 @@ import ocr as ocr_module
 import pdf as pdf_module
 import symbolic
 
-app = FastAPI(title="AIMS sidecar")
+app = FastAPI(title="SIT MarkEase sidecar")
 
 
 @app.get("/health")

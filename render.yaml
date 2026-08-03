@@ -5,7 +5,7 @@
 # heavier CPU work).
 services:
   - type: web
-    name: practica-sidecar
+    name: sit-markease-sidecar
     runtime: docker
     dockerfilePath: ./sidecar/Dockerfile
     dockerContext: ./sidecar
