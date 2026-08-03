@@ -9,3 +9,4 @@ pypdfium2
 pillow
 python-multipart
 pydantic
+pix2text

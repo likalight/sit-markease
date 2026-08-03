@@ -12,6 +12,7 @@ import base64
 
 import cv
 import embed as embed_module
+import ocr as ocr_module
 import pdf as pdf_module
 import symbolic
 
@@ -22,7 +23,10 @@ app = FastAPI(title="AIMS sidecar")
 def health():
     return {
         "ok": True,
-        "models_loaded": {"embeddings": embed_module._model is not None},
+        "models_loaded": {
+            "embeddings": embed_module._model is not None,
+            "ocr": ocr_module._p2t is not None,
+        },
     }
 
 
@@ -99,3 +103,15 @@ def embed_texts(req: EmbedRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"embedding failed: {e}")
     return {"vectors": vectors, "dim": 384}
+
+
+class OcrTranscribeRequest(BaseModel):
+    image_b64: str
+
+
+@app.post("/ocr/transcribe")
+def ocr_transcribe(req: OcrTranscribeRequest):
+    try:
+        return ocr_module.transcribe(req.image_b64)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ocr transcription failed: {e}")

@@ -1,10 +1,10 @@
-// Practica mark — icon only, no wordmark. A black blocked square (matching
+// SIT MarkEase mark — icon only, no wordmark. A black blocked square (matching
 // the squared-off geometry of the real SIT mark) sitting on a tilted red
 // plate (the same motif as SIT's own tilted red rectangle), with a white
 // ascending-step-into-checkmark glyph: progress, verified.
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" className={className} role="img" aria-label="Practica">
+    <svg viewBox="0 0 48 48" className={className} role="img" aria-label="SIT MarkEase">
       <rect x="4" y="6" width="38" height="38" rx="3" fill="var(--color-primary)" transform="rotate(-6 23 25)" />
       <rect x="6" y="4" width="38" height="38" rx="3" fill="var(--color-ink)" />
       {/* Ascending steps rising into a checkmark flick — progress, verified. */}

@@ -23,7 +23,7 @@ export async function NavHeader() {
       <div className="flex flex-wrap items-center gap-x-lg gap-y-xs">
         <Link href="/dashboard" className="flex shrink-0 items-center gap-xs">
           <Logo className="h-7 w-7" />
-          <span className="font-serif text-title-md text-ink">Practica</span>
+          <span className="font-serif text-title-md text-ink">SIT MarkEase</span>
         </Link>
         <nav className="flex flex-wrap items-center gap-x-md gap-y-xs text-body-sm text-muted">
           {user.role === "educator" && (

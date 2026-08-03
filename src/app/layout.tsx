@@ -18,8 +18,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swa
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Practica",
-  description: "Practica — AI-assisted assessment diagnosis. Built at SIT (AIMS: AI for Individualised Mastery Support).",
+  title: "SIT MarkEase",
+  description: "SIT MarkEase — AI-assisted assessment diagnosis. Built at SIT.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

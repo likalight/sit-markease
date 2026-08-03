@@ -16,7 +16,7 @@ export default async function EnterStudentPage({
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-lg px-6 py-section">
       <Link href="/" className="mx-auto flex items-center gap-xs">
         <Logo className="h-8 w-8" />
-        <span className="font-serif text-title-md text-ink">Practica</span>
+        <span className="font-serif text-title-md text-ink">SIT MarkEase</span>
       </Link>
 
       <div className="text-center">

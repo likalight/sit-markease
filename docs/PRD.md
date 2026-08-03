@@ -1,4 +1,4 @@
-# AIMS — AI for Individualised Mastery Support
+# SIT MarkEase
 ## Product Requirements Document v2.0 — Zero-Cost Build
 
 **Project:** AI-Assisted Framework for Scalable Feedback and Targeted Practice in Open-Ended Assessments

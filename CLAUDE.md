@@ -1,6 +1,6 @@
 # CLAUDE.md — working rules for this repo
 
-Project: **AIMS — AI for Individualised Mastery Support**. Full spec: `docs/PRD.md` (v2.0, zero-cost build). Read it in full before writing code. It is self-contained — ignore any earlier drafts.
+Project: **SIT MarkEase**. Full spec: `docs/PRD.md` (v2.0, zero-cost build). Read it in full before writing code. It is self-contained — ignore any earlier drafts.
 
 ## Non-negotiables
 

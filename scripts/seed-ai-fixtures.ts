@@ -18,6 +18,7 @@ import { aiCache, cacheKey, hashImage } from "../src/lib/ai/cache";
 import {
   s2ReadSystemPrompt,
   s2ReadUserPrompt,
+  renderOcrHints,
   s4AssessSystemPrompt,
   s4AssessUserPrompt,
   s5DiagnoseSystemPrompt,
@@ -28,7 +29,8 @@ import {
   s7PracticeUserPrompt,
   PROMPT_VERSIONS,
 } from "../src/lib/pipeline/prompts";
-import { stripVariableAssignment } from "../src/lib/pipeline/s4-assess";
+import { stripVariableAssignment, retrieveRubricReferences } from "../src/lib/pipeline/s4-assess";
+import { gatherOcrHintSources } from "../src/lib/pipeline/s2-transcribe";
 import { retrieveChunks } from "../src/lib/rag/retrieve";
 import type { TranscriptionRead } from "../src/lib/schemas/transcription";
 import type { Assessment } from "../src/lib/schemas/assessment";
@@ -320,8 +322,16 @@ async function main() {
     const processedBytes = await db.downloadImage(firstPage.processed_path);
     const imageHash = hashImage(processedBytes.toString("base64"));
 
+    // Must mirror readTranscription()'s OCR hint-gathering exactly (src/lib/pipeline/s2-transcribe.ts)
+    // — the hint text is part of the prompt string, so a mismatched hint here
+    // would seed a cache key the real pipeline never actually requests. Reuses
+    // the same gatherOcrHintSources() the real pipeline calls, rather than
+    // reimplementing the pix2text+Textract logic a second time here.
+    const sources = await gatherOcrHintSources(processedBytes.toString("base64"));
+    const ocrHint = sources.length > 0 ? renderOcrHints(sources) : undefined;
+
     const readSystem = s2ReadSystemPrompt();
-    const readPrompt = s2ReadUserPrompt(LINE_COUNT);
+    const readPrompt = s2ReadUserPrompt(LINE_COUNT, ocrHint);
     const key = cacheKey({
       promptVersion: PROMPT_VERSIONS.s2Read,
       provider: PRIMARY_PROVIDER,
@@ -358,6 +368,11 @@ async function main() {
     );
     const symbolicCheck = !symbolicResult.parsed ? "unparseable" : symbolicResult.equivalent ? "equivalent" : "not_equivalent";
 
+    // Must mirror assessSubmission()'s RAG retrieval exactly (src/lib/pipeline/s4-assess.ts)
+    // — same reasoning as the S2 OCR hint above: a mismatched prompt here seeds
+    // a cache key the real pipeline never actually requests.
+    const retrievedReferences = await retrieveRubricReferences(submission.question_id, question);
+
     const system = s4AssessSystemPrompt();
     const prompt = s4AssessUserPrompt({
       questionPromptText: question.prompt_text,
@@ -366,6 +381,7 @@ async function main() {
       criteria: question.criteria,
       steps,
       symbolicCheck,
+      retrievedReferences,
     });
 
     const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s4Assess, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt });

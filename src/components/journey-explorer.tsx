@@ -13,7 +13,7 @@ const STUDENT_STEPS: Step[] = [
     title: "Submit your work",
     short: "Photograph or upload your handwritten answer, yourself.",
     detail:
-      "No waiting on a teacher to scan or upload anything on your behalf. Open Practica, take a photo or upload a file, and it's already on its way to being graded.",
+      "No waiting on a teacher to scan or upload anything on your behalf. Open SIT MarkEase, take a photo or upload a file, and it's already on its way to being graded.",
   },
   {
     title: "An AI reads it",

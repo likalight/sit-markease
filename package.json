@@ -19,6 +19,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@aws-sdk/client-textract": "^3.1101.0",
     "@google/generative-ai": "^0.21.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",

@@ -2,6 +2,11 @@
 
 Anything not fully implemented, listed immediately as it's introduced.
 
+## pix2text OCR hint (docs/DECISIONS.md)
+
+- `sidecar/ocr.py` auto-downloads pix2text's models from Hugging Face on first `/ocr/transcribe` call (cached under `~/.pix2text`, `~/.cnocr`, `~/.cnstd` afterwards — `C:\Users\<user>\AppData\Roaming\{pix2text,cnocr,cnstd}` on Windows). Needs internet on the sidecar's first real OCR call; every call after that is fully local. `/health`'s `models_loaded.ocr` stays `false` until that first call has happened (same lazy-load pattern as `embeddings`). Verified live: real model download + a real `/ocr/transcribe` call against `eval/gold/images/correct.png` both work, ~47s cold. Output has real recognition noise on math notation (confused `0`/`∅`, mangled exponents) — expected, and exactly why S2 treats it as a hint rather than ground truth.
+- **`pip install -r sidecar/requirements.txt` pulls in `opencv-python` (GUI build) as a transitive dependency of pix2text** (via rapidocr/ultralytics/albumentations), installing it alongside the already-required `opencv-python-headless` — both provide the `cv2` import path, which is fragile, and `opencv-python` needs GUI system libraries the Render deploy's `python:3.11-slim` image doesn't have (only `libgl1`/`libglib2.0-0`, installed for the headless build). Fixed once by `pip uninstall opencv-python` + `pip install --force-reinstall --no-deps opencv-python-headless==<same version>`, but **a fresh `pip install -r requirements.txt` will reintroduce the conflict** — rerun that same two-step fix after any full reinstall, and re-check before the next Render deploy.
+
 ## Post-M9 — went live (current, as of the OpenAI/Gemini/Supabase migration)
 
 Several stubs below are now stale — corrected here rather than rewritten in place, so the log stays an honest record of what was true when written:

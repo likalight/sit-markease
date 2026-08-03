@@ -48,6 +48,50 @@
   --color-neutral-low: #86868c;
 }
 
+/* Landing-page / review-surface theme override — matches the SIT MarkEase
+   pitch deck's maroon/crimson/peach/cream palette exactly (same hex values
+   as aims-deck.html's :root). Scoped to `.landing-theme` (the public
+   landing page) and `.review-theme` (the educator review console + student
+   feedback page — the two surfaces where a human actually looks at a
+   graded submission, matching the deck's dashboard mockup), each paired
+   with page-local Newsreader/Archivo/IBM Plex Mono font loads, rather than
+   changed globally — every other authenticated page (dashboard, insights,
+   exam-prep, settings) still uses the black/white/red system above
+   unchanged. See docs/DECISIONS.md for why these systems now deliberately
+   diverge. Semantic status colors (verified/attention/disputed) are
+   intentionally NOT redecked to the maroon family — same "kept deliberately
+   far from red so status never reads as brand" rule applies here, just
+   with a warmer canvas behind them now. */
+.landing-theme,
+.review-theme {
+  --color-canvas: #fffbf6;
+  --color-surface-soft: #ffeedd;
+  --color-surface-card: #fbdcc0;
+  --color-surface-strong: #f5c79d;
+
+  --color-surface-dark: #880d1e;
+  --color-surface-dark-elevated: #a01526;
+  --color-surface-dark-soft: #6e0a18;
+
+  --color-ink: #34120e;
+  --color-body: #4a241c;
+  --color-body-strong: #34120e;
+  --color-muted: #6b4438;
+  --color-muted-soft: #8c6656;
+  --color-hairline: rgba(136, 13, 30, 0.18);
+  --color-hairline-soft: rgba(136, 13, 30, 0.1);
+  --color-on-dark: #ffeedd;
+  --color-on-dark-soft: #e8b8a8;
+
+  --color-primary: #dd2d4a;
+  --color-primary-active: #880d1e;
+  --color-primary-soft: #fbe3e7;
+  --color-primary-hairline: rgba(221, 45, 74, 0.35);
+  --color-on-primary: #ffeedd;
+
+  --color-neutral-low: #b08d78;
+}
+
 body {
   background-color: var(--color-canvas);
   color: var(--color-body);

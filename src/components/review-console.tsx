@@ -2,10 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import { ScriptViewer } from "./script-viewer";
 import { ConfidenceBar } from "./confidence-bar";
 import { MathText } from "./math";
 import { stepState } from "@/lib/design/step-state";
+
+// Same page-scoped theming technique as the landing page (src/app/page.tsx,
+// globals.css's `.landing-theme`/`.review-theme`) — reuses the existing
+// --font-serif/--font-sans/--font-mono variable names so every
+// font-serif/font-sans/font-mono utility already in this file just picks
+// them up, applied only within this component's root, not globally.
+const reviewSerif = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+const reviewSans = Archivo({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans", display: "swap" });
+const reviewMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
 
 interface Step {
   stepIndex: number;
@@ -73,6 +89,26 @@ export function ReviewConsole(props: {
   const levelsByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.levels]));
   const adjusted = props.criteria.some((c) => scores[c.criterionKey] !== c.score);
   const currentTotal = Object.values(scores).reduce((a, b) => a + b, 0);
+
+  // Plain-language summary of the AI's own recommendation, derived from real
+  // per-submission data (never fabricated) — matches the deck's "AI Summary"
+  // dashboard banner. Criterion names can be missing on older/incomplete
+  // rubric data — labelName falls back to the raw key, and drops the clause
+  // entirely rather than ever rendering the literal word "null"/"undefined".
+  function labelName(criterionKey: string | null | undefined): string | null {
+    if (!criterionKey) return null;
+    return nameByKey[criterionKey] ?? criterionKey;
+  }
+  const ranked = [...props.criteria].sort((a, b) => b.score / b.maxScore - a.score / a.maxScore);
+  const strongestName = ranked.length > 0 ? labelName(ranked[0]?.criterionKey) : null;
+  const weakestName = ranked.length > 1 ? labelName(ranked[ranked.length - 1]?.criterionKey) : null;
+  const aiSummary = props.needsHumanReview
+    ? `Recommends ${currentTotal}/${props.maxTotal}, but flagged this one for a closer look${
+        props.misconceptions.length > 0 ? ` — likely ${props.misconceptions[0].name.toLowerCase()}` : ""
+      }.`
+    : `Recommends ${currentTotal}/${props.maxTotal}.${strongestName ? ` Strongest on "${strongestName}"` : ""}${
+        weakestName && weakestName !== strongestName ? `, weakest on "${weakestName}"` : ""
+      }${strongestName ? "." : ""}`;
 
   function scrollToStep(idx: number) {
     setSelectedStep(idx);
@@ -177,10 +213,18 @@ export function ReviewConsole(props: {
   );
 
   return (
-    <div className="grid h-full grid-cols-[1fr_1fr_1fr] bg-canvas">
-      {/* Left: script-viewer */}
-      <div className="overflow-auto border-r border-hairline p-lg">
-        <h2 className="mb-sm text-caption-caps text-muted-soft">Original script</h2>
+    <div
+      className={`review-theme grid h-full grid-cols-[1fr_1fr_1fr] bg-canvas ${reviewSerif.variable} ${reviewSans.variable} ${reviewMono.variable}`}
+    >
+      {/* Left: script-viewer, on a ruled-paper backdrop matching the
+          deck's "handwritten script — scanned" dashboard mockup */}
+      <div
+        className="overflow-auto border-r border-hairline p-lg"
+        style={{
+          backgroundImage: "repeating-linear-gradient(var(--color-canvas) 0px, var(--color-canvas) 27px, var(--color-hairline-soft) 28px)",
+        }}
+      >
+        <h2 className="mb-sm font-mono text-caption-caps text-muted-soft">Original script</h2>
         {props.originalUrl ? (
           <ScriptViewer
             imageUrl={props.originalUrl}
@@ -198,7 +242,7 @@ export function ReviewConsole(props: {
 
       {/* Centre: step-row list */}
       <div className="overflow-auto border-r border-hairline p-lg">
-        <h2 className="mb-sm text-caption-caps text-muted-soft">Reconciled steps</h2>
+        <h2 className="mb-sm font-mono text-caption-caps text-muted-soft">Reconciled steps</h2>
         <p className="mb-md text-caption text-muted-soft">{props.questionPromptText}</p>
         <div className="flex flex-col gap-xs">
           {props.steps.map((s) => {
@@ -272,12 +316,22 @@ export function ReviewConsole(props: {
 
       {/* Right: criterion-cards + approve */}
       <div className="flex flex-col overflow-auto p-lg">
-        <h2 className="mb-sm text-caption-caps text-muted-soft">Recommendation</h2>
+        <h2 className="mb-sm font-mono text-caption-caps text-muted-soft">Recommendation</h2>
+
+        {/* AI Summary banner — matches the deck's dashboard mockup */}
+        <div className="mb-sm flex items-start gap-xs rounded-sm bg-primary-soft px-sm py-xs">
+          <span className="mt-[1px] shrink-0 rounded-sm bg-primary px-xs py-[1px] font-mono text-caption-caps text-on-primary">
+            AI Summary
+          </span>
+          <p className="text-body-sm text-body">{aiSummary}</p>
+        </div>
+
         {props.needsHumanReview && (
           <p className="mb-sm rounded-sm bg-disputed-soft px-sm py-xs text-caption text-disputed">
             ⚑ Flagged for human review
           </p>
         )}
+        <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — RAG-matched</p>
         <div className="flex flex-col gap-sm">
           {props.criteria.map((c, i) => {
             const evidenceSteps = props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex));

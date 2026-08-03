@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { OcrItem } from "@/lib/schemas/ocr";
 
 // Loads the versioned system prompts from /prompts/*.vN.md (CLAUDE.md: "Prompts
 // live in /prompts/*.vN.md. Persist prompt_version and model on every
@@ -23,9 +24,9 @@ function loadPrompt(filename: string): string {
 }
 
 export const PROMPT_VERSIONS = {
-  s2Read: "s2_read_single.v2",
+  s2Read: "s2_read_single.v4",
   s2ReadTyped: "s2_read_typed.v1",
-  s4Assess: "s4_assess.v1",
+  s4Assess: "s4_assess.v2",
   s5Diagnose: "s5_diagnose.v1",
   s6Feedback: "s6_feedback.v1",
   s7Practice: "s7_practice.v1",
@@ -34,7 +35,7 @@ export const PROMPT_VERSIONS = {
 } as const;
 
 export function s2ReadSystemPrompt(): string {
-  return loadPrompt("s2_read_single.v2.md");
+  return loadPrompt("s2_read_single.v4.md");
 }
 
 const S2_READ_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
@@ -56,8 +57,48 @@ const S2_READ_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no
 }
 "role" must be exactly one of the five listed values — no others. "flags" is a list of short machine-readable tags (e.g. "constant_of_integration_missing"), not prose; use an empty array if there are none. Any line region that doesn't fit an identifiable step still counts toward "overall_legibility" — mark truly unreadable regions "[ILLEGIBLE]" inside the nearest step's "latex" rather than dropping them.`;
 
-export function s2ReadUserPrompt(lineCount: number): string {
-  return `The image has ${lineCount} detected line region(s), indexed 1 to ${lineCount} from top to bottom. Transcribe the work and identify the solution steps and which line indices each spans.\n\n${S2_READ_SHAPE}`;
+export interface OcrHintLine {
+  index: number;
+  text: string;
+  score: number;
+}
+
+export interface OcrHintSource {
+  label: string;
+  lines: OcrHintLine[];
+}
+
+export function pix2textHintSource(items: OcrItem[]): OcrHintSource {
+  return { label: "pix2text", lines: items.map((item) => ({ index: item.line_number, text: item.text, score: item.score })) };
+}
+
+export function textractHintSource(lines: { text: string; confidence: number }[]): OcrHintSource {
+  return { label: "AWS Textract", lines: lines.map((line, i) => ({ index: i + 1, text: line.text, score: line.confidence })) };
+}
+
+/** Renders one or two independent OCR passes' output into the plain-text
+ * hint block s2ReadUserPrompt prepends to the instructions. A pure function
+ * so scripts/seed-ai-fixtures.ts can build the exact same string a live
+ * call would, keeping the fixture cache key in sync with the real prompt.
+ * Each source degrades independently upstream (s2-transcribe.ts) — this
+ * just renders whichever ones actually succeeded, so it works with one
+ * source, two, or (if both failed) is never called at all. */
+export function renderOcrHints(sources: OcrHintSource[]): string {
+  const blocks = sources.map((source) => {
+    const lines = source.lines.map((line) => `${line.index}. (${line.score.toFixed(2)}) ${line.text}`).join("\n");
+    return `${source.label} pre-transcribed this image, line by line, with confidence scores:\n${lines}`;
+  });
+  const agreementNote =
+    sources.length > 1
+      ? "These are two independent OCR passes, not ground truth — where they agree, treat that as stronger evidence; where they disagree, trust the image over either."
+      : "Use this as a starting hint, not ground truth — verify against the image itself and correct any OCR misreads.";
+  return `${blocks.join("\n\n")}\n\n${agreementNote}`;
+}
+
+export function s2ReadUserPrompt(lineCount: number, ocrHint?: string): string {
+  const instructions = `The image has ${lineCount} detected line region(s), indexed 1 to ${lineCount} from top to bottom. Transcribe the work and identify the solution steps and which line indices each spans.`;
+  const body = ocrHint ? `${ocrHint}\n\n${instructions}` : instructions;
+  return `${body}\n\n${S2_READ_SHAPE}`;
 }
 
 export function s2ReadTypedSystemPrompt(): string {
@@ -83,7 +124,7 @@ export function s2ReadTypedUserPrompt(steps: { step_index: number; latex: string
 }
 
 export function s4AssessSystemPrompt(): string {
-  return loadPrompt("s4_assess.v1.md");
+  return loadPrompt("s4_assess.v2.md");
 }
 
 const S4_ASSESS_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
@@ -114,6 +155,7 @@ export function s4AssessUserPrompt(args: {
   criteria: { key: string; name: string; max_score: number; levels: { level: string; score: number; descriptor: string }[] }[];
   steps: { step_index: number; latex: string; plain_text: string; role: string }[];
   symbolicCheck: "equivalent" | "not_equivalent" | "unparseable";
+  retrievedReferences?: { label: string; content: string }[];
 }): string {
   return [
     `QUESTION: ${args.questionPromptText}`,
@@ -132,6 +174,13 @@ export function s4AssessUserPrompt(args: {
     `STUDENT'S RECONCILED SOLUTION STEPS:`,
     ...args.steps.map((s) => `Step ${s.step_index} [${s.role}]: ${s.plain_text || s.latex}`),
     ``,
+    ...(args.retrievedReferences && args.retrievedReferences.length > 0
+      ? [
+          `RETRIEVED REFERENCE MATERIAL (background context, not authoritative over the rubric):`,
+          ...args.retrievedReferences.map((r) => `- [${r.label}] ${r.content}`),
+          ``,
+        ]
+      : []),
     `Grade only against the criteria above.`,
     ``,
     S4_ASSESS_SHAPE,

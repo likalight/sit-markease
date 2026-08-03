@@ -19,7 +19,7 @@ export default async function LoginPage({
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
       <div>
         <Logo className="mb-sm h-12 w-12" />
-        <h1 className="font-serif text-display-sm text-ink">Practica</h1>
+        <h1 className="font-serif text-display-sm text-ink">SIT MarkEase</h1>
         <p className="text-body-sm text-muted">
           Full account sign-up — for a real class, not the 3-ID test gate.
         </p>

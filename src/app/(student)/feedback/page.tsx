@@ -1,10 +1,25 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { FeedbackFlagButton } from "@/components/feedback-flag-button";
+import { RequestRevisionButton } from "@/components/request-revision-button";
 import { ScriptViewer } from "@/components/script-viewer";
 import { stepState } from "@/lib/design/step-state";
+
+// Same page-scoped theming as the landing page / review console
+// (globals.css's `.review-theme`) — deck-matching maroon/cream palette +
+// fonts, applied only within this page's <main>.
+const feedbackSerif = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+const feedbackSans = Archivo({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans", display: "swap" });
+const feedbackMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
 // a student reads this once, carefully. Mark + criterion bars, the
@@ -105,7 +120,9 @@ export default async function StudentFeedbackPage() {
   const visible = cards.filter((c): c is NonNullable<typeof c> => c !== null);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
+    <main
+      className={`review-theme mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section ${feedbackSerif.variable} ${feedbackSans.variable} ${feedbackMono.variable}`}
+    >
       <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
 
       {visible.length === 0 && <p className="text-body-md text-muted">No feedback yet.</p>}
@@ -114,7 +131,7 @@ export default async function StudentFeedbackPage() {
         c.pending ? (
           <div key={c.submissionId} className="flex flex-col gap-xs border-t border-hairline pt-xl">
             <p className="text-body-md text-muted">
-              Your submission has been graded by Practica and is waiting on your teacher's review. Feedback
+              Your submission has been graded by SIT MarkEase and is waiting on your teacher's review. Feedback
               will appear here once it's approved.
             </p>
           </div>
@@ -147,16 +164,21 @@ export default async function StudentFeedbackPage() {
           {/* Annotated script — the emotional core (docs/DESIGN.md §3) */}
           {c.originalUrl && (
             <div>
-              <h2 className="mb-xs text-caption-caps text-muted-soft">Your script</h2>
+              <h2 className="mb-xs font-mono text-caption-caps text-muted-soft">Your script</h2>
               <ScriptViewer imageUrl={c.originalUrl} boxes={c.scriptBoxes} activeLineIndices={c.highlightedLineIndices} />
             </div>
           )}
 
-          <p className="text-body-md text-body">{c.summary}</p>
+          <div className="flex items-start gap-xs rounded-sm bg-primary-soft px-sm py-xs">
+            <span className="mt-[1px] shrink-0 rounded-sm bg-primary px-xs py-[1px] font-mono text-caption-caps text-on-primary">
+              AI Summary
+            </span>
+            <p className="text-body-md text-body">{c.summary}</p>
+          </div>
 
           {c.strengths.length > 0 && (
             <div>
-              <h2 className="text-caption-caps text-muted-soft">What went well</h2>
+              <h2 className="font-mono text-caption-caps text-muted-soft">What went well</h2>
               <ul className="mt-xs list-disc pl-5 text-body-md text-body">
                 {c.strengths.map((s, i) => (
                   <li key={i}>
@@ -169,7 +191,7 @@ export default async function StudentFeedbackPage() {
 
           {c.breakdownPoints.length > 0 && (
             <div>
-              <h2 className="text-caption-caps text-muted-soft">Where it broke down</h2>
+              <h2 className="font-mono text-caption-caps text-muted-soft">Where it broke down</h2>
               <ul className="mt-xs flex flex-col gap-sm">
                 {c.breakdownPoints.map((b, i) => (
                   <li key={i} className="rounded-lg border-l-[3px] border-l-attention bg-attention-soft px-md py-sm">
@@ -184,7 +206,7 @@ export default async function StudentFeedbackPage() {
 
           {c.misconceptions.length > 0 && (
             <div>
-              <h2 className="text-caption-caps text-muted-soft">Misconception cards</h2>
+              <h2 className="font-mono text-caption-caps text-muted-soft">Misconception cards</h2>
               <ul className="mt-xs flex flex-col gap-sm">
                 {c.misconceptions.map((m, i) => (
                   <li key={i} className="rounded-lg border-l-[3px] border-l-attention bg-surface-soft px-md py-sm">
@@ -209,10 +231,12 @@ export default async function StudentFeedbackPage() {
             {c.nextAction}
           </div>
 
-          {c.hasPracticeSet && (
+          {c.hasPracticeSet ? (
             <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
               Go to your practice set →
             </Link>
+          ) : (
+            <RequestRevisionButton submissionId={c.submissionId} />
           )}
 
           <FeedbackFlagButton feedbackId={c.feedbackId} />

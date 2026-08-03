@@ -16,9 +16,12 @@ export const maxDuration = 300;
 // §10 — POST /api/questions/:id/submissions
 // Students submit their own work directly (not an educator uploading on
 // their behalf) — image or PDF upload → S1 preprocess → S1b line detection
-// → persisted submission/page(s)/lines, then immediately runs S2-S7 (see
-// src/lib/pipeline/orchestrator.ts), which also auto-releases the grade if
-// it's confident. Batch upload is later work (see docs/STUBS.md). Persists
+// → persisted submission/page(s)/lines, then immediately runs S2-S6 (see
+// src/lib/pipeline/orchestrator.ts). Every result, confident or not, waits
+// for an explicit educator approval (CLAUDE.md rule 3) — there is no
+// auto-release. S7 (practice generation) is a separate student-triggered
+// action after approval, not part of this chain. Batch upload is later
+// work (see docs/STUBS.md). Persists
 // through src/lib/db/facade.ts, which branches on AIMS_FIXTURE_MODE
 // (docs/DECISIONS.md "M2 — free-tier providers").
 // Every accepted submission triggers real, billed OpenAI calls with no

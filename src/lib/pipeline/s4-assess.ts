@@ -1,6 +1,7 @@
 import { callStructured } from "@/lib/ai/client";
 import { db } from "@/lib/db/facade";
 import { sidecar } from "@/lib/sidecar/client";
+import { retrieveChunks } from "@/lib/rag/retrieve";
 import { AssessmentSchema, type SymbolicCheck } from "@/lib/schemas/assessment";
 import { assessNativeSchema } from "./native-schemas";
 import { s4AssessSystemPrompt, s4AssessUserPrompt, PROMPT_VERSIONS } from "./prompts";
@@ -31,6 +32,34 @@ async function computeSymbolicCheck(
     return result.equivalent ? "equivalent" : "not_equivalent";
   } catch {
     return "unparseable";
+  }
+}
+
+// RAG-matched rubric grounding — mirrors the same corpus lookup S7 already
+// does (s7-practice.ts), reused here so scoring, not just practice
+// generation, gets to see relevant worked examples/misconception notes for
+// this topic. Background context only, never authoritative over the rubric
+// itself (see s4_assess.v2.md) — CLAUDE.md rule 8: any failure here just
+// means no reference material, never a failed assessment.
+export async function retrieveRubricReferences(
+  questionId: string,
+  question: { topic_tags?: string[] | null }
+): Promise<{ label: string; content: string }[]> {
+  try {
+    const module_ = await db.getModuleForQuestion(questionId);
+    if (!module_) return [];
+
+    const resources = await db.listResources(module_.id);
+    const chunks = await db.listResourceChunks(resources.map((r: any) => r.id));
+    if (chunks.length === 0) return [];
+
+    const resourceLabelById = new Map(resources.map((r: any) => [r.id, r.label]));
+    const query = (question.topic_tags ?? []).join(" ");
+    const retrieved = await retrieveChunks(query, chunks, 3);
+
+    return retrieved.map((c: any) => ({ label: resourceLabelById.get(c.resource_id) ?? "unknown source", content: c.content }));
+  } catch {
+    return [];
   }
 }
 
@@ -72,6 +101,7 @@ export async function assessSubmission(submissionId: string): Promise<AssessResu
 
   const steps = await db.listSolutionSteps(transcription.id);
   const symbolicCheck = await computeSymbolicCheck(transcription.final_answer_latex, question.expected_answer_latex);
+  const retrievedReferences = await retrieveRubricReferences(submission.question_id, question);
 
   let assessment;
   try {
@@ -87,6 +117,7 @@ export async function assessSubmission(submissionId: string): Promise<AssessResu
         criteria: question.criteria,
         steps,
         symbolicCheck,
+        retrievedReferences,
       }),
       schema: AssessmentSchema,
       nativeSchema: assessNativeSchema,

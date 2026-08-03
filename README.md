@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/banner.png" alt="Practica" width="100%" />
+  <img src=".github/assets/banner.png" alt="SIT MarkEase" width="100%" />
 </p>
 
 <p align="center">
@@ -13,12 +13,12 @@
 </p>
 
 <p align="center">
-  <b>AI for Individualised Mastery Support (AIMS)</b> — an AI-assisted framework for scalable feedback<br/>
+  <b>SIT MarkEase</b> — an AI-assisted framework for scalable feedback<br/>
   and targeted practice in open-ended, handwritten assessments. Built at SIT.
 </p>
 
 <p align="center">
-  <img src=".github/assets/landing.png" alt="Practica landing page" width="90%" />
+  <img src=".github/assets/landing.png" alt="SIT MarkEase landing page" width="90%" />
 </p>
 
 ---
@@ -29,7 +29,7 @@ Large-enrolment modules can't give timely, individual feedback on open-ended ass
 1,680 handwritten scripts a term doesn't scale, so feedback collapses into a mark and a tick. Students
 get a number, not a reason, and no way to find practice targeting their actual gap.
 
-## What Practica does
+## What SIT MarkEase does
 
 A student photographs (or uploads a PDF of) their handwritten working. From there:
 

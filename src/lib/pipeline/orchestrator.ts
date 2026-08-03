@@ -4,22 +4,26 @@ import { transcribeTypedSubmission } from "./s2-transcribe-typed";
 import { assessSubmission } from "./s4-assess";
 import { diagnoseSubmission } from "./s5-diagnose";
 import { generateFeedback } from "./s6-feedback";
-import { generatePracticeSet } from "./s7-practice";
 
-// Single place that runs S2->S7 in order, then auto-releases the grade the
-// moment it's earned — a confident, agreeing, verified result needs no
-// educator to touch it. Only a disputed/low-confidence result
-// (grade_recommendation.needs_human_review) is left unapproved, which is
-// exactly what puts it in the educator's queue (getReviewQueue() already
-// filters to "no final_grade yet" — so this function is the only thing that
-// needed to change to make "educator only sees the uncertain ones" true).
+// Runs S2->S6 in order (transcribe, assess, diagnose, feedback). CLAUDE.md
+// rule 3: nothing writes final_grades without an explicit educator approval
+// action — every result, confident or not, lands in the review queue
+// (getReviewQueue() filters to "no final_grade yet") and waits for a real
+// approve action (POST /api/submissions/:id/approve). This function used to
+// also auto-release confident results with approved_by: null, which
+// directly violated rule 3 — removed (docs/DECISIONS.md).
+//
+// S7 (practice generation) no longer runs automatically here either — it's
+// now a student-triggered action (POST /api/submissions/:id/request-revision,
+// see s7-practice.ts), matching the pitch deck's "student sees gap &
+// requests revision" step rather than practice sets appearing unasked.
 //
 // Shared by both entry points below — a photo submission and a typed
 // submission only differ in how S2 produces its transcription; S4 onward
 // has no idea which path a submission came through.
 async function continuePipelineAfterTranscription(submissionId: string, transcribeResult: TranscribeResult) {
   if (transcribeResult.status === "needs_human_transcription" || transcribeResult.status === "failed") {
-    return { ...transcribeResult, assess: { status: "failed" }, diagnose: { status: "failed" }, feedback: { status: "failed" }, practice: { status: "failed" }, autoReleased: false };
+    return { ...transcribeResult, assess: { status: "failed" }, diagnose: { status: "failed" }, feedback: { status: "failed" } };
   }
 
   const assessResult = await assessSubmission(submissionId);
@@ -32,38 +36,8 @@ async function continuePipelineAfterTranscription(submissionId: string, transcri
     preferredTone = (student as any)?.feedback_tone ?? "supportive";
   }
   const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId, preferredTone) : { status: "failed" as const };
-  const practiceResult =
-    diagnoseResult.status === "diagnosed" && diagnoseResult.detectedCount > 0
-      ? await generatePracticeSet(submissionId)
-      : { status: "failed" as const, itemCount: 0, discardedCount: 0 };
 
-  let autoReleased = false;
-  if (assessResult.status === "assessed") {
-    const grade = await db.getGradeRecommendation(submissionId);
-    if (grade && !(grade as any).needs_human_review) {
-      await db.createFinalGrade({
-        submission_id: submissionId,
-        total: (grade as any).total_recommended,
-        approved_by: null,
-        approved_at: new Date().toISOString(),
-        adjusted: false,
-        adjustment_note: null,
-        review_seconds: 0,
-      });
-      await db.insertAuditLog({
-        actor_id: null,
-        entity_type: "submission",
-        entity_id: submissionId,
-        action: "auto_release",
-        before: null,
-        after: { total: (grade as any).total_recommended },
-      });
-      await db.updateSubmission(submissionId, { status: "approved" });
-      autoReleased = true;
-    }
-  }
-
-  return { ...transcribeResult, assess: assessResult, diagnose: diagnoseResult, feedback: feedbackResult, practice: practiceResult, autoReleased };
+  return { ...transcribeResult, assess: assessResult, diagnose: diagnoseResult, feedback: feedbackResult };
 }
 
 export async function runFullPipeline(submissionId: string) {

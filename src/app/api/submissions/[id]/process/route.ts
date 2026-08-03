@@ -8,7 +8,8 @@ export const maxDuration = 300;
 
 // §10 — POST /api/submissions/:id/process
 // Runs S2 (transcribe) + S3 (assess quality) + S4 (assess) + S5 (diagnose) + S6
-// (feedback) + S7 (targeted practice).
+// (feedback). S7 (targeted practice) no longer runs here — it's a
+// student-triggered action, see api/submissions/[id]/request-revision.
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || user.role !== "educator") {

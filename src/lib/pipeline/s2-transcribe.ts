@@ -1,8 +1,10 @@
 import { callStructured } from "@/lib/ai/client";
 import { db } from "@/lib/db/facade";
+import { sidecar } from "@/lib/sidecar/client";
+import { detectText, isConfigured as isTextractConfigured } from "@/lib/ocr/textract";
 import { TranscriptionReadSchema, type TranscriptionRead } from "@/lib/schemas/transcription";
 import { s2ReadNativeSchema } from "./native-schemas";
-import { s2ReadSystemPrompt, s2ReadUserPrompt, PROMPT_VERSIONS } from "./prompts";
+import { s2ReadSystemPrompt, s2ReadUserPrompt, pix2textHintSource, textractHintSource, renderOcrHints, type OcrHintSource, PROMPT_VERSIONS } from "./prompts";
 import { assessRead } from "./reconcile";
 
 // §7.3 — S2 single-read transcription. One multimodal LLM call does literal
@@ -11,13 +13,39 @@ import { assessRead } from "./reconcile";
 // "multimodal LLMs" as a technology, not two independent AI reads that must
 // agree). Runs on the `primary` role.
 
+/** pix2text and Textract are pre-transcription hints, not a replacement for
+ * the vision call — CLAUDE.md rule 5 keeps the image as the final
+ * authority. Each is called independently and degrades on its own (sidecar
+ * down, Textract not configured, either API erroring) — a missing or
+ * failed source just means one fewer hint, never a failed transcription
+ * (CLAUDE.md rule 8). Exported so scripts/seed-ai-fixtures.ts can build the
+ * exact same hint a live call would. */
+export async function gatherOcrHintSources(imageBase64: string): Promise<OcrHintSource[]> {
+  const [pix2textResult, textractResult] = await Promise.allSettled([
+    sidecar.ocrTranscribe(imageBase64),
+    isTextractConfigured() ? detectText(imageBase64) : Promise.reject(new Error("Textract not configured")),
+  ]);
+
+  const sources: OcrHintSource[] = [];
+  if (pix2textResult.status === "fulfilled" && pix2textResult.value.items.length > 0) {
+    sources.push(pix2textHintSource(pix2textResult.value.items));
+  }
+  if (textractResult.status === "fulfilled" && textractResult.value.length > 0) {
+    sources.push(textractHintSource(textractResult.value));
+  }
+  return sources;
+}
+
 export async function readTranscription(imageBase64: string, lineCount: number, submissionId: string): Promise<TranscriptionRead> {
+  const sources = await gatherOcrHintSources(imageBase64);
+  const ocrHint = sources.length > 0 ? renderOcrHints(sources) : undefined;
+
   return callStructured({
     stage: "S2_read",
     promptVersion: PROMPT_VERSIONS.s2Read,
     role: "primary",
     system: s2ReadSystemPrompt(),
-    prompt: s2ReadUserPrompt(lineCount),
+    prompt: s2ReadUserPrompt(lineCount, ocrHint),
     images: [{ mimeType: "image/png", base64: imageBase64 }],
     schema: TranscriptionReadSchema,
     nativeSchema: s2ReadNativeSchema,

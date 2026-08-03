@@ -14,6 +14,7 @@ import {
   type EquivalentResponse,
   type VerifyItemResponse,
 } from "@/lib/schemas/symbolic";
+import { OcrTranscribeResponseSchema, type OcrTranscribeResponse } from "@/lib/schemas/ocr";
 
 async function postJson<T>(path: string, body: unknown, schema: { parse(v: unknown): T }): Promise<T> {
   const res = await fetch(`${env.sidecarUrl()}${path}`, {
@@ -54,5 +55,9 @@ export const sidecar = {
 
   verifyItem(prompt: string, solution: string): Promise<VerifyItemResponse> {
     return postJson("/math/verify-item", { prompt, solution }, VerifyItemResponseSchema);
+  },
+
+  ocrTranscribe(imageB64: string): Promise<OcrTranscribeResponse> {
+    return postJson("/ocr/transcribe", { image_b64: imageB64 }, OcrTranscribeResponseSchema);
   },
 };
