@@ -2,6 +2,10 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Fixed: practice verification didn't degrade when the sidecar was unreachable
+
+Found live while testing the S7 split above: `verifyGeneratedItem()` (`src/lib/pipeline/s7-practice.ts`) called `sidecar.verifyItem()` (SymPy) with no try/catch — only the LLM fallback path was guarded. A sidecar outage surfaced as the whole `S7_verify` stage_run failing with a raw `"fetch failed"` error instead of degrading to LLM judgement, violating CLAUDE.md rule 8. Wrapped the SymPy call the same way the LLM call already was; a sidecar failure now falls through to LLM verification instead of failing the stage. Verified live: stopped the sidecar, re-ran practice generation on a real gold submission, confirmed `S7_verify` now succeeds (LLM-verified items) instead of failing with `fetch failed`.
+
 ## Made the real pipeline match the pitch deck's 8-step journey
 
 Comparing the pitch deck's idealized journey against the actual code turned up four real gaps (not just deck-vs-docs ones — one of them was an actual violation of CLAUDE.md's own rule 3). All four fixed:

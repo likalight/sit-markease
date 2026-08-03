@@ -33,12 +33,22 @@ interface GenerationContext {
 type GenerateItemsResult = { status: "generated"; context: GenerationContext } | { status: "skipped_no_misconception" | "failed" };
 
 async function verifyGeneratedItem(item: PracticeItem, submissionId: string): Promise<{ verified: boolean; verifiedBy: "sympy" | "llm" | "unverified" }> {
-  const sympyResult = await sidecar.verifyItem(item.prompt_latex, item.solution_latex);
-  if (sympyResult.method === "sympy") {
-    return { verified: sympyResult.valid, verifiedBy: "sympy" };
+  try {
+    const sympyResult = await sidecar.verifyItem(item.prompt_latex, item.solution_latex);
+    if (sympyResult.method === "sympy") {
+      return { verified: sympyResult.valid, verifiedBy: "sympy" };
+    }
+  } catch {
+    // Sidecar unreachable (down, network error) — fall through to LLM
+    // judgement below rather than letting this take down the whole
+    // verification stage (CLAUDE.md rule 8). Previously unguarded: a
+    // sidecar outage surfaced as "fetch failed" on the S7_verify stage_run
+    // instead of degrading, found live when the sidecar was briefly down.
   }
 
-  // Fallback: LLM judgement (§7.8 point 2).
+  // Fallback: LLM judgement (§7.8 point 2) — also reached when SymPy
+  // couldn't parse the expression (method !== "sympy") or the sidecar call
+  // above failed outright.
   try {
     const judged = await callStructured({
       stage: "S7_verify",
