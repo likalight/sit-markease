@@ -6,6 +6,7 @@ import { ScriptViewer } from "./script-viewer";
 import { ConfidenceBar } from "./confidence-bar";
 import { MathText } from "./math";
 import { stepState } from "@/lib/design/step-state";
+import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-grouping";
 
 interface Step {
   stepIndex: number;
@@ -237,10 +238,11 @@ export function ReviewConsole(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTotal, adjusted, submitting, focusedCriterionIdx, selectedStep, props.criteria.length]);
 
-  // One box per rubric part, not per OCR line — the whole worked section
-  // for e.g. "Part (ii)" gets a single outline, matching how an instructor
-  // actually thinks about a script ("where's part ii") rather than a box
-  // per detected line of handwriting.
+  // One box per question PART, not per OCR line and not per rubric
+  // criterion — those diverge whenever a single part is graded by more
+  // than one criterion (see lib/design/part-grouping.ts). The whole worked
+  // section for e.g. "Part (ii)" gets a single outline, matching how an
+  // instructor actually thinks about a script ("where's part ii").
   function criterionState(c: Criterion): "verified" | "attention" | "disputed" {
     const evidenceSteps = props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex));
     if (evidenceSteps.some((s) => s.agreement < 0.6)) return "disputed";
@@ -248,10 +250,16 @@ export function ReviewConsole(props: {
     return "verified";
   }
 
-  const partBoxes = props.criteria
-    .map((c) => {
+  const partGroups = groupCriteriaByPart(
+    props.criteria,
+    (c) => nameByKey[c.criterionKey] ?? c.criterionKey,
+    props.questionPromptText
+  );
+  const partBoxes = Array.from(partGroups.entries())
+    .map(([groupKey, groupCriteria]) => {
+      const evidenceStepIndices = groupCriteria.flatMap((c) => c.evidenceStepIndices);
       const lineIndices = new Set(
-        props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex)).flatMap((s) => s.lineIndices)
+        props.steps.filter((s) => evidenceStepIndices.includes(s.stepIndex)).flatMap((s) => s.lineIndices)
       );
       const lineBoxes = props.boxes.filter((b) => lineIndices.has(b.lineIndex)).map((b) => b.box);
       if (lineBoxes.length === 0) return null;
@@ -259,17 +267,29 @@ export function ReviewConsole(props: {
       const y = Math.min(...lineBoxes.map((b) => b.y));
       const right = Math.max(...lineBoxes.map((b) => b.x + b.w));
       const bottom = Math.max(...lineBoxes.map((b) => b.y + b.h));
+      const states = groupCriteria.map(criterionState);
+      const state = states.includes("disputed") ? "disputed" : states.includes("attention") ? "attention" : "verified";
+      const soleName = groupCriteria.length === 1 ? (nameByKey[groupCriteria[0].criterionKey] ?? groupCriteria[0].criterionKey) : null;
+      const isPositionalKey = groupKey !== "all" && groupKey !== "unlabeled";
+      const label =
+        groupCriteria.length > 1
+          ? `Part (${groupKey})`
+          : isPositionalKey && !extractPartLabel(soleName!)
+            ? `Part (${groupKey}) - ${soleName}`
+            : soleName ?? undefined;
       return {
-        key: c.criterionKey,
+        key: groupKey,
+        criterionKeys: groupCriteria.map((c) => c.criterionKey),
         box: { x, y, w: right - x, h: bottom - y },
-        state: criterionState(c),
-        label: nameByKey[c.criterionKey] ?? c.criterionKey,
+        state: state as "verified" | "attention" | "disputed",
+        label,
       };
     })
     .filter((b): b is NonNullable<typeof b> => b !== null);
 
-  const activeCriterionKeys = new Set(
-    props.criteria.filter((_, i) => i === focusedCriterionIdx).map((c) => c.criterionKey)
+  const focusedCriterionKey = props.criteria[focusedCriterionIdx]?.criterionKey;
+  const activePartKeys = new Set(
+    partBoxes.filter((b) => focusedCriterionKey && b.criterionKeys.includes(focusedCriterionKey)).map((b) => b.key)
   );
 
   return (
@@ -300,9 +320,11 @@ export function ReviewConsole(props: {
           <ScriptViewer
             imageUrl={props.originalUrl}
             boxes={partBoxes}
-            activeKeys={activeCriterionKeys}
+            activeKeys={activePartKeys}
             onBoxClick={(key) => {
-              const idx = props.criteria.findIndex((c) => c.criterionKey === key);
+              const group = partBoxes.find((b) => b.key === key);
+              const firstCriterionKey = group?.criterionKeys[0];
+              const idx = props.criteria.findIndex((c) => c.criterionKey === firstCriterionKey);
               if (idx >= 0) {
                 setFocusedCriterionIdx(idx);
                 const firstStep = props.criteria[idx].evidenceStepIndices[0];

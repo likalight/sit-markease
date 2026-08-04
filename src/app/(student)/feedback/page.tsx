@@ -7,6 +7,7 @@ import { RequestRevisionButton } from "@/components/request-revision-button";
 import { ScriptViewer } from "@/components/script-viewer";
 import { MathText } from "@/components/math";
 import { OcrStepFlagButton } from "@/components/ocr-step-flag-button";
+import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-grouping";
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
 // a student reads this once, carefully. Mark + criterion bars, the
@@ -59,13 +60,20 @@ export default async function StudentFeedbackPage() {
 
       const tags = await db.listMisconceptionTags(submission.id);
 
-      // One box per rubric part, spanning the union of every line that
-      // part's evidence steps touch — matches the review console's
-      // part-level annotation instead of a box per OCR line.
-      const partBoxes = criteria
-        .map((c: any) => {
+      // One box per question PART, not per rubric criterion — those diverge
+      // whenever a single part is graded by more than one criterion. Matches
+      // the review console's part-level annotation (lib/design/part-grouping.ts)
+      // instead of a box per OCR line or per criterion.
+      const partGroups = groupCriteriaByPart(
+        criteria,
+        (c: any) => nameByKey[c.criterion_key] ?? c.criterion_key,
+        question?.prompt_text ?? ""
+      );
+      const partBoxes = Array.from(partGroups.entries())
+        .map(([groupKey, groupCriteria]) => {
+          const evidenceStepIndices = groupCriteria.flatMap((c: any) => c.evidence_step_indices);
           const lineIndices = new Set(
-            steps.filter((s: any) => c.evidence_step_indices.includes(s.step_index)).flatMap((s: any) => s.line_indices)
+            steps.filter((s: any) => evidenceStepIndices.includes(s.step_index)).flatMap((s: any) => s.line_indices)
           );
           const lineBoxes = lines.filter((l: any) => lineIndices.has(l.line_index)).map((l: any) => l.box);
           if (lineBoxes.length === 0) return null;
@@ -73,21 +81,37 @@ export default async function StudentFeedbackPage() {
           const y = Math.min(...lineBoxes.map((b: any) => b.y));
           const right = Math.max(...lineBoxes.map((b: any) => b.x + b.w));
           const bottom = Math.max(...lineBoxes.map((b: any) => b.y + b.h));
-          const ratio = c.score / c.max_score;
-          const state = ratio >= 1 ? "verified" : ratio > 0 ? "attention" : "disputed";
+          const ratios = groupCriteria.map((c: any) => c.score / c.max_score);
+          const state = ratios.some((r: number) => r <= 0) ? "disputed" : ratios.every((r: number) => r >= 1) ? "verified" : "attention";
+          const soleName =
+            groupCriteria.length === 1 ? nameByKey[groupCriteria[0].criterion_key] ?? groupCriteria[0].criterion_key : null;
+          const isPositionalKey = groupKey !== "all" && groupKey !== "unlabeled";
+          const label =
+            groupCriteria.length > 1
+              ? `Part (${groupKey})`
+              : isPositionalKey && !extractPartLabel(soleName!)
+                ? `Part (${groupKey}) - ${soleName}`
+                : soleName;
           return {
-            key: c.criterion_key,
+            key: groupKey,
+            criterionKeys: groupCriteria.map((c: any) => c.criterion_key),
             box: { x, y, w: right - x, h: bottom - y },
             state,
-            label: nameByKey[c.criterion_key] ?? c.criterion_key,
+            label,
           };
         })
         .filter((b: any): b is NonNullable<typeof b> => b !== null);
 
       const activePartKeys = new Set(
-        criteria
-          .filter((c: any) => breakdownPoints.some((b) => c.evidence_step_indices.includes(b.step_index)))
-          .map((c: any) => c.criterion_key)
+        partBoxes
+          .filter((b: any) =>
+            criteria.some(
+              (c: any) =>
+                b.criterionKeys.includes(c.criterion_key) &&
+                breakdownPoints.some((bp) => c.evidence_step_indices.includes(bp.step_index))
+            )
+          )
+          .map((b: any) => b.key)
       );
 
       const module_ = await db.getModuleForQuestion(submission.question_id);
