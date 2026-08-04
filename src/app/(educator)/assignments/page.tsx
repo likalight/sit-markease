@@ -93,7 +93,12 @@ export default async function AssignmentsPage() {
                       {r.released} auto-released — view attempts →
                     </Link>
                   ) : (
-                    <span className="text-verified">{r.released} reviewed &amp; released</span>
+                    <>
+                      <span className="text-verified">{r.released} reviewed &amp; released</span>
+                      <Link href={`/assignments/${r.assessmentId}/upload`} className="underline">
+                        Upload a script →
+                      </Link>
+                    </>
                   )}
                   {r.pending > 0 && (
                     <Link href="/review" className="text-disputed underline">

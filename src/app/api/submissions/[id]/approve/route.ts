@@ -13,10 +13,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   const body = await request.json();
-  const { totalScore, adjusted, adjustmentNote, reviewSeconds } = body as {
+  const { totalScore, adjusted, adjustmentNote, internalNote, reviewSeconds } = body as {
     totalScore: number;
     adjusted: boolean;
     adjustmentNote?: string;
+    internalNote?: string;
     reviewSeconds: number;
   };
 
@@ -32,6 +33,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     approved_at: new Date().toISOString(),
     adjusted,
     adjustment_note: adjustmentNote ?? null,
+    // Instructor-only note — never surfaced on the student feedback page,
+    // unlike adjustment_note (which is about the score) or feedback.summary
+    // (which is what the student reads). See docs/DECISIONS.md.
+    internal_note: internalNote ?? null,
     review_seconds: reviewSeconds,
   });
 

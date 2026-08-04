@@ -80,15 +80,21 @@ export default async function LandingPage({
 
   return (
     <main className="flex flex-col overflow-x-clip bg-canvas">
-      {/* Nav */}
+      {/* Nav — no generic "sign in": only the two real entry points, jumping
+          straight to their forms in the hero below. */}
       <nav className="mx-auto flex w-full max-w-[1160px] items-center justify-between px-6 py-md">
         <Link href="/" className="flex items-center gap-xs">
           <Logo className="h-9 w-9" />
           <span className="font-serif text-title-lg text-ink">SIT MarkEase</span>
         </Link>
-        <Link href="/login" className="text-body-sm text-body underline">
-          Sign in
-        </Link>
+        <div className="flex items-center gap-md">
+          <a href="#student-login" className="text-body-sm text-body underline">
+            Student login
+          </a>
+          <a href="#instructor-login" className="text-body-sm text-body underline">
+            Instructor login
+          </a>
+        </div>
       </nav>
 
       {/* Hero + embedded entry */}
@@ -115,10 +121,11 @@ export default async function LandingPage({
 
         <div className="relative mx-auto grid w-full max-w-2xl gap-md sm:grid-cols-2">
           <form
+            id="student-login"
             action={enterAsStudentAction}
-            className="flex flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
+            className="flex scroll-mt-24 flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
           >
-            <p className="font-serif text-title-md text-ink">I'm a student</p>
+            <p className="font-serif text-title-md text-ink">Student login</p>
             <p className="text-body-sm text-muted">Enter your 3-digit demo ID.</p>
             <input
               name="studentId"
@@ -128,20 +135,21 @@ export default async function LandingPage({
               placeholder="111"
               className="rounded-sm border border-hairline bg-canvas px-md py-sm text-center text-title-md tabular-nums tracking-widest"
             />
-            <SubmitButton pendingLabel="Signing in…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
-              Submit work
+            <SubmitButton pendingLabel="Logging in…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
+              Log in
             </SubmitButton>
           </form>
 
           <form
+            id="instructor-login"
             action={enterAsEducatorAction}
-            className="flex flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
+            className="flex scroll-mt-24 flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
           >
-            <p className="font-serif text-title-md text-ink">I'm an educator</p>
+            <p className="font-serif text-title-md text-ink">Instructor login</p>
             <p className="text-body-sm text-muted">One click into the review queue — no setup needed for the demo.</p>
             <div className="flex-1" />
-            <SubmitButton pendingLabel="Signing in…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
-              Review submissions
+            <SubmitButton pendingLabel="Logging in…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
+              Log in
             </SubmitButton>
           </form>
         </div>
@@ -193,9 +201,14 @@ export default async function LandingPage({
       <footer className="w-full bg-surface-dark">
         <div className="mx-auto flex max-w-[1160px] items-center justify-between px-6 py-lg text-caption text-on-dark-soft">
           <span>SIT MarkEase</span>
-          <Link href="/login" className="underline">
-            Sign in
-          </Link>
+          <div className="flex items-center gap-md">
+            <a href="#student-login" className="underline">
+              Student login
+            </a>
+            <a href="#instructor-login" className="underline">
+              Instructor login
+            </a>
+          </div>
         </div>
       </footer>
     </main>

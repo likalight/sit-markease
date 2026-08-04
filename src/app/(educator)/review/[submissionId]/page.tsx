@@ -47,23 +47,51 @@ export default async function ReviewSubmissionPage({
     misconceptionTags.flatMap((t: any) => t.evidence_step_indices as number[])
   );
 
-  // Gradescope-style: "next" stays within this question's own batch, not
-  // the whole cross-question queue — an instructor works through one
+  // Gradescope-style: navigation stays within this question's own batch,
+  // not the whole cross-question queue — an instructor works through one
   // rubric before switching to a different question.
+  //
+  // Two different batches, on purpose:
+  // - The full, unfiltered list (every submission ever made to this
+  //   question, oldest first) backs plain Previous/Next — this is the only
+  //   way to browse back to something already approved, since approving a
+  //   submission removes it from the review queue entirely.
+  // - The review queue's ungraded-only grouping backs "next/previous
+  //   ungraded" — approving flips the current submission's status, so
+  //   "what's next to actually grade" has to come from a queue that already
+  //   excludes graded work, not from index+1 on the full list.
+  const allForQuestion = (await db.listSubmissionsForQuestion(submission.question_id))
+    .slice()
+    .sort((a: any, b: any) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime());
+  const fullIndex = allForQuestion.findIndex((s: any) => s.id === submissionId);
+  const prevSubmissionId = fullIndex > 0 ? allForQuestion[fullIndex - 1].id : null;
+  const nextSubmissionId =
+    fullIndex >= 0 && fullIndex + 1 < allForQuestion.length ? allForQuestion[fullIndex + 1].id : null;
+
   const groups = await getReviewQueueGroupedByQuestion();
   const group = groups.find((g) => g.questionId === submission.question_id);
   const batchEntries = group?.entries ?? [];
-  const currentIndex = batchEntries.findIndex((e) => e.submissionId === submissionId);
-  const nextSubmissionId =
-    currentIndex >= 0 && currentIndex + 1 < batchEntries.length ? batchEntries[currentIndex + 1].submissionId : null;
+  const ungradedIndex = batchEntries.findIndex((e) => e.submissionId === submissionId);
+  // If the current submission isn't in the ungraded queue at all (it's
+  // already been approved — you got here via Previous), "next ungraded"
+  // falls back to the head of the queue rather than an index relative to a
+  // position that doesn't exist there.
+  const nextUngradedSubmissionId =
+    ungradedIndex >= 0
+      ? ungradedIndex + 1 < batchEntries.length
+        ? batchEntries[ungradedIndex + 1].submissionId
+        : null
+      : (batchEntries[0]?.submissionId ?? null);
+  const prevUngradedSubmissionId = ungradedIndex > 0 ? batchEntries[ungradedIndex - 1].submissionId : null;
+
   const assessment = await db.getAssessment((question as any)?.assessment_id);
 
   return (
     <ReviewConsole
       submissionId={submissionId}
       assessmentTitle={(assessment as any)?.title ?? ""}
-      batchPosition={currentIndex >= 0 ? currentIndex + 1 : null}
-      batchTotal={batchEntries.length}
+      batchPosition={fullIndex >= 0 ? fullIndex + 1 : null}
+      batchTotal={allForQuestion.length}
       questionPromptText={question?.prompt_text ?? ""}
       originalUrl={originalUrl}
       boxes={boxes.map((b: any) => ({ lineIndex: b.line_index, box: b.box }))}
@@ -94,7 +122,10 @@ export default async function ReviewSubmissionPage({
       needsHumanReview={grade?.needs_human_review ?? false}
       totalRecommended={grade?.total_recommended ?? 0}
       maxTotal={grade?.max_total ?? 0}
+      prevSubmissionId={prevSubmissionId}
       nextSubmissionId={nextSubmissionId}
+      prevUngradedSubmissionId={prevUngradedSubmissionId}
+      nextUngradedSubmissionId={nextUngradedSubmissionId}
       releaseFeedback={
         feedback
           ? {

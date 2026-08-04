@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/lib/db/supabase-admin";
 import { db } from "@/lib/db/facade";
 import { env } from "@/lib/db/env";
 import { setLocalSession } from "@/lib/auth/local-session";
+import { VALID_STUDENT_IDS, GATE_PASSWORD, emailForStudentId, resolveStudentAccount } from "@/lib/auth/student-roster";
 
 // Lightweight access gate: three fixed student IDs stand in for full signup
 // so a student can go straight from the landing page into the submit
@@ -14,14 +15,11 @@ import { setLocalSession } from "@/lib/auth/local-session";
 // first use) so every downstream page — which reads getCurrentUser() off a
 // real session — works unmodified; the "gate" is the 3-digit ID check, not
 // the password, which is fixed and never shown to the user.
-const VALID_STUDENT_IDS = ["111", "222", "333"];
-const GATE_PASSWORD = "practica-gate-access-2026";
+// VALID_STUDENT_IDS / emailForStudentId / account provisioning now live in
+// src/lib/auth/student-roster.ts, shared with the educator on-behalf-of
+// upload route (see docs/DECISIONS.md).
 
-function emailForStudentId(id: string) {
-  return `student${id}@practica.sit.edu`;
-}
-
-async function ensureRealAccount(email: string, name: string, role: "student" | "educator") {
+async function ensureRealEducatorAccount(email: string, name: string) {
   const existing = await db.findUserByEmail(email);
   if (existing) return;
 
@@ -36,7 +34,7 @@ async function ensureRealAccount(email: string, name: string, role: "student" | 
     // check and here — fine, the row will already be there.
     return;
   }
-  await db.createUserWithId(created.user.id, { name, email, role });
+  await db.createUserWithId(created.user.id, { name, email, role: "educator" });
 }
 
 export async function enterAsStudentAction(formData: FormData) {
@@ -55,7 +53,7 @@ export async function enterAsStudentAction(formData: FormData) {
     redirect("/submit");
   }
 
-  await ensureRealAccount(email, name, "student");
+  await resolveStudentAccount(id);
   const supabase = await supabaseServer();
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: GATE_PASSWORD });
   if (signInError) {
@@ -75,7 +73,7 @@ export async function enterAsEducatorAction() {
     redirect("/review");
   }
 
-  await ensureRealAccount(email, name, "educator");
+  await ensureRealEducatorAccount(email, name);
   const supabase = await supabaseServer();
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: GATE_PASSWORD });
   if (signInError) {

@@ -52,7 +52,15 @@ export function ReviewConsole(props: {
   needsHumanReview: boolean;
   totalRecommended: number;
   maxTotal: number;
+  // Two distinct batches (see the page component): plain adjacent
+  // prev/next browse every submission for this question regardless of
+  // grade status; the "ungraded" pair is what Approve & next / Skip
+  // actually advance through, since approving removes an item from that
+  // queue entirely.
+  prevSubmissionId: string | null;
   nextSubmissionId: string | null;
+  prevUngradedSubmissionId: string | null;
+  nextUngradedSubmissionId: string | null;
   releaseFeedback: { summary: string; strengths: { text: string; step_indices: number[] }[]; nextAction: string } | null;
 }) {
   const router = useRouter();
@@ -83,21 +91,48 @@ export function ReviewConsole(props: {
   const mountedAt = useRef(Date.now());
   const stepRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-  const nameByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.name]));
-  const levelsByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.levels]));
+  // Mutable copies of the rubric/criteria the page loaded with — "+ Add
+  // rubric item" appends to these live, mid-review, rather than requiring a
+  // page reload to see a criterion that didn't exist when this page
+  // rendered (rubrics were previously only ever authored once, by AI, at
+  // question-creation time).
+  const [criteriaList, setCriteriaList] = useState<Criterion[]>(props.criteria);
+  const [rubricList, setRubricList] = useState<{ key: string; name: string; levels: RubricLevel[] }[]>(
+    props.rubricCriteria
+  );
+  const [showAddCriterion, setShowAddCriterion] = useState(false);
+  const [newCriterionName, setNewCriterionName] = useState("");
+  const [newCriterionMaxScore, setNewCriterionMaxScore] = useState(1);
+  const [addingCriterion, setAddingCriterion] = useState(false);
+
+  // Manual point-adjustment — independent of clicking rubric levels, for
+  // when the instructor disagrees with the rubric-derived total wholesale
+  // rather than criterion by criterion.
+  const [manualOverride, setManualOverride] = useState<number | null>(null);
+  const [showOverride, setShowOverride] = useState(false);
+  const [overrideReason, setOverrideReason] = useState("");
+
+  // Internal-only note — never released to the student, unlike the
+  // feedback text above. Persisted on final_grades.internal_note, a column
+  // no student-facing query touches.
+  const [internalNote, setInternalNote] = useState("");
+
+  const nameByKey = Object.fromEntries(rubricList.map((c) => [c.key, c.name]));
+  const levelsByKey = Object.fromEntries(rubricList.map((c) => [c.key, c.levels]));
 
   // Reverse lookup so each transcription step can show which rubric part it
   // was used as evidence for — Gradescope-style "this working is Part (ii)"
   // annotation, requested alongside the clean-math-by-default view.
   const criterionNameByStep = new Map<number, string>();
-  for (const c of props.criteria) {
+  for (const c of criteriaList) {
     const name = nameByKey[c.criterionKey] ?? c.criterionKey;
     for (const idx of c.evidenceStepIndices) {
       criterionNameByStep.set(idx, criterionNameByStep.has(idx) ? `${criterionNameByStep.get(idx)}, ${name}` : name);
     }
   }
-  const adjusted = props.criteria.some((c) => scores[c.criterionKey] !== c.score);
-  const currentTotal = Object.values(scores).reduce((a, b) => a + b, 0);
+  const rubricTotal = Object.values(scores).reduce((a, b) => a + b, 0);
+  const adjusted = manualOverride !== null || criteriaList.some((c) => scores[c.criterionKey] !== c.score);
+  const currentTotal = manualOverride !== null ? manualOverride : rubricTotal;
 
   // Plain-language summary of the AI's own recommendation, derived from real
   // per-submission data (never fabricated) — matches the deck's "AI Summary"
@@ -108,7 +143,7 @@ export function ReviewConsole(props: {
     if (!criterionKey) return null;
     return nameByKey[criterionKey] ?? criterionKey;
   }
-  const ranked = [...props.criteria].sort((a, b) => b.score / b.maxScore - a.score / a.maxScore);
+  const ranked = [...criteriaList].sort((a, b) => b.score / b.maxScore - a.score / a.maxScore);
   const strongestName = ranked.length > 0 ? labelName(ranked[0]?.criterionKey) : null;
   const weakestName = ranked.length > 1 ? labelName(ranked[ranked.length - 1]?.criterionKey) : null;
   const aiSummary = props.needsHumanReview
@@ -132,17 +167,53 @@ export function ReviewConsole(props: {
       const res = await fetch(`/api/submissions/${props.submissionId}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ totalScore: currentTotal, adjusted, reviewSeconds }),
+        body: JSON.stringify({
+          totalScore: currentTotal,
+          adjusted,
+          adjustmentNote: manualOverride !== null ? overrideReason || "Manually overridden total." : undefined,
+          internalNote: internalNote || undefined,
+          reviewSeconds,
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
-      router.push(props.nextSubmissionId ? `/review/${props.nextSubmissionId}` : "/review");
+      router.push(props.nextUngradedSubmissionId ? `/review/${props.nextUngradedSubmissionId}` : "/review");
     } finally {
       setSubmitting(false);
     }
   }
 
   function skip() {
-    router.push(props.nextSubmissionId ? `/review/${props.nextSubmissionId}` : "/review");
+    router.push(props.nextUngradedSubmissionId ? `/review/${props.nextUngradedSubmissionId}` : "/review");
+  }
+
+  function goTo(submissionId: string | null) {
+    if (submissionId) router.push(`/review/${submissionId}`);
+  }
+
+  async function addRubricItem() {
+    if (addingCriterion) return;
+    const name = newCriterionName.trim();
+    if (!name || newCriterionMaxScore <= 0) return;
+    setAddingCriterion(true);
+    try {
+      const evidenceStepIndex = selectedStep ?? props.steps[0]?.stepIndex ?? 1;
+      const res = await fetch(`/api/submissions/${props.submissionId}/criteria`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, maxScore: newCriterionMaxScore, evidenceStepIndex }),
+      });
+      if (!res.ok) return;
+      const { criterion, result } = await res.json();
+      setRubricList((prev) => [...prev, criterion]);
+      setCriteriaList((prev) => [...prev, result]);
+      setScores((prev) => ({ ...prev, [result.criterionKey]: result.score }));
+      setLevels((prev) => ({ ...prev, [result.criterionKey]: result.level }));
+      setNewCriterionName("");
+      setNewCriterionMaxScore(1);
+      setShowAddCriterion(false);
+    } finally {
+      setAddingCriterion(false);
+    }
   }
 
   function setLevelForCriterion(criterionKey: string, levelIdx: number) {
@@ -159,7 +230,8 @@ export function ReviewConsole(props: {
   }
 
   function setLevelOnFocused(levelIdx: number) {
-    const criterion = props.criteria[focusedCriterionIdx];
+    const criterion = criteriaList[focusedCriterionIdx];
+    if (!criterion) return;
     setLevelForCriterion(criterion.criterionKey, levelIdx);
   }
 
@@ -215,10 +287,10 @@ export function ReviewConsole(props: {
         approveAndAdvance();
       } else if (e.key === "j" || e.key === "J") {
         e.preventDefault();
-        setFocusedCriterionIdx((i) => (i + 1) % Math.max(props.criteria.length, 1));
+        setFocusedCriterionIdx((i) => (i + 1) % Math.max(criteriaList.length, 1));
       } else if (e.key === "k" || e.key === "K") {
         e.preventDefault();
-        setFocusedCriterionIdx((i) => (i - 1 + props.criteria.length) % Math.max(props.criteria.length, 1));
+        setFocusedCriterionIdx((i) => (i - 1 + criteriaList.length) % Math.max(criteriaList.length, 1));
       } else if (e.key >= "1" && e.key <= "5") {
         e.preventDefault();
         setLevelOnFocused(Number(e.key) - 1);
@@ -236,7 +308,7 @@ export function ReviewConsole(props: {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTotal, adjusted, submitting, focusedCriterionIdx, selectedStep, props.criteria.length]);
+  }, [currentTotal, adjusted, submitting, focusedCriterionIdx, selectedStep, criteriaList.length]);
 
   // One box per question PART, not per OCR line and not per rubric
   // criterion — those diverge whenever a single part is graded by more
@@ -251,7 +323,7 @@ export function ReviewConsole(props: {
   }
 
   const partGroups = groupCriteriaByPart(
-    props.criteria,
+    criteriaList,
     (c) => nameByKey[c.criterionKey] ?? c.criterionKey,
     props.questionPromptText
   );
@@ -287,7 +359,7 @@ export function ReviewConsole(props: {
     })
     .filter((b): b is NonNullable<typeof b> => b !== null);
 
-  const focusedCriterionKey = props.criteria[focusedCriterionIdx]?.criterionKey;
+  const focusedCriterionKey = criteriaList[focusedCriterionIdx]?.criterionKey;
   const activePartKeys = new Set(
     partBoxes.filter((b) => focusedCriterionKey && b.criterionKeys.includes(focusedCriterionKey)).map((b) => b.key)
   );
@@ -295,16 +367,47 @@ export function ReviewConsole(props: {
   return (
     <div className="flex h-full flex-col bg-canvas">
       {/* Gradescope-style batch context — which assignment, and where this
-          submission sits among the others for the same question. "Next"
-          only ever advances within this same batch (see the page component's
-          nextSubmissionId), so the instructor works one rubric at a time. */}
+          submission sits among the others for the same question. Plain
+          Previous/Next browse every submission for this question regardless
+          of grade status; Prev/Next Ungraded jump within just the queue of
+          work still needing a decision (see the page component). */}
       <div className="flex items-center justify-between border-b border-hairline bg-surface-dark px-lg py-xs">
         <span className="font-mono text-caption-caps text-on-dark">{props.assessmentTitle}</span>
-        {props.batchPosition !== null && (
-          <span className="font-mono text-caption tabular-nums text-on-dark-soft">
-            {props.batchPosition} of {props.batchTotal}
-          </span>
-        )}
+        <div className="flex items-center gap-sm">
+          <button
+            onClick={() => goTo(props.prevUngradedSubmissionId)}
+            disabled={!props.prevUngradedSubmissionId}
+            className="font-mono text-caption text-on-dark-soft underline disabled:opacity-30 disabled:no-underline"
+          >
+            ‹ Prev ungraded
+          </button>
+          <button
+            onClick={() => goTo(props.prevSubmissionId)}
+            disabled={!props.prevSubmissionId}
+            className="font-mono text-caption text-on-dark-soft underline disabled:opacity-30 disabled:no-underline"
+          >
+            ‹ Prev
+          </button>
+          {props.batchPosition !== null && (
+            <span className="font-mono text-caption tabular-nums text-on-dark-soft">
+              Submission: {props.batchPosition} of {props.batchTotal}
+            </span>
+          )}
+          <button
+            onClick={() => goTo(props.nextSubmissionId)}
+            disabled={!props.nextSubmissionId}
+            className="font-mono text-caption text-on-dark-soft underline disabled:opacity-30 disabled:no-underline"
+          >
+            Next ›
+          </button>
+          <button
+            onClick={() => goTo(props.nextUngradedSubmissionId)}
+            disabled={!props.nextUngradedSubmissionId}
+            className="font-mono text-caption text-on-dark-soft underline disabled:opacity-30 disabled:no-underline"
+          >
+            Next ungraded ›
+          </button>
+        </div>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-[1fr_1fr_1fr]">
       {/* Left: script-viewer, on a ruled-paper backdrop matching the
@@ -324,10 +427,10 @@ export function ReviewConsole(props: {
             onBoxClick={(key) => {
               const group = partBoxes.find((b) => b.key === key);
               const firstCriterionKey = group?.criterionKeys[0];
-              const idx = props.criteria.findIndex((c) => c.criterionKey === firstCriterionKey);
+              const idx = criteriaList.findIndex((c) => c.criterionKey === firstCriterionKey);
               if (idx >= 0) {
                 setFocusedCriterionIdx(idx);
-                const firstStep = props.criteria[idx].evidenceStepIndices[0];
+                const firstStep = criteriaList[idx].evidenceStepIndices[0];
                 if (firstStep !== undefined) scrollToStep(firstStep);
               }
             }}
@@ -567,7 +670,7 @@ export function ReviewConsole(props: {
 
         <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — RAG-matched</p>
         <div className="flex flex-col border-t border-hairline">
-          {props.criteria.map((c, i) => {
+          {criteriaList.map((c, i) => {
             const cardState = criterionState(c);
             const checkboxBorder =
               cardState === "verified" ? "border-verified" : cardState === "attention" ? "border-attention" : "border-disputed";
@@ -651,6 +754,62 @@ export function ReviewConsole(props: {
           })}
         </div>
 
+        {/* Gradescope's "+Add Rubric Item" — rubrics were previously only
+            ever authored once, by AI, at question-creation time. This
+            writes a real rubric_criteria row (shared by every submission of
+            this question, same as an AI-authored one), not just local
+            state, so it persists past this page. */}
+        {showAddCriterion ? (
+          <div className="mt-xs flex flex-col gap-xs rounded-sm border border-primary/40 bg-surface-soft p-sm">
+            <label className="flex flex-col gap-xxs text-caption text-muted-soft">
+              Item name
+              <input
+                value={newCriterionName}
+                onChange={(e) => setNewCriterionName(e.target.value)}
+                placeholder="e.g. Correct units"
+                className="rounded-sm border border-hairline bg-canvas px-xs py-xs text-body-sm text-body"
+                autoFocus
+              />
+            </label>
+            <label className="flex flex-col gap-xxs text-caption text-muted-soft">
+              Points
+              <input
+                type="number"
+                min={1}
+                value={newCriterionMaxScore}
+                onChange={(e) => setNewCriterionMaxScore(Number(e.target.value))}
+                className="w-20 rounded-sm border border-hairline bg-canvas px-xs py-xs text-body-sm text-body"
+              />
+            </label>
+            <p className="text-caption text-muted-soft">
+              Tied to step {selectedStep ?? props.steps[0]?.stepIndex ?? "—"} — select a different step first to tie
+              it elsewhere.
+            </p>
+            <div className="flex gap-xs">
+              <button
+                onClick={addRubricItem}
+                disabled={addingCriterion || !newCriterionName.trim()}
+                className="rounded-sm bg-ink px-xs py-[2px] text-caption text-on-dark disabled:opacity-50"
+              >
+                {addingCriterion ? "Adding…" : "Add item"}
+              </button>
+              <button
+                onClick={() => setShowAddCriterion(false)}
+                className="rounded-sm border border-hairline px-xs py-[2px] text-caption"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAddCriterion(true)}
+            className="mt-xs w-fit rounded-sm border border-dashed border-hairline px-sm py-xs text-caption text-muted underline"
+          >
+            + Add rubric item
+          </button>
+        )}
+
         {props.misconceptions.length > 0 && (
           <div className="mt-sm rounded-lg bg-attention-soft p-sm">
             <p className="text-caption-caps text-attention">Misconceptions detected</p>
@@ -667,6 +826,64 @@ export function ReviewConsole(props: {
             Total: <strong className="text-body-strong">{currentTotal}</strong> / {props.maxTotal}
             {adjusted && <span className="ml-xs text-caption text-attention">adjusted</span>}
           </p>
+
+          {/* Manual point adjustment — independent of clicking rubric
+              levels, for disagreeing with the total wholesale rather than
+              criterion by criterion. */}
+          {showOverride ? (
+            <div className="flex flex-col gap-xs rounded-sm border border-attention/40 bg-attention-soft p-sm">
+              <label className="flex items-center gap-xs text-caption text-muted-soft">
+                Override total
+                <input
+                  type="number"
+                  value={manualOverride ?? rubricTotal}
+                  onChange={(e) => setManualOverride(Number(e.target.value))}
+                  className="w-20 rounded-sm border border-hairline bg-canvas px-xs py-xs text-body-sm text-body"
+                />
+                / {props.maxTotal}
+              </label>
+              <label className="flex flex-col gap-xxs text-caption text-muted-soft">
+                Reason (goes in the audit log)
+                <textarea
+                  value={overrideReason}
+                  onChange={(e) => setOverrideReason(e.target.value)}
+                  className="min-h-10 rounded-sm border border-hairline bg-canvas px-xs py-xs text-body-sm text-body"
+                />
+              </label>
+              <button
+                onClick={() => {
+                  setManualOverride(null);
+                  setOverrideReason("");
+                  setShowOverride(false);
+                }}
+                className="w-fit rounded-sm border border-hairline px-xs py-[2px] text-caption"
+              >
+                Remove override
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setManualOverride(rubricTotal);
+                setShowOverride(true);
+              }}
+              className="w-fit text-caption text-muted underline"
+            >
+              Override total
+            </button>
+          )}
+
+          {/* Internal-only note — never released to the student, unlike
+              "What the student will see" above. */}
+          <label className="flex flex-col gap-xxs text-caption text-muted-soft">
+            Instructor notes <span className="text-muted-soft">(internal only — never shown to the student)</span>
+            <textarea
+              value={internalNote}
+              onChange={(e) => setInternalNote(e.target.value)}
+              className="min-h-10 rounded-sm border border-hairline bg-canvas px-xs py-xs text-body-sm text-body"
+            />
+          </label>
+
           <div className="flex gap-xs">
             <button
               onClick={approveAndAdvance}
