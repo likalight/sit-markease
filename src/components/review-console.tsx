@@ -52,8 +52,12 @@ export function ReviewConsole(props: {
   totalRecommended: number;
   maxTotal: number;
   nextSubmissionId: string | null;
+  releaseFeedback: { summary: string; strengths: { text: string; step_indices: number[] }[]; nextAction: string } | null;
 }) {
   const router = useRouter();
+  const [feedbackSummary, setFeedbackSummary] = useState(props.releaseFeedback?.summary ?? "");
+  const [feedbackNextAction, setFeedbackNextAction] = useState(props.releaseFeedback?.nextAction ?? "");
+  const [editingFeedback, setEditingFeedback] = useState(false);
   const [scores, setScores] = useState<Record<string, number>>(
     Object.fromEntries(props.criteria.map((c) => [c.criterionKey, c.score]))
   );
@@ -191,6 +195,15 @@ export function ReviewConsole(props: {
       body: JSON.stringify({ latex: editLatexText }),
     });
     setEditingLatexStep(null);
+  }
+
+  async function saveFeedback() {
+    await fetch(`/api/submissions/${props.submissionId}/feedback`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ summary: feedbackSummary, next_action: feedbackNextAction }),
+    });
+    setEditingFeedback(false);
   }
 
   useEffect(() => {
@@ -435,6 +448,74 @@ export function ReviewConsole(props: {
             ⚑ Flagged for human review
           </p>
         )}
+
+        {/* Instructor marking mode (Nicholas's review): approving a score
+            isn't the only gate — the instructor verifies the actual words
+            the student is about to receive, not just the number. */}
+        {props.releaseFeedback && (
+          <div className="mb-sm rounded-sm border border-hairline p-sm">
+            <div className="mb-xs flex items-center justify-between">
+              <p className="font-mono text-caption-caps text-muted-soft">What the student will see</p>
+              {!editingFeedback && (
+                <button onClick={() => setEditingFeedback(true)} className="text-caption text-body underline">
+                  edit
+                </button>
+              )}
+            </div>
+            {editingFeedback ? (
+              <div className="flex flex-col gap-xs">
+                <label className="flex flex-col gap-xxs text-caption text-muted-soft">
+                  Summary
+                  <textarea
+                    value={feedbackSummary}
+                    onChange={(e) => setFeedbackSummary(e.target.value)}
+                    className="min-h-14 rounded-sm border border-primary/40 bg-canvas px-xs py-xs text-body-sm text-body"
+                  />
+                </label>
+                <label className="flex flex-col gap-xxs text-caption text-muted-soft">
+                  Next action
+                  <textarea
+                    value={feedbackNextAction}
+                    onChange={(e) => setFeedbackNextAction(e.target.value)}
+                    className="min-h-10 rounded-sm border border-primary/40 bg-canvas px-xs py-xs text-body-sm text-body"
+                  />
+                </label>
+                <div className="flex gap-xs">
+                  <button onClick={saveFeedback} className="rounded-sm bg-ink px-xs py-[2px] text-caption text-on-dark">
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFeedbackSummary(props.releaseFeedback?.summary ?? "");
+                      setFeedbackNextAction(props.releaseFeedback?.nextAction ?? "");
+                      setEditingFeedback(false);
+                    }}
+                    className="rounded-sm border border-hairline px-xs py-[2px] text-caption"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-xs">
+                <p className="text-body-sm text-body">{feedbackSummary}</p>
+                {props.releaseFeedback.strengths.length > 0 && (
+                  <ul className="flex flex-col gap-xxs">
+                    {props.releaseFeedback.strengths.map((s, i) => (
+                      <li key={i} className="text-body-sm text-verified">
+                        ✓ {s.text}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-body-sm text-muted">
+                  <strong className="text-body-strong">Next:</strong> {feedbackNextAction}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — RAG-matched</p>
         <div className="flex flex-col border-t border-hairline">
           {props.criteria.map((c, i) => {

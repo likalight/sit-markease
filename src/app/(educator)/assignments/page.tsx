@@ -35,6 +35,7 @@ export default async function AssignmentsPage() {
         assessmentId: q.assessment_id,
         assignmentName: assessment?.title ?? "Untitled assignment",
         status: assessment?.status ?? "draft",
+        mode: (assessment as any)?.assessment_mode ?? "summative",
         promptText: q.prompt_text,
         maxScore: q.max_score,
         submissionCount: submissions.length,
@@ -71,7 +72,12 @@ export default async function AssignmentsPage() {
           {rows.map((r) => (
             <li key={r.id} className="flex flex-col gap-xs px-md py-sm">
               <div className="flex items-baseline justify-between">
-                <span className="text-caption-caps text-muted-soft">{r.assignmentName}</span>
+                <span className="flex items-center gap-xs text-caption-caps text-muted-soft">
+                  {r.assignmentName}
+                  <span className="rounded-sm border border-hairline px-xs py-[1px] text-caption text-muted-soft">
+                    {r.mode}
+                  </span>
+                </span>
                 {r.avgScore !== null && (
                   <span className="text-data-sm tabular-nums text-body-strong">
                     avg {r.avgScore.toFixed(1)}/{r.maxScore}
@@ -82,7 +88,13 @@ export default async function AssignmentsPage() {
               <div className="flex items-center justify-between gap-md">
                 <div className="flex items-center gap-md text-caption text-muted">
                   <span>{r.submissionCount} submitted</span>
-                  <span className="text-verified">{r.released} reviewed &amp; released</span>
+                  {r.mode === "formative" ? (
+                    <Link href={`/assignments/${r.assessmentId}/attempts`} className="underline">
+                      {r.released} auto-released — view attempts →
+                    </Link>
+                  ) : (
+                    <span className="text-verified">{r.released} reviewed &amp; released</span>
+                  )}
                   {r.pending > 0 && (
                     <Link href="/review" className="text-disputed underline">
                       {r.pending} awaiting your review →

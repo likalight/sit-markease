@@ -118,13 +118,13 @@ export const db = {
   // for the "create assignment" flow (that one stays for anything that still
   // needs a bare default container). New assessments start "draft" (schema
   // default) — not submittable until updateAssessmentStatus opens them.
-  async createAssessment(moduleId: string, title: string) {
+  async createAssessment(moduleId: string, title: string, mode: "formative" | "summative" = "summative") {
     if (fx()) {
-      return localStore.insert("assessments", { module_id: moduleId, title, status: "draft" });
+      return localStore.insert("assessments", { module_id: moduleId, title, status: "draft", assessment_mode: mode });
     }
     const { data, error } = await supabaseAdmin()
       .from("assessments")
-      .insert({ module_id: moduleId, title, status: "draft" })
+      .insert({ module_id: moduleId, title, status: "draft", assessment_mode: mode })
       .select("*")
       .single();
     if (error) throw error;
@@ -560,11 +560,23 @@ export const db = {
     return data;
   },
 
+  async updateFeedback(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("feedback", id, patch);
+    const { error } = await supabaseAdmin().from("feedback").update(patch).eq("id", id);
+    if (error) throw error;
+  },
+
   async insertFeedbackFlag(row: Record<string, any>) {
     if (fx()) return localStore.insert("feedback_flags", row);
     const { data, error } = await supabaseAdmin().from("feedback_flags").insert(row).select("*").single();
     if (error) throw error;
     return data;
+  },
+
+  async listFeedbackFlags(feedbackId: string) {
+    if (fx()) return localStore.find("feedback_flags", (f: any) => f.feedback_id === feedbackId);
+    const { data } = await supabaseAdmin().from("feedback_flags").select("*").eq("feedback_id", feedbackId);
+    return data ?? [];
   },
 
   // --- RAG corpus + practice (S7) ---

@@ -5,6 +5,8 @@ import { db } from "@/lib/db/facade";
 import { FeedbackFlagButton } from "@/components/feedback-flag-button";
 import { RequestRevisionButton } from "@/components/request-revision-button";
 import { ScriptViewer } from "@/components/script-viewer";
+import { MathText } from "@/components/math";
+import { OcrStepFlagButton } from "@/components/ocr-step-flag-button";
 import { stepState } from "@/lib/design/step-state";
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
@@ -70,6 +72,12 @@ export default async function StudentFeedbackPage() {
 
       const practiceSet = await db.getPracticeSetForSubmission(submission.id);
 
+      // Formative mode has no instructor gate, so — unlike summative,
+      // where a student never sees the raw transcription at all — the
+      // student here is the one safeguard against a misread OCR result.
+      const assessment = await db.getAssessment((question as any)?.assessment_id);
+      const isFormative = (assessment as any)?.assessment_mode === "formative";
+
       return {
         submissionId: submission.id,
         pending: false as const,
@@ -102,6 +110,10 @@ export default async function StudentFeedbackPage() {
           remediationNote: taxonomyById.get(t.misconception_id)?.remediation_note ?? "",
         })),
         hasPracticeSet: !!practiceSet,
+        isFormative,
+        steps: isFormative
+          ? steps.map((s: any) => ({ stepIndex: s.step_index, latex: s.latex, plainText: s.plain_text }))
+          : [],
       };
     })
   );
@@ -153,6 +165,27 @@ export default async function StudentFeedbackPage() {
             <div>
               <h2 className="mb-xs font-mono text-caption-caps text-muted-soft">Your script</h2>
               <ScriptViewer imageUrl={c.originalUrl} boxes={c.scriptBoxes} activeLineIndices={c.highlightedLineIndices} />
+            </div>
+          )}
+
+          {c.isFormative && c.steps.length > 0 && (
+            <div>
+              <h2 className="mb-xs font-mono text-caption-caps text-muted-soft">
+                Check your work was read correctly
+              </h2>
+              <ul className="flex flex-col gap-xs">
+                {c.steps.map((s) => (
+                  <li
+                    key={s.stepIndex}
+                    className="flex items-center justify-between gap-sm rounded-sm border border-hairline px-sm py-xs"
+                  >
+                    <span className="text-body-sm text-body">
+                      <MathText latex={s.latex} />
+                    </span>
+                    <OcrStepFlagButton feedbackId={c.feedbackId} stepIndex={s.stepIndex} />
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
@@ -218,7 +251,11 @@ export default async function StudentFeedbackPage() {
             {c.nextAction}
           </div>
 
-          {c.hasPracticeSet ? (
+          {c.isFormative ? (
+            <Link href="/submit" className="text-body-md text-body underline">
+              Revise and resubmit →
+            </Link>
+          ) : c.hasPracticeSet ? (
             <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
               Go to your practice set →
             </Link>

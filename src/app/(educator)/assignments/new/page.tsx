@@ -46,6 +46,25 @@ export default async function NewQuestionPage({
           />
         </label>
 
+        <fieldset className="flex flex-col gap-xs text-body-sm text-body">
+          <legend className="mb-xxs">Mode</legend>
+          <label className="flex items-start gap-xs">
+            <input type="radio" name="mode" value="summative" defaultChecked className="mt-[3px]" />
+            <span>
+              <strong>Summative</strong> — a real exam, test, or graded assignment. Every score is drafted
+              by AI, but nothing reaches a student until an instructor reviews and approves it.
+            </span>
+          </label>
+          <label className="flex items-start gap-xs">
+            <input type="radio" name="mode" value="formative" className="mt-[3px]" />
+            <span>
+              <strong>Formative</strong> — low-stakes weekly practice. Feedback releases to the student
+              instantly with no instructor gate, uses progressive hints instead of revealing the answer
+              outright, and lets the student revise and resubmit.
+            </span>
+          </label>
+        </fieldset>
+
         <DocumentUploadField />
 
         <label className="flex flex-col gap-xs text-body-sm text-body">

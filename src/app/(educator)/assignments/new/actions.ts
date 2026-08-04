@@ -18,6 +18,8 @@ export async function createQuestionAction(formData: FormData) {
   }
 
   const assignmentName = String(formData.get("assignmentName") ?? "").trim();
+  const modeRaw = String(formData.get("mode") ?? "summative");
+  const mode: "formative" | "summative" = modeRaw === "formative" ? "formative" : "summative";
   const promptText = String(formData.get("promptText") ?? "").trim();
   const modelSolution = String(formData.get("modelSolution") ?? "").trim();
   const expectedAnswerLatex = String(formData.get("expectedAnswerLatex") ?? "").trim();
@@ -49,7 +51,7 @@ export async function createQuestionAction(formData: FormData) {
   }
 
   const module_ = await db.findOrCreateDefaultModule(user!.id);
-  const assessment = await db.createAssessment((module_ as any).id, assignmentName);
+  const assessment = await db.createAssessment((module_ as any).id, assignmentName, mode);
   const existingCount = await db.countQuestionsForAssessment((assessment as any).id);
 
   const question = await db.createQuestion({

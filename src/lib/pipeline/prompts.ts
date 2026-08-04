@@ -28,7 +28,7 @@ export const PROMPT_VERSIONS = {
   s2ReadTyped: "s2_read_typed.v1",
   s4Assess: "s4_assess.v2",
   s5Diagnose: "s5_diagnose.v1",
-  s6Feedback: "s6_feedback.v1",
+  s6Feedback: "s6_feedback.v2",
   s7Practice: "s7_practice.v1",
   s7Verify: "s7_verify.v1",
   rubricStructure: "rubric_structure.v1",
@@ -244,7 +244,7 @@ export function s5DiagnoseUserPrompt(args: {
 }
 
 export function s6FeedbackSystemPrompt(): string {
-  return loadPrompt("s6_feedback.v1.md");
+  return loadPrompt("s6_feedback.v2.md");
 }
 
 const S6_FEEDBACK_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:

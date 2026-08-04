@@ -10,7 +10,7 @@ import { generateFeedback } from "./s6-feedback";
 // action — every result, confident or not, lands in the review queue
 // (getReviewQueue() filters to "no final_grade yet") and waits for a real
 // approve action (POST /api/submissions/:id/approve). This function used to
-// also auto-release confident results with approved_by: null, which
+// also auto-release every confident result with approved_by: null, which
 // directly violated rule 3 — removed (docs/DECISIONS.md).
 //
 // S7 (practice generation) no longer runs automatically here either — it's
@@ -21,6 +21,35 @@ import { generateFeedback } from "./s6-feedback";
 // Shared by both entry points below — a photo submission and a typed
 // submission only differ in how S2 produces its transcription; S4 onward
 // has no idea which path a submission came through.
+
+// Reintroduced auto-release, scoped to formative-mode assessments only
+// (Nicholas's review, docs/DECISIONS.md): a weekly-practice question is a
+// different product from a graded assessment — the whole point is instant
+// feedback with no human reviewer in the immediate loop. This is a
+// deliberate, mode-gated exception, not a reversion of the summative-mode
+// fix above; summative submissions are completely unaffected.
+async function autoReleaseIfFormative(submissionId: string) {
+  const submission = await db.getSubmission(submissionId);
+  if (!submission) return;
+  const question = await db.getQuestionWithRubric(submission.question_id);
+  const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
+  if ((assessment as any)?.assessment_mode !== "formative") return;
+
+  const grade = await db.getGradeRecommendation(submissionId);
+  if (!grade) return;
+
+  await db.createFinalGrade({
+    submission_id: submissionId,
+    total: (grade as any).total_recommended,
+    approved_by: null,
+    approved_at: new Date().toISOString(),
+    adjusted: false,
+    adjustment_note: "Auto-released — formative practice mode, no instructor gate.",
+    review_seconds: 0,
+  });
+  await db.updateSubmission(submissionId, { status: "released" });
+}
+
 async function continuePipelineAfterTranscription(submissionId: string, transcribeResult: TranscribeResult) {
   if (transcribeResult.status === "needs_human_transcription" || transcribeResult.status === "failed") {
     return { ...transcribeResult, assess: { status: "failed" }, diagnose: { status: "failed" }, feedback: { status: "failed" } };
@@ -32,10 +61,23 @@ async function continuePipelineAfterTranscription(submissionId: string, transcri
   let preferredTone: "supportive" | "concise" | "socratic" = "supportive";
   if (assessResult.status === "assessed") {
     const submission = await db.getSubmission(submissionId);
-    const student = submission?.student_id ? await db.getUser(submission.student_id) : null;
-    preferredTone = (student as any)?.feedback_tone ?? "supportive";
+    const question = submission ? await db.getQuestionWithRubric(submission.question_id) : null;
+    const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
+    if ((assessment as any)?.assessment_mode === "formative") {
+      // Progressive hints, not a preference — the defining trait of
+      // formative mode (Nicholas's review), so it overrides whatever tone
+      // the student has set for themselves.
+      preferredTone = "socratic";
+    } else {
+      const student = submission?.student_id ? await db.getUser(submission.student_id) : null;
+      preferredTone = (student as any)?.feedback_tone ?? "supportive";
+    }
   }
   const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId, preferredTone) : { status: "failed" as const };
+
+  if (feedbackResult.status === "generated") {
+    await autoReleaseIfFormative(submissionId);
+  }
 
   return { ...transcribeResult, assess: assessResult, diagnose: diagnoseResult, feedback: feedbackResult };
 }

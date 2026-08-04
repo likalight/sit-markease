@@ -37,6 +37,7 @@ export default async function ReviewSubmissionPage({
 
   const grade = await db.getGradeRecommendation(submissionId);
   const criteria = grade ? await db.listCriterionResults(grade.id) : [];
+  const feedback = await db.getFeedback(submissionId);
 
   const module_ = await db.getModuleForQuestion(submission.question_id);
   const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
@@ -94,6 +95,15 @@ export default async function ReviewSubmissionPage({
       totalRecommended={grade?.total_recommended ?? 0}
       maxTotal={grade?.max_total ?? 0}
       nextSubmissionId={nextSubmissionId}
+      releaseFeedback={
+        feedback
+          ? {
+              summary: (feedback as any).summary ?? "",
+              strengths: ((feedback as any).strengths ?? []) as { text: string; step_indices: number[] }[],
+              nextAction: (feedback as any).next_action ?? "",
+            }
+          : null
+      }
     />
   );
 }
