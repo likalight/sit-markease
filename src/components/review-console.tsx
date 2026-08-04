@@ -314,7 +314,7 @@ export function ReviewConsole(props: {
           </p>
         )}
         <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — RAG-matched</p>
-        <div className="flex flex-col gap-sm">
+        <div className="flex flex-col border-t border-hairline">
           {props.criteria.map((c, i) => {
             const evidenceSteps = props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex));
             const cardState = evidenceSteps.some((s) => s.agreement < 0.6)
@@ -322,38 +322,61 @@ export function ReviewConsole(props: {
               : c.confidence < 0.85
                 ? "attention"
                 : "verified";
-            const borderColor =
-              cardState === "verified" ? "border-l-verified" : cardState === "attention" ? "border-l-attention" : "border-l-disputed";
+            const checkboxBorder =
+              cardState === "verified" ? "border-verified" : cardState === "attention" ? "border-attention" : "border-disputed";
+            const fill = scores[c.criterionKey] / c.maxScore;
             const focused = i === focusedCriterionIdx;
             return (
               <div
                 key={c.criterionKey}
                 onClick={() => setFocusedCriterionIdx(i)}
-                className={`rounded-lg border border-hairline border-l-[3px] ${borderColor} bg-canvas p-lg ${
-                  focused ? "shadow-raised ring-1 ring-primary/15" : ""
+                className={`flex cursor-pointer items-start gap-sm border-b border-hairline px-xs py-sm ${
+                  focused ? "bg-surface-soft" : ""
                 }`}
               >
-                <div className="mb-xs flex items-center justify-between">
-                  <span className="text-title-sm text-body-strong">{nameByKey[c.criterionKey] ?? c.criterionKey}</span>
-                  <span className="text-data-sm tabular-nums text-muted">
-                    {levels[c.criterionKey]} · {scores[c.criterionKey]}/{c.maxScore}
-                  </span>
+                <div
+                  className={`mt-[2px] flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-sm border-2 ${checkboxBorder}`}
+                  style={
+                    fill >= 1
+                      ? { backgroundColor: "var(--color-primary)" }
+                      : fill > 0
+                        ? {
+                            backgroundImage:
+                              "repeating-linear-gradient(135deg, var(--color-primary), var(--color-primary) 3px, transparent 3px, transparent 6px)",
+                          }
+                        : undefined
+                  }
+                >
+                  {fill >= 1 && <span className="text-caption text-on-primary">✓</span>}
                 </div>
-                <p className="mb-xs text-body-sm text-muted">{c.justification}</p>
-                <div className="mb-xs flex flex-wrap gap-xxs">
-                  {c.evidenceStepIndices.map((idx) => (
-                    <button
-                      key={idx}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        scrollToStep(idx);
-                      }}
-                      className="rounded-pill bg-surface-card px-xs py-[1px] text-caption text-body"
-                    >
-                      Step {idx}
-                    </button>
-                  ))}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-xs">
+                    <span className="text-title-sm font-semibold text-body-strong">
+                      {nameByKey[c.criterionKey] ?? c.criterionKey}
+                    </span>
+                    <span className="rounded-sm border border-muted-soft/40 px-xs py-[1px] font-mono text-caption text-muted-soft">
+                      RAG
+                    </span>
+                  </div>
+                  <p className="text-body-sm text-muted">{c.justification}</p>
+                  <div className="mt-xxs flex flex-wrap gap-xxs">
+                    {c.evidenceStepIndices.map((idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          scrollToStep(idx);
+                        }}
+                        className="rounded-pill bg-surface-card px-xs py-[1px] text-caption text-body"
+                      >
+                        Step {idx}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                <span className="shrink-0 font-mono text-title-sm font-bold tabular-nums text-primary-active">
+                  +{scores[c.criterionKey]}
+                </span>
               </div>
             );
           })}

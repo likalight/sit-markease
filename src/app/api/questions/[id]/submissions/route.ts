@@ -79,7 +79,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const pages = await db.listSubmissionPages(result.submissionId);
   const firstPage = pages.find((p: any) => p.page_index === 0) ?? pages[0];
-  const originalUrl = firstPage ? await db.getImageUrl(firstPage.storage_path) : null;
+  // Same processed-vs-original coordinate-space fix as the review page —
+  // the returned `boxes` are computed against the deskewed image, so the
+  // image shown alongside them has to be that same processed one.
+  const originalUrl = firstPage ? await db.getImageUrl(firstPage.processed_path ?? firstPage.storage_path) : null;
   const pipeline = await runFullPipeline(result.submissionId);
 
   return NextResponse.json({ ...result, originalUrl, pipeline });

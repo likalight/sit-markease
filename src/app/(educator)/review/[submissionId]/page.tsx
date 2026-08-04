@@ -25,7 +25,12 @@ export default async function ReviewSubmissionPage({
   const pages = await db.listSubmissionPages(submissionId);
   const page = pages[0];
   const boxes = page ? await db.listDetectedLines(page.id) : [];
-  const originalUrl = page ? await db.getImageUrl(page.storage_path) : null;
+  // Line boxes are computed by OpenCV against the deskewed/denoised image
+  // (sidecar/cv.py preprocess), not the raw upload — deskewing rotates and
+  // can resize the frame, so box percentages only line up against that same
+  // processed image. Showing the original here silently misaligned every
+  // box whenever a page had any real-world skew.
+  const originalUrl = page ? await db.getImageUrl(page.processed_path ?? page.storage_path) : null;
 
   const transcription = await db.getTranscription(submissionId);
   const steps = transcription ? await db.listSolutionSteps(transcription.id) : [];
