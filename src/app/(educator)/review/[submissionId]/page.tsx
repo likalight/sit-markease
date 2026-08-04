@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
-import { getReviewQueue } from "@/lib/pipeline/review-queue";
+import { getReviewQueueGroupedByQuestion } from "@/lib/pipeline/review-queue";
 import { ReviewConsole } from "@/components/review-console";
 
 // §11.1 E3 — the hero screen. Three panes: original image + line boxes |
@@ -46,13 +46,23 @@ export default async function ReviewSubmissionPage({
     misconceptionTags.flatMap((t: any) => t.evidence_step_indices as number[])
   );
 
-  const queue = await getReviewQueue();
-  const currentIndex = queue.findIndex((q) => q.submissionId === submissionId);
-  const nextSubmissionId = currentIndex >= 0 && currentIndex + 1 < queue.length ? queue[currentIndex + 1].submissionId : null;
+  // Gradescope-style: "next" stays within this question's own batch, not
+  // the whole cross-question queue — an instructor works through one
+  // rubric before switching to a different question.
+  const groups = await getReviewQueueGroupedByQuestion();
+  const group = groups.find((g) => g.questionId === submission.question_id);
+  const batchEntries = group?.entries ?? [];
+  const currentIndex = batchEntries.findIndex((e) => e.submissionId === submissionId);
+  const nextSubmissionId =
+    currentIndex >= 0 && currentIndex + 1 < batchEntries.length ? batchEntries[currentIndex + 1].submissionId : null;
+  const assessment = await db.getAssessment((question as any)?.assessment_id);
 
   return (
     <ReviewConsole
       submissionId={submissionId}
+      assessmentTitle={(assessment as any)?.title ?? ""}
+      batchPosition={currentIndex >= 0 ? currentIndex + 1 : null}
+      batchTotal={batchEntries.length}
       questionPromptText={question?.prompt_text ?? ""}
       originalUrl={originalUrl}
       boxes={boxes.map((b: any) => ({ lineIndex: b.line_index, box: b.box }))}

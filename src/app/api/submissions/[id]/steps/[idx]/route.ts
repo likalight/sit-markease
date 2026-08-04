@@ -19,8 +19,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const body = await request.json().catch(() => ({}));
   const plainText = typeof body.plain_text === "string" ? body.plain_text : null;
-  if (plainText === null) {
-    return NextResponse.json({ error: { code: "MISSING_PLAIN_TEXT", message: "plain_text is required" } }, { status: 400 });
+  const latex = typeof body.latex === "string" ? body.latex : null;
+  if (plainText === null && latex === null) {
+    return NextResponse.json(
+      { error: { code: "MISSING_FIELDS", message: "plain_text or latex is required" } },
+      { status: 400 }
+    );
   }
 
   const transcription = await db.getTranscription(submissionId);
@@ -34,7 +38,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: { code: "STEP_NOT_FOUND", message: `no step ${stepIndex}` } }, { status: 404 });
   }
 
-  await db.updateSolutionStep(step.id, { plain_text: plainText, edited_by_human: true, source: "human" });
+  const patch: Record<string, unknown> = { edited_by_human: true, source: "human" };
+  if (plainText !== null) patch.plain_text = plainText;
+  if (latex !== null) patch.latex = latex;
+  await db.updateSolutionStep(step.id, patch);
 
   return NextResponse.json({ ok: true });
 }

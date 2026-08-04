@@ -38,6 +38,9 @@ interface Criterion {
 // keyboard-first, built for the fortieth script of the evening.
 export function ReviewConsole(props: {
   submissionId: string;
+  assessmentTitle: string;
+  batchPosition: number | null;
+  batchTotal: number;
   questionPromptText: string;
   originalUrl: string | null;
   boxes: { lineIndex: number; box: { x: number; y: number; w: number; h: number } }[];
@@ -64,6 +67,12 @@ export function ReviewConsole(props: {
   const [stepTexts, setStepTexts] = useState<Record<number, string>>(
     Object.fromEntries(props.steps.map((s) => [s.stepIndex, s.plainText]))
   );
+  const [stepLatex, setStepLatex] = useState<Record<number, string>>(
+    Object.fromEntries(props.steps.map((s) => [s.stepIndex, s.latex]))
+  );
+  const [expandedLatexStep, setExpandedLatexStep] = useState<number | null>(null);
+  const [editingLatexStep, setEditingLatexStep] = useState<number | null>(null);
+  const [editLatexText, setEditLatexText] = useState("");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const mountedAt = useRef(Date.now());
@@ -71,6 +80,17 @@ export function ReviewConsole(props: {
 
   const nameByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.name]));
   const levelsByKey = Object.fromEntries(props.rubricCriteria.map((c) => [c.key, c.levels]));
+
+  // Reverse lookup so each transcription step can show which rubric part it
+  // was used as evidence for — Gradescope-style "this working is Part (ii)"
+  // annotation, requested alongside the clean-math-by-default view.
+  const criterionNameByStep = new Map<number, string>();
+  for (const c of props.criteria) {
+    const name = nameByKey[c.criterionKey] ?? c.criterionKey;
+    for (const idx of c.evidenceStepIndices) {
+      criterionNameByStep.set(idx, criterionNameByStep.has(idx) ? `${criterionNameByStep.get(idx)}, ${name}` : name);
+    }
+  }
   const adjusted = props.criteria.some((c) => scores[c.criterionKey] !== c.score);
   const currentTotal = Object.values(scores).reduce((a, b) => a + b, 0);
 
@@ -120,18 +140,22 @@ export function ReviewConsole(props: {
     router.push(props.nextSubmissionId ? `/review/${props.nextSubmissionId}` : "/review");
   }
 
-  function setLevelOnFocused(levelIdx: number) {
-    const criterion = props.criteria[focusedCriterionIdx];
-    const options = levelsByKey[criterion.criterionKey] ?? [];
+  function setLevelForCriterion(criterionKey: string, levelIdx: number) {
+    const options = levelsByKey[criterionKey] ?? [];
     const chosen = options[levelIdx];
     if (!chosen) return;
-    setLevels((prev) => ({ ...prev, [criterion.criterionKey]: chosen.level }));
-    setScores((prev) => ({ ...prev, [criterion.criterionKey]: chosen.score }));
-    fetch(`/api/submissions/${props.submissionId}/criteria/${criterion.criterionKey}`, {
+    setLevels((prev) => ({ ...prev, [criterionKey]: chosen.level }));
+    setScores((prev) => ({ ...prev, [criterionKey]: chosen.score }));
+    fetch(`/api/submissions/${props.submissionId}/criteria/${criterionKey}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ level: chosen.level, score: chosen.score }),
     });
+  }
+
+  function setLevelOnFocused(levelIdx: number) {
+    const criterion = props.criteria[focusedCriterionIdx];
+    setLevelForCriterion(criterion.criterionKey, levelIdx);
   }
 
   function startEditFocusedStep() {
@@ -151,6 +175,22 @@ export function ReviewConsole(props: {
       body: JSON.stringify({ plain_text: editText }),
     });
     setEditingStep(null);
+  }
+
+  function startEditLatex(stepIndex: number) {
+    setEditingLatexStep(stepIndex);
+    setEditLatexText(stepLatex[stepIndex] ?? "");
+  }
+
+  async function saveEditedLatex() {
+    if (editingLatexStep === null) return;
+    setStepLatex((prev) => ({ ...prev, [editingLatexStep]: editLatexText }));
+    await fetch(`/api/submissions/${props.submissionId}/steps/${editingLatexStep}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latex: editLatexText }),
+    });
+    setEditingLatexStep(null);
   }
 
   useEffect(() => {
@@ -197,7 +237,20 @@ export function ReviewConsole(props: {
   );
 
   return (
-    <div className="grid h-full grid-cols-[1fr_1fr_1fr] bg-canvas">
+    <div className="flex h-full flex-col bg-canvas">
+      {/* Gradescope-style batch context — which assignment, and where this
+          submission sits among the others for the same question. "Next"
+          only ever advances within this same batch (see the page component's
+          nextSubmissionId), so the instructor works one rubric at a time. */}
+      <div className="flex items-center justify-between border-b border-hairline bg-surface-dark px-lg py-xs">
+        <span className="font-mono text-caption-caps text-on-dark">{props.assessmentTitle}</span>
+        {props.batchPosition !== null && (
+          <span className="font-mono text-caption tabular-nums text-on-dark-soft">
+            {props.batchPosition} of {props.batchTotal}
+          </span>
+        )}
+      </div>
+      <div className="grid min-h-0 flex-1 grid-cols-[1fr_1fr_1fr]">
       {/* Left: script-viewer, on a ruled-paper backdrop matching the
           deck's "handwritten script — scanned" dashboard mockup */}
       <div
@@ -245,7 +298,14 @@ export function ReviewConsole(props: {
                 <div className={`w-[3px] shrink-0 rounded-pill ${railColor}`} />
                 <div className="flex-1">
                   <div className="flex items-center justify-between text-caption text-muted-soft">
-                    <span className="tabular-nums">Step {s.stepIndex}</span>
+                    <span className="flex items-center gap-xs tabular-nums">
+                      Step {s.stepIndex}
+                      {criterionNameByStep.has(s.stepIndex) && (
+                        <span className="rounded-pill border border-hairline px-xs py-[1px] text-caption-caps text-muted">
+                          {criterionNameByStep.get(s.stepIndex)}
+                        </span>
+                      )}
+                    </span>
                     <span className="tabular-nums">
                       {state !== "verified" && (
                         <span className="mr-xs rounded-pill bg-surface-card px-xs py-[1px] text-caption-caps">
@@ -280,10 +340,72 @@ export function ReviewConsole(props: {
                     </div>
                   ) : (
                     <>
+                      {/* Clean rendered math by default (CLAUDE.md: never show
+                          raw LaTeX to a user) — the source string is only one
+                          click away for an instructor who wants to check or
+                          correct it, never shown up front. */}
                       <p className="text-body-sm text-body">
-                        <MathText latex={s.latex} />
+                        <MathText latex={stepLatex[s.stepIndex] ?? s.latex} />
                       </p>
                       <p className="text-caption text-muted">{stepTexts[s.stepIndex]}</p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedLatexStep((v) => (v === s.stepIndex ? null : s.stepIndex));
+                        }}
+                        className="mt-xxs font-mono text-caption text-muted-soft underline"
+                      >
+                        {expandedLatexStep === s.stepIndex ? "hide LaTeX" : "view LaTeX"}
+                      </button>
+                      {expandedLatexStep === s.stepIndex && (
+                        <div className="mt-xs rounded-sm border border-hairline bg-surface-soft p-xs">
+                          {editingLatexStep === s.stepIndex ? (
+                            <div className="flex flex-col gap-xs">
+                              <textarea
+                                value={editLatexText}
+                                onChange={(e) => setEditLatexText(e.target.value)}
+                                className="min-h-14 rounded-sm border border-primary/40 bg-canvas px-xs py-xs font-mono text-caption"
+                                autoFocus
+                              />
+                              <div className="flex gap-xs">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    saveEditedLatex();
+                                  }}
+                                  className="rounded-sm bg-ink px-xs py-[2px] text-caption text-on-dark"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingLatexStep(null);
+                                  }}
+                                  className="rounded-sm border border-hairline px-xs py-[2px] text-caption"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-start justify-between gap-xs">
+                              <code className="whitespace-pre-wrap break-all font-mono text-caption text-muted">
+                                {stepLatex[s.stepIndex] ?? s.latex}
+                              </code>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEditLatex(s.stepIndex);
+                                }}
+                                className="shrink-0 font-mono text-caption text-body underline"
+                              >
+                                edit
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                   <div className="mt-xs w-24">
@@ -373,6 +495,28 @@ export function ReviewConsole(props: {
                       </button>
                     ))}
                   </div>
+                  {/* AI suggests, instructor decides — every level is a
+                      direct, clickable choice, not just a keyboard shortcut. */}
+                  <div className="mt-xxs flex flex-wrap gap-xxs">
+                    {(levelsByKey[c.criterionKey] ?? []).map((lvl) => (
+                      <button
+                        key={lvl.level}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFocusedCriterionIdx(i);
+                          setLevelForCriterion(c.criterionKey, (levelsByKey[c.criterionKey] ?? []).indexOf(lvl));
+                        }}
+                        title={lvl.descriptor}
+                        className={`rounded-sm border px-xs py-[1px] text-caption ${
+                          levels[c.criterionKey] === lvl.level
+                            ? "border-primary bg-primary-soft font-medium text-primary-active"
+                            : "border-hairline text-muted"
+                        }`}
+                      >
+                        {lvl.level} · {lvl.score}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <span className="shrink-0 font-mono text-title-sm font-bold tabular-nums text-primary-active">
                   +{scores[c.criterionKey]}
@@ -417,6 +561,7 @@ export function ReviewConsole(props: {
             J/K focus criterion · 1–5 set level · ? for shortcuts
           </p>
         </div>
+      </div>
       </div>
 
       {showShortcuts && (
