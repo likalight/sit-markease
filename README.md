@@ -57,11 +57,10 @@ solution, and rough rubric notes, and AI structures a weighted rubric from it.
 
 ## Try it live
 
-Live deployment is being moved to this repo — link coming shortly. In the meantime, see
-[Local setup](#local-setup) below.
+**[sit-markease.vercel.app](https://sit-markease.vercel.app)**
 
-- **Student** → enter one of the demo IDs (`111`, `222`, `333`) → straight into the submit screen
-- **Educator** → one click → straight into the review queue
+- **Student login** → enter one of the demo IDs (`111`, `222`, `333`) → straight into the submit screen
+- **Instructor login** → one click → straight into the review queue
 
 ## Architecture
 
