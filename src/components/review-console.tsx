@@ -220,6 +220,15 @@ export function ReviewConsole(props: {
     const options = levelsByKey[criterionKey] ?? [];
     const chosen = options[levelIdx];
     if (!chosen) return;
+    // A manual override pins the displayed total, independent of rubric
+    // clicks — but silently ignoring a click while it's active would let an
+    // instructor believe nothing happened when the criterion score actually
+    // did change and persist. Clicking a level is a clear signal they want
+    // rubric-driven scoring again, so it exits override mode.
+    if (manualOverride !== null) {
+      setManualOverride(null);
+      setShowOverride(false);
+    }
     setLevels((prev) => ({ ...prev, [criterionKey]: chosen.level }));
     setScores((prev) => ({ ...prev, [criterionKey]: chosen.score }));
     fetch(`/api/submissions/${props.submissionId}/criteria/${criterionKey}`, {
@@ -836,8 +845,14 @@ export function ReviewConsole(props: {
                 Override total
                 <input
                   type="number"
+                  min={0}
+                  max={props.maxTotal}
                   value={manualOverride ?? rubricTotal}
-                  onChange={(e) => setManualOverride(Number(e.target.value))}
+                  onChange={(e) => {
+                    const raw = Number(e.target.value);
+                    const clamped = Number.isFinite(raw) ? Math.min(Math.max(raw, 0), props.maxTotal) : 0;
+                    setManualOverride(clamped);
+                  }}
                   className="w-20 rounded-sm border border-hairline bg-canvas px-xs py-xs text-body-sm text-body"
                 />
                 / {props.maxTotal}

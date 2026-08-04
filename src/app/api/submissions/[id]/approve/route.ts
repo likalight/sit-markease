@@ -26,6 +26,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: { code: "NO_RECOMMENDATION", message: "no grade recommendation to approve" } }, { status: 400 });
   }
 
+  // Bounds-check the score at this boundary regardless of what the client
+  // sent — the manual-override UI clamps client-side, but a system boundary
+  // shouldn't rely on that alone (e.g. a stale client, a direct API call).
+  const maxTotal = (grade as any).max_total;
+  if (typeof totalScore !== "number" || !Number.isFinite(totalScore) || totalScore < 0 || totalScore > maxTotal) {
+    return NextResponse.json(
+      { error: { code: "INVALID_SCORE", message: `totalScore must be between 0 and ${maxTotal}` } },
+      { status: 400 }
+    );
+  }
+
   const finalGrade = await db.createFinalGrade({
     submission_id: submissionId,
     total: totalScore,

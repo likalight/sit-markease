@@ -50,6 +50,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: { code: "NOT_FOUND", message: "this question has no rubric" } }, { status: 404 });
   }
 
+  // The evidence step must be a real step of this submission's own
+  // transcription — otherwise the criterion's "Step N" chip would point at
+  // nothing, and scrollToStep() would silently find no match.
+  const transcription = await db.getTranscription(submissionId);
+  const steps = transcription ? await db.listSolutionSteps((transcription as any).id) : [];
+  if (!steps.some((s: any) => s.step_index === evidenceStepIndex)) {
+    return NextResponse.json(
+      { error: { code: "INVALID_STEP", message: `step ${evidenceStepIndex} isn't part of this submission's transcription` } },
+      { status: 400 }
+    );
+  }
+
   // Minimal two-level scale (not-met / fully-met) — a manually added item
   // mid-review is a quick "I noticed this, dock/credit it" note, not a
   // fully-designed multi-level AI rubric criterion.
