@@ -7,7 +7,6 @@ import { RequestRevisionButton } from "@/components/request-revision-button";
 import { ScriptViewer } from "@/components/script-viewer";
 import { MathText } from "@/components/math";
 import { OcrStepFlagButton } from "@/components/ocr-step-flag-button";
-import { stepState } from "@/lib/design/step-state";
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
 // a student reads this once, carefully. Mark + criterion bars, the
@@ -59,11 +58,36 @@ export default async function StudentFeedbackPage() {
       }[];
 
       const tags = await db.listMisconceptionTags(submission.id);
-      const misconceptionStepIndices = new Set<number>(tags.flatMap((t: any) => t.evidence_step_indices));
-      const highlightedLineIndices = new Set(
-        steps
-          .filter((s: any) => breakdownPoints.some((b) => b.step_index === s.step_index))
-          .flatMap((s: any) => s.line_indices)
+
+      // One box per rubric part, spanning the union of every line that
+      // part's evidence steps touch — matches the review console's
+      // part-level annotation instead of a box per OCR line.
+      const partBoxes = criteria
+        .map((c: any) => {
+          const lineIndices = new Set(
+            steps.filter((s: any) => c.evidence_step_indices.includes(s.step_index)).flatMap((s: any) => s.line_indices)
+          );
+          const lineBoxes = lines.filter((l: any) => lineIndices.has(l.line_index)).map((l: any) => l.box);
+          if (lineBoxes.length === 0) return null;
+          const x = Math.min(...lineBoxes.map((b: any) => b.x));
+          const y = Math.min(...lineBoxes.map((b: any) => b.y));
+          const right = Math.max(...lineBoxes.map((b: any) => b.x + b.w));
+          const bottom = Math.max(...lineBoxes.map((b: any) => b.y + b.h));
+          const ratio = c.score / c.max_score;
+          const state = ratio >= 1 ? "verified" : ratio > 0 ? "attention" : "disputed";
+          return {
+            key: c.criterion_key,
+            box: { x, y, w: right - x, h: bottom - y },
+            state,
+            label: nameByKey[c.criterion_key] ?? c.criterion_key,
+          };
+        })
+        .filter((b: any): b is NonNullable<typeof b> => b !== null);
+
+      const activePartKeys = new Set(
+        criteria
+          .filter((c: any) => breakdownPoints.some((b) => c.evidence_step_indices.includes(b.step_index)))
+          .map((c: any) => c.criterion_key)
       );
 
       const module_ = await db.getModuleForQuestion(submission.question_id);
@@ -90,15 +114,8 @@ export default async function StudentFeedbackPage() {
           maxScore: c.max_score,
         })),
         originalUrl,
-        scriptBoxes: lines.map((l: any) => {
-          const step = steps.find((s: any) => s.line_indices.includes(l.line_index));
-          return {
-            lineIndex: l.line_index,
-            box: l.box,
-            state: step ? stepState(step.agreement, misconceptionStepIndices.has(step.step_index)) : ("neutral" as const),
-          };
-        }),
-        highlightedLineIndices,
+        partBoxes,
+        activePartKeys,
         summary: feedback.summary,
         strengths: feedback.strengths as { text: string; step_indices: number[] }[],
         breakdownPoints,
@@ -164,7 +181,7 @@ export default async function StudentFeedbackPage() {
           {c.originalUrl && (
             <div>
               <h2 className="mb-xs font-mono text-caption-caps text-muted-soft">Your script</h2>
-              <ScriptViewer imageUrl={c.originalUrl} boxes={c.scriptBoxes} activeLineIndices={c.highlightedLineIndices} />
+              <ScriptViewer imageUrl={c.originalUrl} boxes={c.partBoxes} activeKeys={c.activePartKeys} />
             </div>
           )}
 

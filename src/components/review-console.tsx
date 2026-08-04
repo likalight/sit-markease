@@ -237,16 +237,39 @@ export function ReviewConsole(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTotal, adjusted, submitting, focusedCriterionIdx, selectedStep, props.criteria.length]);
 
-  const scriptBoxes = props.boxes.map((b) => {
-    const step = props.steps.find((s) => s.lineIndices.includes(b.lineIndex));
-    return {
-      lineIndex: b.lineIndex,
-      box: b.box,
-      state: step ? stepState(step.agreement, step.hasMisconception) : ("neutral" as const),
-    };
-  });
-  const activeLines = new Set(
-    props.steps.filter((s) => s.stepIndex === selectedStep).flatMap((s) => s.lineIndices)
+  // One box per rubric part, not per OCR line — the whole worked section
+  // for e.g. "Part (ii)" gets a single outline, matching how an instructor
+  // actually thinks about a script ("where's part ii") rather than a box
+  // per detected line of handwriting.
+  function criterionState(c: Criterion): "verified" | "attention" | "disputed" {
+    const evidenceSteps = props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex));
+    if (evidenceSteps.some((s) => s.agreement < 0.6)) return "disputed";
+    if (c.confidence < 0.85) return "attention";
+    return "verified";
+  }
+
+  const partBoxes = props.criteria
+    .map((c) => {
+      const lineIndices = new Set(
+        props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex)).flatMap((s) => s.lineIndices)
+      );
+      const lineBoxes = props.boxes.filter((b) => lineIndices.has(b.lineIndex)).map((b) => b.box);
+      if (lineBoxes.length === 0) return null;
+      const x = Math.min(...lineBoxes.map((b) => b.x));
+      const y = Math.min(...lineBoxes.map((b) => b.y));
+      const right = Math.max(...lineBoxes.map((b) => b.x + b.w));
+      const bottom = Math.max(...lineBoxes.map((b) => b.y + b.h));
+      return {
+        key: c.criterionKey,
+        box: { x, y, w: right - x, h: bottom - y },
+        state: criterionState(c),
+        label: nameByKey[c.criterionKey] ?? c.criterionKey,
+      };
+    })
+    .filter((b): b is NonNullable<typeof b> => b !== null);
+
+  const activeCriterionKeys = new Set(
+    props.criteria.filter((_, i) => i === focusedCriterionIdx).map((c) => c.criterionKey)
   );
 
   return (
@@ -276,11 +299,15 @@ export function ReviewConsole(props: {
         {props.originalUrl ? (
           <ScriptViewer
             imageUrl={props.originalUrl}
-            boxes={scriptBoxes}
-            activeLineIndices={activeLines}
-            onBoxClick={(lineIndex) => {
-              const step = props.steps.find((s) => s.lineIndices.includes(lineIndex));
-              if (step) scrollToStep(step.stepIndex);
+            boxes={partBoxes}
+            activeKeys={activeCriterionKeys}
+            onBoxClick={(key) => {
+              const idx = props.criteria.findIndex((c) => c.criterionKey === key);
+              if (idx >= 0) {
+                setFocusedCriterionIdx(idx);
+                const firstStep = props.criteria[idx].evidenceStepIndices[0];
+                if (firstStep !== undefined) scrollToStep(firstStep);
+              }
             }}
           />
         ) : (
@@ -519,12 +546,7 @@ export function ReviewConsole(props: {
         <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — RAG-matched</p>
         <div className="flex flex-col border-t border-hairline">
           {props.criteria.map((c, i) => {
-            const evidenceSteps = props.steps.filter((s) => c.evidenceStepIndices.includes(s.stepIndex));
-            const cardState = evidenceSteps.some((s) => s.agreement < 0.6)
-              ? "disputed"
-              : c.confidence < 0.85
-                ? "attention"
-                : "verified";
+            const cardState = criterionState(c);
             const checkboxBorder =
               cardState === "verified" ? "border-verified" : cardState === "attention" ? "border-attention" : "border-disputed";
             const fill = scores[c.criterionKey] / c.maxScore;
