@@ -1,37 +1,9 @@
 import Link from "next/link";
-import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import { Logo } from "@/components/logo";
 import { enterAsStudentAction, enterAsEducatorAction } from "@/app/enter/actions";
 import { SubmitButton } from "@/components/submit-button";
 
 export const dynamic = "force-dynamic";
-
-// Landing-page-only fonts, matching aims-deck.html exactly (Newsreader
-// display serif, Archivo sans, IBM Plex Mono captions). Reuses the app's
-// existing --font-serif/--font-sans/--font-mono variable names so every
-// font-serif/font-sans/font-mono utility class below just works — but
-// applied only on this page's <main>, so the rest of the app keeps its
-// Space Grotesk/Inter/JetBrains Mono system untouched. Paired with the
-// `.landing-theme` color override in globals.css.
-const landingSerif = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-serif",
-  display: "swap",
-});
-const landingSans = Archivo({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
-  display: "swap",
-});
-const landingMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 function ShapeAccent({ className = "" }: { className?: string }) {
   return (
@@ -107,9 +79,7 @@ export default async function LandingPage({
   const { error } = await searchParams;
 
   return (
-    <main
-      className={`landing-theme flex flex-col overflow-x-clip bg-canvas ${landingSerif.variable} ${landingSans.variable} ${landingMono.variable}`}
-    >
+    <main className="flex flex-col overflow-x-clip bg-canvas">
       {/* Nav */}
       <nav className="mx-auto flex w-full max-w-[1160px] items-center justify-between px-6 py-md">
         <Link href="/" className="flex items-center gap-xs">

@@ -1,25 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { FeedbackFlagButton } from "@/components/feedback-flag-button";
 import { RequestRevisionButton } from "@/components/request-revision-button";
 import { ScriptViewer } from "@/components/script-viewer";
 import { stepState } from "@/lib/design/step-state";
-
-// Same page-scoped theming as the landing page / review console
-// (globals.css's `.review-theme`) — deck-matching maroon/cream palette +
-// fonts, applied only within this page's <main>.
-const feedbackSerif = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-serif",
-  display: "swap",
-});
-const feedbackSans = Archivo({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans", display: "swap" });
-const feedbackMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
 // a student reads this once, carefully. Mark + criterion bars, the
@@ -120,9 +106,7 @@ export default async function StudentFeedbackPage() {
   const visible = cards.filter((c): c is NonNullable<typeof c> => c !== null);
 
   return (
-    <main
-      className={`review-theme mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section ${feedbackSerif.variable} ${feedbackSans.variable} ${feedbackMono.variable}`}
-    >
+    <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
       <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
 
       {visible.length === 0 && <p className="text-body-md text-muted">No feedback yet.</p>}

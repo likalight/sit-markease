@@ -2,68 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Practica design system v2 — bold black/white/red, matching the real SIT
-   mark (black square, tilted red plate, white wordmark) instead of the old
-   soft cream/editorial-serif look. Token NAMES are unchanged from v1 (every
-   component already references bg-canvas/text-muted/border-hairline/etc.) —
-   only the values and the display font changed, so this file alone re-skins
-   the whole app without touching component code. */
+/* SIT MarkEase design system — maroon/crimson/peach/cream, matching the
+   pitch deck exactly (same hex values as aims-deck.html's :root). Was
+   previously scoped to `.landing-theme`/`.review-theme` on just the
+   landing page, review console, and feedback page, while every other
+   authenticated page kept the older black/white/red "SIT mark" system —
+   now promoted to the actual global default so the whole app is one
+   consistent look. Token NAMES are unchanged throughout (every component
+   already references bg-canvas/text-muted/border-hairline/etc.) — this
+   file alone re-skins the whole app without touching component code. See
+   docs/DECISIONS.md for the full history of this palette's evolution. */
 :root {
-  /* Canvas — crisp white/near-white, not cream */
-  --color-canvas: #ffffff;
-  --color-surface-soft: #f4f4f5;
-  --color-surface-card: #e9e9eb;
-  --color-surface-strong: #d8d8dc;
-
-  /* True black — SIT's block, not a warm dark */
-  --color-surface-dark: #0b0b0c;
-  --color-surface-dark-elevated: #1a1a1c;
-  --color-surface-dark-soft: #131314;
-
-  /* Ink */
-  --color-ink: #0b0b0c;
-  --color-body: #2b2b2e;
-  --color-body-strong: #0b0b0c;
-  --color-muted: #5c5c62;
-  --color-muted-soft: #86868c;
-  --color-hairline: #dcdce0;
-  --color-hairline-soft: #ececee;
-  --color-on-dark: #ffffff;
-  --color-on-dark-soft: #a4a4ab;
-
-  /* SIT Red — from the actual mark. Scarce: brand + CTA only, never status. */
-  --color-primary: #e4002b;
-  --color-primary-active: #b30022;
-  --color-primary-soft: #fde3e8;
-  --color-primary-hairline: #f5b7c1;
-  --color-on-primary: #ffffff;
-
-  /* Semantic scale — kept deliberately far from red so status never reads as brand. */
-  --color-verified: #0f7a4d;
-  --color-verified-soft: #e2f3ea;
-  --color-attention: #b5720a;
-  --color-attention-soft: #faedd9;
-  --color-disputed: #7a2856;
-  --color-disputed-soft: #f3e2ec;
-  --color-neutral-low: #86868c;
-}
-
-/* Landing-page / review-surface theme override — matches the SIT MarkEase
-   pitch deck's maroon/crimson/peach/cream palette exactly (same hex values
-   as aims-deck.html's :root). Scoped to `.landing-theme` (the public
-   landing page) and `.review-theme` (the educator review console + student
-   feedback page — the two surfaces where a human actually looks at a
-   graded submission, matching the deck's dashboard mockup), each paired
-   with page-local Newsreader/Archivo/IBM Plex Mono font loads, rather than
-   changed globally — every other authenticated page (dashboard,
-   exam-prep, settings) still uses the black/white/red system above
-   unchanged. See docs/DECISIONS.md for why these systems now deliberately
-   diverge. Semantic status colors (verified/attention/disputed) are
-   intentionally NOT redecked to the maroon family — same "kept deliberately
-   far from red so status never reads as brand" rule applies here, just
-   with a warmer canvas behind them now. */
-.landing-theme,
-.review-theme {
   --color-canvas: #fffbf6;
   --color-surface-soft: #ffeedd;
   --color-surface-card: #fbdcc0;
@@ -89,6 +38,14 @@
   --color-primary-hairline: rgba(221, 45, 74, 0.35);
   --color-on-primary: #ffeedd;
 
+  /* Semantic scale — kept deliberately far from the maroon/crimson brand
+     colors so status never reads as brand. */
+  --color-verified: #0f7a4d;
+  --color-verified-soft: #e2f3ea;
+  --color-attention: #b5720a;
+  --color-attention-soft: #faedd9;
+  --color-disputed: #7a2856;
+  --color-disputed-soft: #f3e2ec;
   --color-neutral-low: #b08d78;
 }
 
@@ -100,38 +57,4 @@ body {
 /* tabular figures wherever numbers sit near other numbers */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
-}
-
-/* Signature motif — the tilted red plate behind SIT's own wordmark,
-   reused as a decorative accent (e.g. behind a display headline or a
-   featured card). Deliberately subtle: a background element, never load-
-   bearing for legibility. */
-.tilt-plate {
-  position: relative;
-}
-.tilt-plate::before {
-  content: "";
-  position: absolute;
-  inset: -4% -2%;
-  background: var(--color-primary);
-  transform: rotate(-2deg);
-  z-index: -1;
-  border-radius: 2px;
-}
-
-/* Infinite marquee, used by the tech-stack and SIT-logo carousels. Pauses
-   on hover so it's actually readable if someone wants to look closely. */
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.marquee-track {
-  animation: marquee 28s linear infinite;
-}
-.marquee-track:hover {
-  animation-play-state: paused;
 }

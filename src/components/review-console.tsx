@@ -2,26 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import { ScriptViewer } from "./script-viewer";
 import { ConfidenceBar } from "./confidence-bar";
 import { MathText } from "./math";
 import { stepState } from "@/lib/design/step-state";
-
-// Same page-scoped theming technique as the landing page (src/app/page.tsx,
-// globals.css's `.landing-theme`/`.review-theme`) — reuses the existing
-// --font-serif/--font-sans/--font-mono variable names so every
-// font-serif/font-sans/font-mono utility already in this file just picks
-// them up, applied only within this component's root, not globally.
-const reviewSerif = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-serif",
-  display: "swap",
-});
-const reviewSans = Archivo({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans", display: "swap" });
-const reviewMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
 
 interface Step {
   stepIndex: number;
@@ -213,9 +197,7 @@ export function ReviewConsole(props: {
   );
 
   return (
-    <div
-      className={`review-theme grid h-full grid-cols-[1fr_1fr_1fr] bg-canvas ${reviewSerif.variable} ${reviewSans.variable} ${reviewMono.variable}`}
-    >
+    <div className="grid h-full grid-cols-[1fr_1fr_1fr] bg-canvas">
       {/* Left: script-viewer, on a ruled-paper backdrop matching the
           deck's "handwritten script — scanned" dashboard mockup */}
       <div

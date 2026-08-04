@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Newsreader, Archivo, IBM_Plex_Mono } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 
-// Design-system v2 — bold, geometric display type (matching SIT's own
-// blocky wordmark) instead of v1's delicate Instrument Serif. Free Google
-// Fonts, self-hosted by next/font at build time (no runtime CDN
-// dependency). Variable name kept as --font-serif for continuity with
-// existing `font-serif` usages across components — see tailwind.config.ts.
-const displayFont = Space_Grotesk({
+// SIT MarkEase design system — matching aims-deck.html exactly (Newsreader
+// display serif, Archivo sans, IBM Plex Mono captions/data). Previously
+// loaded only on the landing page/review console/feedback page, each
+// re-declaring these same fonts locally; every other page used Space
+// Grotesk/Inter/JetBrains Mono. Promoted here so the whole app shares one
+// font system, matching the palette promotion in globals.css. Variable
+// names kept as --font-serif/--font-sans/--font-mono for continuity with
+// existing font-serif/font-sans/font-mono usages — see tailwind.config.ts.
+const displayFont = Newsreader({
   subsets: ["latin"],
-  weight: ["500", "700"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   variable: "--font-serif",
   display: "swap",
 });
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+const sansFont = Archivo({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans", display: "swap" });
+const monoFont = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "SIT MarkEase",
@@ -24,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${displayFont.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${sansFont.variable} ${monoFont.variable}`}>
       <body className="min-h-screen bg-canvas font-sans text-body">{children}</body>
     </html>
   );
