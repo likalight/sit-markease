@@ -40,7 +40,10 @@ export default async function StudentFeedbackPage() {
 
       const pages = await db.listSubmissionPages(submission.id);
       const page = pages[0];
-      const originalUrl = page ? await db.getImageUrl(page.storage_path) : null;
+      // Same processed-vs-original coordinate-space fix as the review
+      // console (src/app/(educator)/review/[submissionId]/page.tsx) — line
+      // boxes are computed against the deskewed image, not the raw upload.
+      const originalUrl = page ? await db.getImageUrl(page.processed_path ?? page.storage_path) : null;
       const lines = page ? await db.listDetectedLines(page.id) : [];
 
       const transcription = await db.getTranscription(submission.id);
