@@ -14,6 +14,7 @@ import {
 } from "./prompts";
 
 const MAX_RUBRIC_PAGES = Number(process.env.AIMS_RUBRIC_MAX_PAGES ?? 15);
+type DocumentInput = { bytes: Buffer; contentType: string };
 
 // Lets an educator upload a real marking-scheme/rubric document (photo or
 // PDF) instead of retyping it, prefilling the same fields the "New
@@ -46,23 +47,42 @@ export async function extractQuestionAndRubric(
   contentType: string,
   options?: { targetQuestion?: string }
 ): Promise<DocumentExtract> {
+  return extractQuestionAndRubricFromDocuments([{ bytes, contentType }], options);
+}
+
+export async function extractQuestionAndRubricFromDocuments(
+  documents: DocumentInput[],
+  options?: { targetQuestion?: string }
+): Promise<DocumentExtract> {
   let images: { mimeType: "image/png" | "image/jpeg"; base64: string }[];
 
-  if (contentType === "application/pdf") {
-    const converted = await sidecar.pdfToImages(bytes.toString("base64"), {
-      dpi: 144,
-      maxWidth: 1200,
-      imageFormat: "jpeg",
-      quality: 76,
-    });
-    if (converted.images_b64.length === 0) throw new Error("PDF had no pages");
-    if (converted.images_b64.length > MAX_RUBRIC_PAGES) {
-      throw new Error(`rubric PDFs are capped at ${MAX_RUBRIC_PAGES} pages for this workflow`);
-    }
-    images = converted.images_b64.map((base64) => ({ mimeType: "image/jpeg", base64 }));
-  } else {
-    images = [{ mimeType: contentType === "image/jpeg" ? "image/jpeg" : "image/png", base64: bytes.toString("base64") }];
+  const rendered = (
+    await Promise.all(
+      documents.map(async ({ bytes, contentType }) => {
+        if (contentType === "application/pdf") {
+          const converted = await sidecar.pdfToImages(bytes.toString("base64"), {
+            dpi: 144,
+            maxWidth: 1200,
+            imageFormat: "jpeg",
+            quality: 76,
+          });
+          if (converted.images_b64.length === 0) throw new Error("PDF had no pages");
+          return converted.images_b64.map((base64) => ({ mimeType: "image/jpeg" as const, base64 }));
+        }
+        return [
+          {
+            mimeType: contentType === "image/jpeg" ? ("image/jpeg" as const) : ("image/png" as const),
+            base64: bytes.toString("base64"),
+          },
+        ];
+      })
+    )
+  ).flat();
+
+  if (rendered.length > MAX_RUBRIC_PAGES) {
+    throw new Error(`rubric PDFs are capped at ${MAX_RUBRIC_PAGES} pages for this workflow`);
   }
+  images = rendered;
 
   const sources = await gatherHintSources(images[0].base64);
   const ocrHint = sources.length > 0 ? renderOcrHints(sources) : undefined;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { isPdfFile, renderPdfToImageFiles } from "@/lib/pdf/render-client";
 
 export function AssessmentRubricPdfImport({ assessmentId }: { assessmentId: string }) {
   const router = useRouter();
@@ -23,11 +24,15 @@ export function AssessmentRubricPdfImport({ assessmentId }: { assessmentId: stri
   async function importFile(file: File | undefined) {
     if (!file) return;
     setStatus("importing");
-    setMessage("Reading rubric PDF and building editable rubrics...");
+    setMessage(isPdfFile(file) ? "Rendering rubric PDF in your browser..." : "Reading rubric image and building editable rubrics...");
 
     try {
+      const files = isPdfFile(file)
+        ? await renderPdfToImageFiles(file, { maxPages: 15, maxWidth: 1200, quality: 0.76 })
+        : [file];
+      setMessage("Building editable rubrics from the rendered pages...");
       const body = new FormData();
-      body.append("file", file);
+      files.forEach((page) => body.append("files", page));
       const response = await fetch(`/api/assessments/${assessmentId}/rubric-document`, { method: "POST", body });
       const json = await readJsonResponse(response);
       if (!response.ok) throw new Error(json.error?.message ?? "could not import rubric PDF");

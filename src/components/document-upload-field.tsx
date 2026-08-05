@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isPdfFile, renderPdfToImageFiles } from "@/lib/pdf/render-client";
 
 // Optional shortcut on the "New question" form — upload a photo/PDF of a
 // real marking-scheme document instead of retyping it. Prefills the
@@ -27,8 +28,11 @@ export function DocumentUploadField() {
     setError(null);
 
     try {
+      const files = isPdfFile(file)
+        ? await renderPdfToImageFiles(file, { maxPages: 15, maxWidth: 1200, quality: 0.76 })
+        : [file];
       const formData = new FormData();
-      formData.append("file", file);
+      files.forEach((page) => formData.append("files", page));
       const res = await fetch("/api/assignments/extract-document", { method: "POST", body: formData });
       const data = await readJsonResponse(res);
       if (!res.ok) throw new Error(data.error?.message ?? "extraction failed");

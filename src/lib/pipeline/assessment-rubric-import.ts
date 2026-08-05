@@ -13,16 +13,23 @@ import {
 const MAX_RUBRIC_PAGES = Number(process.env.AIMS_RUBRIC_MAX_PAGES ?? 15);
 const RUBRIC_IMAGE_WIDTH = Number(process.env.AIMS_RUBRIC_IMAGE_WIDTH ?? 1200);
 
-async function documentImages(bytes: Buffer, contentType: string) {
-  const pageBuffers =
-    contentType === "application/pdf"
-      ? (await sidecar.pdfToImages(bytes.toString("base64"), {
-          dpi: 144,
-          maxWidth: RUBRIC_IMAGE_WIDTH,
-          imageFormat: "jpeg",
-          quality: 76,
-        })).images_b64.map((base64) => Buffer.from(base64, "base64"))
-      : [bytes];
+type DocumentInput = { bytes: Buffer; contentType: string };
+
+async function documentImages(documents: DocumentInput[]) {
+  const pageBuffers = (
+    await Promise.all(
+      documents.map(async (document) =>
+        document.contentType === "application/pdf"
+          ? (await sidecar.pdfToImages(document.bytes.toString("base64"), {
+              dpi: 144,
+              maxWidth: RUBRIC_IMAGE_WIDTH,
+              imageFormat: "jpeg",
+              quality: 76,
+            })).images_b64.map((base64) => Buffer.from(base64, "base64"))
+          : [document.bytes]
+      )
+    )
+  ).flat();
 
   if (pageBuffers.length > MAX_RUBRIC_PAGES) {
     throw new Error(`rubric PDFs are capped at ${MAX_RUBRIC_PAGES} pages for this workflow`);
@@ -43,11 +50,14 @@ async function documentImages(bytes: Buffer, contentType: string) {
 export async function importAssessmentRubricDocument(args: {
   assessmentId: string;
   assessmentTitle: string;
-  bytes: Buffer;
-  contentType: string;
+  bytes?: Buffer;
+  contentType?: string;
+  documents?: DocumentInput[];
 }) {
   const startedAt = Date.now();
-  const images = await documentImages(args.bytes, args.contentType);
+  const documents = args.documents ?? (args.bytes ? [{ bytes: args.bytes, contentType: args.contentType ?? "image/png" }] : []);
+  if (documents.length === 0) throw new Error("upload a rubric PDF or image");
+  const images = await documentImages(documents);
   console.log(`[rubric-import] rendered ${images.length} page(s) in ${Date.now() - startedAt}ms`);
   const extracted = await callStructured({
     stage: "assessment_rubric_document",
