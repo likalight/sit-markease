@@ -33,7 +33,40 @@ export const PROMPT_VERSIONS = {
   s7Verify: "s7_verify.v1",
   rubricStructure: "rubric_structure.v1",
   documentExtract: "document_extract.v1",
+  scriptMapping: "script_mapping.v1",
 } as const;
+
+export function scriptMappingSystemPrompt(): string {
+  return loadPrompt("script_mapping.v1.md");
+}
+
+const SCRIPT_MAPPING_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
+{
+  "mappings": [
+    {
+      "question_id": "<one UUID from the supplied question list>",
+      "detected_label": "<the student's visible label, e.g. 3(b), or empty string>",
+      "regions": [{ "page_index": 0, "x": 0.0, "y": 0.0, "w": 1.0, "h": 0.5 }],
+      "confidence": 0.0-1.0,
+      "notes": "<short reason for this match>"
+    }
+  ],
+  "unassigned_regions": [{ "page_index": 0, "x": 0.0, "y": 0.0, "w": 1.0, "h": 0.2 }],
+  "flags": ["<short_snake_case_flag>"]
+}
+Return at most one mapping object per question_id; put every disjoint block for that question in its regions array. Page indices are zero-based in the same order as the images.`;
+
+export function scriptMappingUserPrompt(questions: { id: string; position: number; prompt_text: string }[], pageCount: number): string {
+  return [
+    `This script has ${pageCount} page image(s), supplied in page_index order from 0 to ${pageCount - 1}.`,
+    `Map the student's answer regions to these assessment questions:`,
+    ...questions.map((q) => `- question_id=${q.id}; display_label=Q${q.position}; prompt=${q.prompt_text}`),
+    ``,
+    `Include only questions for which the script contains visible answer work. Keep uncertain blocks unassigned.`,
+    ``,
+    SCRIPT_MAPPING_SHAPE,
+  ].join("\n");
+}
 
 export function s2ReadSystemPrompt(): string {
   return loadPrompt("s2_read_single.v4.md");

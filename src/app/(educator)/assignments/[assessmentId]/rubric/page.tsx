@@ -43,6 +43,12 @@ export default async function AssessmentRubricPage({
           </div>
           <div className="flex items-center gap-sm">
             <Link
+              href={`/assignments/${assessmentId}/setup`}
+              className="rounded-sm border border-hairline px-md py-xs text-body-sm text-body"
+            >
+              Issue settings
+            </Link>
+            <Link
               href={`/assignments/${assessmentId}/questions/new`}
               className="rounded-sm border border-hairline px-md py-xs text-body-sm text-body"
             >

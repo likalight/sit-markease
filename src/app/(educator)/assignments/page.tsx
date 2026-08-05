@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
-import { setAssessmentStatusAction } from "./actions";
+import { releaseAssessmentAction, setAssessmentStatusAction } from "./actions";
 
 export default async function AssignmentsPage() {
   const user = await getCurrentUser();
@@ -24,6 +24,7 @@ export default async function AssignmentsPage() {
   const rows = await Promise.all(
     Array.from(byAssessment.entries()).map(async ([assessmentId, groupQuestions]) => {
       const assessment = await db.getAssessment(assessmentId);
+      if ((assessment as any)?.archived_at) return null;
       let submissionCount = 0;
       let released = 0;
       let pending = 0;
@@ -62,7 +63,8 @@ export default async function AssignmentsPage() {
     })
   );
 
-  rows.sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
+  const visibleRows = rows.filter(Boolean) as NonNullable<(typeof rows)[number]>[];
+  visibleRows.sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-lg px-6 py-xl">
@@ -81,7 +83,7 @@ export default async function AssignmentsPage() {
         </div>
       </div>
 
-      {rows.length === 0 ? (
+      {visibleRows.length === 0 ? (
         <p className="text-body-sm text-muted">
           No assignments yet — <Link href="/assignments/new" className="underline">create one</Link>.
         </p>
@@ -100,7 +102,7 @@ export default async function AssignmentsPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {visibleRows.map((r) => (
                 <tr key={r.assessmentId} className="border-b border-hairline last:border-b-0 hover:bg-surface-soft/60">
                   <td className="px-md py-sm text-body text-body-strong">{r.assignmentName}</td>
                   <td className="px-md py-sm">
@@ -114,7 +116,9 @@ export default async function AssignmentsPage() {
                     {r.avgPct !== null ? `${Math.round(r.avgPct * 100)}%` : "—"}
                   </td>
                   <td className="px-md py-sm">
-                    <form action={setAssessmentStatusAction}>
+                    {r.status === "released" ? (
+                      <span className="border border-verified/40 bg-verified-soft px-sm py-xxs text-caption font-medium text-verified">Released</span>
+                    ) : <form action={setAssessmentStatusAction}>
                       <input type="hidden" name="assessmentId" value={r.assessmentId} />
                       <input type="hidden" name="status" value={r.status === "open" ? "draft" : "open"} />
                       {r.status === "open" ? (
@@ -132,10 +136,13 @@ export default async function AssignmentsPage() {
                           Draft — open
                         </SubmitButton>
                       )}
-                    </form>
+                    </form>}
                   </td>
                   <td className="px-md py-sm">
                     <div className="flex flex-col gap-xxs text-caption">
+                      <Link href={`/assignments/${r.assessmentId}/setup`} className="underline">
+                        Issue to students →
+                      </Link>
                       <Link href={`/assignments/${r.assessmentId}/rubric`} className="underline">
                         Review rubric →
                       </Link>
@@ -149,6 +156,14 @@ export default async function AssignmentsPage() {
                           <Link href={`/assignments/${r.assessmentId}/upload`} className="underline">
                             Upload a script →
                           </Link>
+                          {r.submissionCount > 0 && r.pending === 0 && r.status !== "released" && (
+                            <form action={releaseAssessmentAction}>
+                              <input type="hidden" name="assessmentId" value={r.assessmentId} />
+                              <SubmitButton pendingLabel="Releasing…" className="text-left text-primary-active underline">
+                                Release all results →
+                              </SubmitButton>
+                            </form>
+                          )}
                         </>
                       )}
                       {r.pending > 0 && (

@@ -2,6 +2,16 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Full-assessment delivery, private rosters, timers, and whole-script mapping
+
+The demo now has one product flow per assessment mode instead of one upload per question. Assessments can be issued to a private student roster with opening/due times; formative assessments also have a server-authoritative duration and attempt allowance. Students start one assessment attempt and upload one PDF or several page images for the whole response. Summative intake uses the same whole-script shape, but the educator uploads on the student's behalf.
+
+A new `S1c_question_map` structured vision stage maps normalized page regions to the assessment's real question UUIDs. It supports multiple questions on one page and one question continuing across pages. The mapping is persisted and rendered over the complete source pages; summative scripts always stop for educator confirmation before per-question grading, and low-confidence formative mappings stop there too. Confirmed regions are cropped/stitched into the existing per-question `submissions` pipeline so evidence citations, source-beside-transcription review, rubric grading, and audit behavior stay unchanged. The mapper is never allowed to invent a question ID, and ambiguous regions remain unassigned.
+
+Summative approval and release are now distinct. Approving question results creates the existing audited `final_grades`, but students cannot see them until the educator explicitly releases the assessment, which writes a separate assessment-level audit event. Formative results retain the documented mode-gated immediate-release exception and are grouped by assessment attempt on the student feedback page.
+
+The old demo rows are archived rather than deleted. `scripts/backup-demo-data.ts` exports the current domain data first; `scripts/configure-demo-assessments.ts` is guarded by `AIMS_CONFIGURE_DEMO=true` and leaves only the Maths summative and Physics formative papers visible while preserving the two existing graded Maths practice submissions.
+
 ## Gradescope-style app shell + rubric authoring/review + Cohort dashboard (E4/M10)
 
 Three changes together, from direct instructor feedback on the live app:

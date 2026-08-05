@@ -14,10 +14,15 @@ export interface StoreSchema {
   users: any[];
   modules: any[];
   assessments: any[];
+  assessment_students: any[];
+  assessment_attempts: any[];
   questions: any[];
   rubrics: any[];
   rubric_criteria: any[];
   submissions: any[];
+  script_uploads: any[];
+  script_pages: any[];
+  question_mappings: any[];
   submission_pages: any[];
   detected_lines: any[];
   transcriptions: any[];
@@ -42,10 +47,15 @@ const TABLES: (keyof StoreSchema)[] = [
   "users",
   "modules",
   "assessments",
+  "assessment_students",
+  "assessment_attempts",
   "questions",
   "rubrics",
   "rubric_criteria",
   "submissions",
+  "script_uploads",
+  "script_pages",
+  "question_mappings",
   "submission_pages",
   "detected_lines",
   "transcriptions",

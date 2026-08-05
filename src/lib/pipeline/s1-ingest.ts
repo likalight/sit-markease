@@ -50,9 +50,16 @@ export async function ingestSubmission(
   questionId: string,
   bytes: Buffer,
   contentType: string,
-  studentId: string | null
+  studentId: string | null,
+  links?: { attemptId?: string | null; scriptUploadId?: string | null }
 ): Promise<IngestResult | { error: string }> {
-  const submission = await db.createSubmission({ questionId, studentId, status: "processing" });
+  const submission = await db.createSubmission({
+    questionId,
+    studentId,
+    status: "processing",
+    attemptId: links?.attemptId,
+    scriptUploadId: links?.scriptUploadId,
+  });
 
   // PDF -> one PNG per page (sidecar/pdf.py, pdf2image). Every page is
   // stored as its own submission_page (page_index 0..n), matching the

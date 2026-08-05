@@ -17,15 +17,15 @@ import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-groupin
 export default async function StudentFeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sub?: string }>;
+  searchParams: Promise<{ sub?: string; attempt?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
 
-  const { sub } = await searchParams;
+  const { sub, attempt } = await searchParams;
   const allSubmissions = await db.listAllSubmissions();
   const mine = allSubmissions.filter(
-    (s: any) => s.student_id === user.id && (!sub || s.id === sub)
+    (s: any) => s.student_id === user.id && (!sub || s.id === sub) && (!attempt || s.attempt_id === attempt)
   );
 
   const cards = await Promise.all(
@@ -34,17 +34,20 @@ export default async function StudentFeedbackPage({
       const feedback = await db.getFeedback(submission.id);
       if (!feedback || !grade) return null;
 
+      const question = await db.getQuestionWithRubric(submission.question_id);
+      const assessment = await db.getAssessment((question as any)?.assessment_id);
+      const isFormative = (assessment as any)?.assessment_mode === "formative";
+
       // CLAUDE.md rule 3: nothing reaches a student without explicit
       // educator approval. grade.total_recommended is the AI's unapproved
       // recommendation — until an educator approves it (writing a
       // final_grades row), the student sees a pending card, not a mark.
       const finalGrade = await db.getFinalGrade(submission.id);
-      if (!finalGrade) {
+      if (!finalGrade || (!isFormative && (assessment as any)?.status !== "released")) {
         return { submissionId: submission.id, pending: true as const };
       }
 
       const criteria = await db.listCriterionResults(grade.id);
-      const question = await db.getQuestionWithRubric(submission.question_id);
       const nameByKey = Object.fromEntries((question?.criteria ?? []).map((c: any) => [c.key, c.name]));
 
       const pages = await db.listSubmissionPages(submission.id);
@@ -130,15 +133,14 @@ export default async function StudentFeedbackPage({
       // Formative mode has no instructor gate, so — unlike summative,
       // where a student never sees the raw transcription at all — the
       // student here is the one safeguard against a misread OCR result.
-      const assessment = await db.getAssessment((question as any)?.assessment_id);
-      const isFormative = (assessment as any)?.assessment_mode === "formative";
-
       return {
         submissionId: submission.id,
         pending: false as const,
         feedbackId: (feedback as any).id,
         total: (finalGrade as any).total,
         maxTotal: grade.max_total,
+        questionPosition: (question as any)?.position ?? null,
+        questionPrompt: (question as any)?.prompt_text ?? "",
         criteria: criteria.map((c: any) => ({
           name: nameByKey[c.criterion_key] ?? c.criterion_key,
           score: c.score,
@@ -172,7 +174,7 @@ export default async function StudentFeedbackPage({
     <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
       <div className="flex items-baseline justify-between">
         <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
-        {sub && (
+        {(sub || attempt) && (
           <Link href="/feedback" className="text-body-sm text-body underline">
             See all your feedback →
           </Link>
@@ -196,9 +198,11 @@ export default async function StudentFeedbackPage({
         ) : (
         <div key={c.submissionId} className="flex flex-col gap-xl border-t border-hairline pt-xl">
           <div className="flex items-baseline justify-between">
-            <span className="font-serif text-display-md tabular-nums text-ink">
-              {c.total}/{c.maxTotal}
-            </span>
+            <div>
+              {c.questionPosition && <p className="font-mono text-caption-caps text-muted-soft">Question {c.questionPosition}</p>}
+              <p className="line-clamp-2 text-body-sm text-muted">{c.questionPrompt}</p>
+            </div>
+            <span className="font-serif text-display-md tabular-nums text-ink">{c.total}/{c.maxTotal}</span>
           </div>
 
           {/* Criterion bars */}

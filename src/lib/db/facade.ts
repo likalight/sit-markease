@@ -208,9 +208,95 @@ export const db = {
     return data;
   },
 
+  async updateAssessment(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("assessments", id, patch);
+    const { data, error } = await supabaseAdmin().from("assessments").update(patch).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
   async getAssessment(id: string) {
     if (fx()) return localStore.get("assessments", id);
     const { data } = await supabaseAdmin().from("assessments").select("*").eq("id", id).maybeSingle();
+    return data;
+  },
+
+  async listStudents() {
+    if (fx()) return localStore.find("users", (u: any) => u.role === "student");
+    const { data } = await supabaseAdmin().from("users").select("*").eq("role", "student").order("name");
+    return data ?? [];
+  },
+
+  async listAssessmentStudents(assessmentId: string) {
+    if (fx()) {
+      const rows = localStore.find("assessment_students", (r: any) => r.assessment_id === assessmentId);
+      return rows.map((r: any) => ({ ...r, student: localStore.get("users", r.student_id) }));
+    }
+    const { data } = await supabaseAdmin()
+      .from("assessment_students")
+      .select("*, student:users(*)")
+      .eq("assessment_id", assessmentId);
+    return data ?? [];
+  },
+
+  async replaceAssessmentStudents(assessmentId: string, studentIds: string[]) {
+    if (fx()) {
+      localStore.removeWhere("assessment_students", (r: any) => r.assessment_id === assessmentId);
+      return studentIds.length
+        ? localStore.insertMany("assessment_students", studentIds.map((student_id) => ({ assessment_id: assessmentId, student_id, assigned_at: new Date().toISOString() })))
+        : [];
+    }
+    const admin = supabaseAdmin();
+    const { error: deleteError } = await admin.from("assessment_students").delete().eq("assessment_id", assessmentId);
+    if (deleteError) throw deleteError;
+    if (studentIds.length === 0) return [];
+    const { data, error } = await admin
+      .from("assessment_students")
+      .insert(studentIds.map((student_id) => ({ assessment_id: assessmentId, student_id })))
+      .select("*");
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async listAssignedAssessments(studentId: string) {
+    if (fx()) {
+      const ids = new Set(localStore.find("assessment_students", (r: any) => r.student_id === studentId).map((r: any) => r.assessment_id));
+      return localStore.find("assessments", (a: any) => ids.has(a.id) && !a.archived_at);
+    }
+    const { data: assigned } = await supabaseAdmin().from("assessment_students").select("assessment_id").eq("student_id", studentId);
+    const ids = (assigned ?? []).map((r: any) => r.assessment_id);
+    if (ids.length === 0) return [];
+    const { data } = await supabaseAdmin().from("assessments").select("*").in("id", ids).is("archived_at", null).order("created_at", { ascending: false });
+    return data ?? [];
+  },
+
+  async listAssessmentAttempts(assessmentId: string, studentId?: string) {
+    if (fx()) {
+      return localStore.find("assessment_attempts", (a: any) => a.assessment_id === assessmentId && (!studentId || a.student_id === studentId));
+    }
+    let query = supabaseAdmin().from("assessment_attempts").select("*").eq("assessment_id", assessmentId).order("attempt_number");
+    if (studentId) query = query.eq("student_id", studentId);
+    const { data } = await query;
+    return data ?? [];
+  },
+
+  async createAssessmentAttempt(row: Record<string, any>) {
+    if (fx()) return localStore.insert("assessment_attempts", row);
+    const { data, error } = await supabaseAdmin().from("assessment_attempts").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getAssessmentAttempt(id: string) {
+    if (fx()) return localStore.get("assessment_attempts", id);
+    const { data } = await supabaseAdmin().from("assessment_attempts").select("*").eq("id", id).maybeSingle();
+    return data;
+  },
+
+  async updateAssessmentAttempt(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("assessment_attempts", id, patch);
+    const { data, error } = await supabaseAdmin().from("assessment_attempts").update(patch).eq("id", id).select("*").single();
+    if (error) throw error;
     return data;
   },
 
@@ -473,13 +559,15 @@ export const db = {
   },
 
   // --- submissions / pipeline state ---
-  async createSubmission(row: { questionId: string; studentId: string | null; status: string; inputMethod?: "photo" | "typed" }) {
+  async createSubmission(row: { questionId: string; studentId: string | null; status: string; inputMethod?: "photo" | "typed"; attemptId?: string | null; scriptUploadId?: string | null }) {
     if (fx()) {
       return localStore.insert("submissions", {
         question_id: row.questionId,
         student_id: row.studentId,
         status: row.status,
         input_method: row.inputMethod ?? "photo",
+        attempt_id: row.attemptId ?? null,
+        script_upload_id: row.scriptUploadId ?? null,
         submitted_at: new Date().toISOString(),
       });
     }
@@ -490,6 +578,8 @@ export const db = {
         student_id: row.studentId,
         status: row.status,
         input_method: row.inputMethod ?? "photo",
+        attempt_id: row.attemptId ?? null,
+        script_upload_id: row.scriptUploadId ?? null,
       })
       .select("*")
       .single();
@@ -536,6 +626,78 @@ export const db = {
   async listSubmissionsForQuestion(questionId: string) {
     if (fx()) return localStore.find("submissions", (s: any) => s.question_id === questionId);
     const { data } = await supabaseAdmin().from("submissions").select("*").eq("question_id", questionId);
+    return data ?? [];
+  },
+
+  async createScriptUpload(row: Record<string, any>) {
+    if (fx()) return localStore.insert("script_uploads", { ...row, created_at: new Date().toISOString() });
+    const { data, error } = await supabaseAdmin().from("script_uploads").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getScriptUpload(id: string) {
+    if (fx()) return localStore.get("script_uploads", id);
+    const { data } = await supabaseAdmin().from("script_uploads").select("*").eq("id", id).maybeSingle();
+    return data;
+  },
+
+  async listScriptUploadsForAssessment(assessmentId: string) {
+    if (fx()) return localStore.find("script_uploads", (s: any) => s.assessment_id === assessmentId).sort((a: any, b: any) => String(b.created_at).localeCompare(String(a.created_at)));
+    const { data } = await supabaseAdmin().from("script_uploads").select("*").eq("assessment_id", assessmentId).order("created_at", { ascending: false });
+    return data ?? [];
+  },
+
+  async updateScriptUpload(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("script_uploads", id, patch);
+    const { data, error } = await supabaseAdmin().from("script_uploads").update(patch).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async createScriptPage(row: Record<string, any>) {
+    if (fx()) return localStore.insert("script_pages", row);
+    const { data, error } = await supabaseAdmin().from("script_pages").insert(row).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async listScriptPages(scriptUploadId: string) {
+    if (fx()) return localStore.find("script_pages", (p: any) => p.script_upload_id === scriptUploadId).sort((a: any, b: any) => a.page_index - b.page_index);
+    const { data } = await supabaseAdmin().from("script_pages").select("*").eq("script_upload_id", scriptUploadId).order("page_index");
+    return data ?? [];
+  },
+
+  async replaceQuestionMappings(scriptUploadId: string, rows: Record<string, any>[]) {
+    if (fx()) {
+      localStore.removeWhere("question_mappings", (m: any) => m.script_upload_id === scriptUploadId);
+      return rows.length ? localStore.insertMany("question_mappings", rows) : [];
+    }
+    const admin = supabaseAdmin();
+    const { error: deleteError } = await admin.from("question_mappings").delete().eq("script_upload_id", scriptUploadId);
+    if (deleteError) throw deleteError;
+    if (rows.length === 0) return [];
+    const { data, error } = await admin.from("question_mappings").insert(rows).select("*");
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async listQuestionMappings(scriptUploadId: string) {
+    if (fx()) return localStore.find("question_mappings", (m: any) => m.script_upload_id === scriptUploadId);
+    const { data } = await supabaseAdmin().from("question_mappings").select("*").eq("script_upload_id", scriptUploadId);
+    return data ?? [];
+  },
+
+  async updateQuestionMapping(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("question_mappings", id, patch);
+    const { data, error } = await supabaseAdmin().from("question_mappings").update(patch).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
+  async listSubmissionsForScript(scriptUploadId: string) {
+    if (fx()) return localStore.find("submissions", (s: any) => s.script_upload_id === scriptUploadId);
+    const { data } = await supabaseAdmin().from("submissions").select("*").eq("script_upload_id", scriptUploadId);
     return data ?? [];
   },
 

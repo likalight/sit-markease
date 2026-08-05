@@ -232,3 +232,52 @@ export const documentExtractNativeSchema = {
   },
   required: ["prompt_text", "model_solution", "expected_answer_latex", "max_score", "raw_rubric_notes"],
 };
+
+export const scriptMappingNativeSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    mappings: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          question_id: { type: SchemaType.STRING },
+          detected_label: { type: SchemaType.STRING },
+          regions: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                page_index: { type: SchemaType.INTEGER },
+                x: { type: SchemaType.NUMBER },
+                y: { type: SchemaType.NUMBER },
+                w: { type: SchemaType.NUMBER },
+                h: { type: SchemaType.NUMBER },
+              },
+              required: ["page_index", "x", "y", "w", "h"],
+            },
+          },
+          confidence: { type: SchemaType.NUMBER },
+          notes: { type: SchemaType.STRING },
+        },
+        required: ["question_id", "detected_label", "regions", "confidence", "notes"],
+      },
+    },
+    unassigned_regions: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          page_index: { type: SchemaType.INTEGER },
+          x: { type: SchemaType.NUMBER },
+          y: { type: SchemaType.NUMBER },
+          w: { type: SchemaType.NUMBER },
+          h: { type: SchemaType.NUMBER },
+        },
+        required: ["page_index", "x", "y", "w", "h"],
+      },
+    },
+    flags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+  },
+  required: ["mappings", "unassigned_regions", "flags"],
+};

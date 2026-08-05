@@ -2,6 +2,13 @@
 
 Anything not fully implemented, listed immediately as it's introduced.
 
+## Full-assessment delivery
+
+- Automatic question-region mapping is a real structured multimodal-model call and has a human correction screen, but it has not yet been measured against a labelled set of genuine multi-question handwritten papers. The confidence threshold is a routing safeguard, not a measured accuracy claim.
+- Timed formative attempts enforce the server-side expiry when the final script is uploaded. There is no browser autosave of an unselected local file and therefore no automatic file submission at timeout; an expired attempt refuses late upload.
+- Complete scripts are converted to page images before mapping. Large scans still need to fit the hosting platform's request-size and model-image limits; the demo should use compressed PDFs or page images.
+- The existing marking-scheme document extractor still creates one question at a time. A full paper is assembled through the existing "+ Add another question" flow; bulk extraction of every question and rubric from one marking-scheme PDF is not implemented.
+
 ## pix2text OCR hint (docs/DECISIONS.md)
 
 - `sidecar/ocr.py` auto-downloads pix2text's models from Hugging Face on first `/ocr/transcribe` call (cached under `~/.pix2text`, `~/.cnocr`, `~/.cnstd` afterwards — `C:\Users\<user>\AppData\Roaming\{pix2text,cnocr,cnstd}` on Windows). Needs internet on the sidecar's first real OCR call; every call after that is fully local. `/health`'s `models_loaded.ocr` stays `false` until that first call has happened (same lazy-load pattern as `embeddings`). Verified live: real model download + a real `/ocr/transcribe` call against `eval/gold/images/correct.png` both work, ~47s cold. Output has real recognition noise on math notation (confused `0`/`∅`, mangled exponents) — expected, and exactly why S2 treats it as a hint rather than ground truth.
