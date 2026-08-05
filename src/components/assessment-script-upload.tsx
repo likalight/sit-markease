@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabaseBrowser } from "@/lib/db/supabase-browser";
 
 export function AssessmentScriptUpload({
   assessmentId,
@@ -59,18 +60,44 @@ export function AssessmentScriptUpload({
     setLoading(true);
     setError(null);
     setProgress("Preparing script files...");
-    const body = new FormData();
 
     try {
       const preparedFiles = await Promise.all(Array.from(files).map(prepareFile));
-      preparedFiles.forEach((file) => body.append("files", file));
-      if (attemptId) body.append("attemptId", attemptId);
-      if (kind === "summative") body.append("studentId", studentId);
+      const signResponse = await fetch(`/api/assessments/${assessmentId}/scripts/upload-url`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind,
+          attemptId,
+          studentId: kind === "summative" ? studentId : undefined,
+          files: preparedFiles.map((file) => ({ name: file.name, contentType: file.type || "application/octet-stream", size: file.size })),
+        }),
+      });
+      const signJson = await readJsonResponse(signResponse);
+      if (!signResponse.ok) throw new Error(signJson.error?.message ?? "could not prepare upload");
+
+      const supabase = supabaseBrowser();
+      const uploadedFiles = [];
+      for (let index = 0; index < preparedFiles.length; index++) {
+        const file = preparedFiles[index];
+        const signed = signJson.uploads[index];
+        setProgress(`Uploading file ${index + 1} of ${preparedFiles.length}...`);
+        const { error: uploadError } = await supabase.storage
+          .from("submissions")
+          .uploadToSignedUrl(signed.path, signed.token, file);
+        if (uploadError) throw uploadError;
+        uploadedFiles.push({ path: signed.path, contentType: signed.contentType || file.type || "application/octet-stream" });
+      }
 
       setProgress("Reading pages and detecting question boundaries...");
       const response = await fetch(`/api/assessments/${assessmentId}/scripts/${kind === "formative" ? "student" : "educator"}`, {
         method: "POST",
-        body,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          attemptId,
+          studentId: kind === "summative" ? studentId : undefined,
+          files: uploadedFiles,
+        }),
       });
       const json = await readJsonResponse(response);
       if (!response.ok) throw new Error(json.error?.message ?? "upload failed");

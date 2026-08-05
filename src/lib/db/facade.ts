@@ -1083,6 +1083,13 @@ export const db = {
     return data?.signedUrl ?? null;
   },
 
+  async createSignedUploadUrl(relativePath: string) {
+    if (fx()) return { path: relativePath, token: "fixture", signedUrl: localFiles.publicUrl(relativePath) };
+    const { data, error } = await supabaseAdmin().storage.from("submissions").createSignedUploadUrl(relativePath);
+    if (error || !data) throw error ?? new Error(`could not create signed upload URL for ${relativePath}`);
+    return data;
+  },
+
   // --- observability ---
   async logStageRun(row: {
     submissionId?: string | null;

@@ -2,6 +2,10 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Script PDFs upload directly to storage
+
+Large scanned script PDFs can exceed Vercel's request body limit before a route handler runs, producing "Request Entity Too Large" / non-JSON failures despite the app's 15-page cap. Script upload now requests short-lived Supabase Storage signed upload URLs, sends the selected PDF/images directly from the browser to the `submissions` bucket, and then calls the existing student/educator processing routes with lightweight storage references. The processing routes still accept the older multipart path for compatibility, but the UI uses direct-to-storage upload by default.
+
 ## Rubric PDF import optimized to one model pass
 
 The first assessment-level rubric PDF importer extracted questions, then called `structureRubric()` once per question. For an 11-question Maths paper that meant roughly 12 serial AI calls inside one Vercel function request, which is too slow and caused `FUNCTION_INVOCATION_TIMEOUT`. The importer now asks the assessment-rubric extraction stage to return structured editable criteria directly for every question, reducing the hot path to one model call plus database writes. Rubric page images are resized to 1200px JPEG instead of 1600px PNG, and the stage can request a larger JSON response via `AIMS_RUBRIC_IMPORT_MAX_OUTPUT_TOKENS`.
