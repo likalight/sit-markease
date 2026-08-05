@@ -4,7 +4,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { AssessmentScriptUpload } from "@/components/assessment-script-upload";
 import { VALID_STUDENT_IDS, emailForStudentId } from "@/lib/auth/student-roster";
-import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 export default async function EducatorUploadPage({ params }: { params: Promise<{ assessmentId: string }> }) {
   const user = await getCurrentUser();
@@ -28,16 +27,6 @@ export default async function EducatorUploadPage({ params }: { params: Promise<{
           then asks you to confirm the mapping before any rubric assessment runs.
         </p>
       </div>
-      <DemoGuidePanel
-        eyebrow="Summative intake"
-        title="Instructor uploads the exam script"
-        body="This is the closed-book path. Student 111 cannot upload a summative script themselves. The instructor attaches the script, confirms which page regions belong to which questions, then reviews the AI marking before release."
-        steps={[
-          { title: "Select Student 111", body: "The demo roster is preloaded." },
-          { title: "Use built-in demo script", body: "No PDF or scan is needed from the reviewer." },
-          { title: "Confirm mapping", body: "The next screen keeps source pages visible beside the detected question regions." },
-        ]}
-      />
       {mode !== "summative" ? (
         <p className="border border-attention/30 bg-attention-soft px-md py-sm text-body-sm text-attention">Formative assessments are submitted by students from their own dashboard.</p>
       ) : (questions as any[]).length === 0 ? (

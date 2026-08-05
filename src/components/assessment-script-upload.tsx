@@ -62,14 +62,14 @@ export function AssessmentScriptUpload({
     return Promise.all(pages.map(prepareImageFile));
   }
 
-  async function uploadFiles(files: File[]) {
-    if (files.length === 0) return;
+  async function upload(files: FileList | null) {
+    if (!files?.length) return;
     setLoading(true);
     setError(null);
     setProgress("Preparing script files...");
 
     try {
-      const preparedFiles = (await Promise.all(files.map(prepareSourceFile))).flat();
+      const preparedFiles = (await Promise.all(Array.from(files).map(prepareSourceFile))).flat();
       const signResponse = await fetch(`/api/assessments/${assessmentId}/scripts/upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -147,27 +147,6 @@ export function AssessmentScriptUpload({
     }
   }
 
-  async function uploadInputFiles(files: FileList | null) {
-    if (!files?.length) return;
-    await uploadFiles(Array.from(files));
-  }
-
-  async function uploadBuiltInDemoScript() {
-    setLoading(true);
-    setError(null);
-    setProgress("Loading built-in demo script...");
-    try {
-      const response = await fetch("/demo/student-111-script.png");
-      if (!response.ok) throw new Error("could not load the built-in demo script");
-      const blob = await response.blob();
-      const file = new File([blob], "student-111-demo-script.png", { type: "image/png" });
-      await uploadFiles([file]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="flex flex-col gap-md border-t border-hairline pt-md">
       {kind === "summative" && (
@@ -178,16 +157,13 @@ export function AssessmentScriptUpload({
           </select>
         </label>
       )}
-      <input ref={inputRef} type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(event) => uploadInputFiles(event.target.files)} />
-      <div className="flex flex-wrap items-center gap-sm">
-        <button type="button" disabled={loading || (kind === "summative" && !studentId)} onClick={uploadBuiltInDemoScript} className="rounded-sm bg-primary px-md py-sm text-body-sm font-medium text-on-primary disabled:opacity-50">
-          {loading ? "Processing script..." : "Use built-in demo script"}
-        </button>
-        <button type="button" disabled={loading || (kind === "summative" && !studentId)} onClick={() => inputRef.current?.click()} className="rounded-sm border border-hairline bg-canvas px-md py-sm text-body-sm font-medium text-body disabled:opacity-50">
+      <input ref={inputRef} type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(event) => upload(event.target.files)} />
+      <div>
+        <button type="button" disabled={loading || (kind === "summative" && !studentId)} onClick={() => inputRef.current?.click()} className="rounded-sm bg-ink px-md py-sm text-body-sm font-medium text-on-dark disabled:opacity-50">
           {loading ? "Processing script..." : "Upload complete script"}
         </button>
       </div>
-      <p className="text-caption text-muted-soft">For reviewer demos, use the built-in Student 111 script. Real testing still supports one PDF or several page images, up to 15 pages total.</p>
+      <p className="text-caption text-muted-soft">Attach one PDF or several page images, up to 15 pages total. Images are compressed before upload; questions may share a page or continue across pages.</p>
       {progress && <p className="text-body-sm text-muted">{progress}</p>}
       {error && <p className="border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
     </div>

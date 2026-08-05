@@ -4,7 +4,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { startAssessmentAttemptAction } from "./actions";
-import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "No fixed date";
@@ -48,32 +47,11 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
         <h1 className="text-title-lg text-body-strong">My assessments</h1>
         <p className="text-body-sm text-muted">Only assessments issued to you appear here.</p>
       </div>
-      <DemoGuidePanel
-        eyebrow="Student 111 walkthrough"
-        title="See the student side after work is issued"
-        body="Student 111 only sees assigned assessments. Formative work can be started and submitted by the student; summative work appears here only after the instructor releases reviewed results."
-        steps={[
-          {
-            title: "Start or continue Physics",
-            body: "Open the formative attempt and submit using the built-in demo script button.",
-          },
-          {
-            title: "Review returned work",
-            body: "After marking, the Review assessment button shows the AI feedback, evidence, and next steps.",
-          },
-          {
-            title: "Generate exam prep",
-            body: "The Exam prep tab turns marked misconceptions into targeted practice questions.",
-            href: "/exam-prep",
-            action: "Open exam prep",
-          },
-        ]}
-      />
       {error && <p className="border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
       {rows.length === 0 ? (
         <p className="text-body-sm text-muted">You have no assessments assigned right now.</p>
       ) : (
-        <div className="demo-highlight divide-y divide-hairline border-y border-hairline">
+        <div className="divide-y divide-hairline border-y border-hairline">
           {rows.map(({ assessment, questions, attempts, submissions, reviewCount }) => {
             const isFormative = assessment.assessment_mode === "formative";
             const active = (attempts as any[]).find((attempt) => attempt.status === "in_progress" && (!attempt.expires_at || new Date(attempt.expires_at) > new Date()));

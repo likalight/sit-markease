@@ -4,7 +4,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { PracticeItemCard } from "@/components/practice-item-card";
 import { RequestRevisionButton } from "@/components/request-revision-button";
-import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 async function canStudentSeeResult(submission: any) {
   const finalGrade = await db.getFinalGrade(submission.id);
@@ -70,16 +69,6 @@ export default async function ExamPrepPage() {
           Generate practice from reviewed work, then keep working through the gaps you have shown.
         </p>
       </div>
-      <DemoGuidePanel
-        eyebrow="Targeted practice"
-        title="Practice comes from marked evidence, not generic revision"
-        body="After an assessment is reviewed, SIT MarkEase groups the student's misconceptions and generates verified practice items for those exact gaps."
-        steps={[
-          { title: "Choose reviewed work", body: "Only formative or released summative submissions appear here." },
-          { title: "Generate a set", body: "The app creates questions from the observed misconception." },
-          { title: "Work through hints", body: "Practice items use a hint ladder instead of simply giving away the answer." },
-        ]}
-      />
 
       <section className="flex flex-col gap-sm">
         <h2 className="text-title-md text-body-strong">Generate practice sets</h2>

@@ -81,13 +81,3 @@ export async function enterAsEducatorAction() {
   }
   redirect("/review");
 }
-
-export async function enterDemoAction(formData: FormData) {
-  const role = String(formData.get("role") ?? "educator");
-  if (role === "student") {
-    const studentForm = new FormData();
-    studentForm.set("studentId", String(formData.get("studentId") ?? "111"));
-    await enterAsStudentAction(studentForm);
-  }
-  await enterAsEducatorAction();
-}

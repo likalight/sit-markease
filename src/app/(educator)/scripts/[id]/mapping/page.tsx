@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { ScriptMappingReview } from "@/components/script-mapping-review";
-import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 export default async function ScriptMappingPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -25,16 +24,6 @@ export default async function ScriptMappingPage({ params }: { params: Promise<{ 
         <h1 className="mt-xs text-title-lg text-body-strong">Confirm script mapping</h1>
         <p className="text-body-sm text-muted">{(assessment as any)?.title} · {(student as any)?.name} · source pages remain visible throughout review</p>
       </div>
-      <DemoGuidePanel
-        eyebrow="Human checkpoint"
-        title="The AI suggests question regions; the instructor confirms"
-        body="This is how the demo handles scripts where several questions share a page or one answer continues across pages. The source image stays visible, and no summative grading starts until the mapping is confirmed."
-        steps={[
-          { title: "Check the boxes", body: "Each suggested region is tied to a rubric-backed question." },
-          { title: "Confirm mapping", body: "Confirmed regions are cropped into per-question submissions." },
-          { title: "Review grades", body: "After processing, the review queue shows the evidence-backed marking.", href: "/review", action: "Open review queue" },
-        ]}
-      />
       <ScriptMappingReview
         scriptUploadId={id}
         pages={pageViews.filter((page): page is { pageIndex: number; url: string } => !!page.url)}

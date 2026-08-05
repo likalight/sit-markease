@@ -4,7 +4,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { releaseAssessmentAction, setAssessmentStatusAction } from "./actions";
-import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 export default async function AssignmentsPage() {
   const user = await getCurrentUser();
@@ -84,40 +83,12 @@ export default async function AssignmentsPage() {
         </div>
       </div>
 
-      <DemoGuidePanel
-        eyebrow="Instructor walkthrough"
-        title="Start here: two papers, two release models"
-        body="Reviewers can follow the full flow without preparing files. Math is summative: the instructor uploads Student 111's script, checks the AI mapping, reviews the grade, then releases it. Physics is formative: Student 111 submits and can review feedback/practice after marking."
-        steps={[
-          {
-            title: "Inspect the rubric",
-            body: "See how an uploaded mark scheme becomes editable criteria.",
-            href: visibleRows[0] ? `/assignments/${visibleRows[0].assessmentId}/rubric` : undefined,
-            action: "Open rubric",
-          },
-          {
-            title: "Upload without files",
-            body: "Use the built-in demo script on the summative upload page.",
-            href: visibleRows.find((row) => row.mode === "summative")
-              ? `/assignments/${visibleRows.find((row) => row.mode === "summative")!.assessmentId}/upload`
-              : undefined,
-            action: "Upload script",
-          },
-          {
-            title: "Approve before release",
-            body: "Summative results stay hidden until the instructor explicitly approves and releases them.",
-            href: "/review",
-            action: "Review queue",
-          },
-        ]}
-      />
-
       {visibleRows.length === 0 ? (
         <p className="text-body-sm text-muted">
           No assignments yet — <Link href="/assignments/new" className="underline">create one</Link>.
         </p>
       ) : (
-        <div className="demo-highlight overflow-x-auto border border-hairline">
+        <div className="overflow-x-auto border border-hairline">
           <table className="w-full border-collapse text-body-sm">
             <thead>
               <tr className="border-b border-hairline bg-surface-soft text-left text-caption-caps text-muted-soft">
