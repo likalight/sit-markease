@@ -17,12 +17,12 @@ import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-groupin
 export default async function StudentFeedbackPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sub?: string; attempt?: string }>;
+  searchParams: Promise<{ sub?: string; attempt?: string; assessment?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
 
-  const { sub, attempt } = await searchParams;
+  const { sub, attempt, assessment: assessmentParam } = await searchParams;
   const allSubmissions = await db.listAllSubmissions();
   const mine = allSubmissions.filter(
     (s: any) => s.student_id === user.id && (!sub || s.id === sub) && (!attempt || s.attempt_id === attempt)
@@ -36,6 +36,7 @@ export default async function StudentFeedbackPage({
 
       const question = await db.getQuestionWithRubric(submission.question_id);
       const assessment = await db.getAssessment((question as any)?.assessment_id);
+      if (assessmentParam && (assessment as any)?.id !== assessmentParam) return null;
       const isFormative = (assessment as any)?.assessment_mode === "formative";
 
       // CLAUDE.md rule 3: nothing reaches a student without explicit
@@ -44,7 +45,7 @@ export default async function StudentFeedbackPage({
       // final_grades row), the student sees a pending card, not a mark.
       const finalGrade = await db.getFinalGrade(submission.id);
       if (!finalGrade || (!isFormative && (assessment as any)?.status !== "released")) {
-        return { submissionId: submission.id, pending: true as const };
+        return { submissionId: submission.id, pending: true as const, hasPracticeSet: false };
       }
 
       const criteria = await db.listCriterionResults(grade.id);
@@ -128,8 +129,6 @@ export default async function StudentFeedbackPage({
       const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
       const taxonomyById = new Map(taxonomy.map((t: any) => [t.id, t]));
 
-      const practiceSet = await db.getPracticeSetForSubmission(submission.id);
-
       // Formative mode has no instructor gate, so — unlike summative,
       // where a student never sees the raw transcription at all — the
       // student here is the one safeguard against a misread OCR result.
@@ -159,7 +158,7 @@ export default async function StudentFeedbackPage({
           observedSignature: t.observed_signature,
           remediationNote: taxonomyById.get(t.misconception_id)?.remediation_note ?? "",
         })),
-        hasPracticeSet: !!practiceSet,
+        hasPracticeSet: false,
         isFormative,
         steps: isFormative
           ? steps.map((s: any) => ({ stepIndex: s.step_index, latex: s.latex, plainText: s.plain_text }))
@@ -173,9 +172,10 @@ export default async function StudentFeedbackPage({
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
       <div className="flex items-baseline justify-between">
-        <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
-        {(sub || attempt) && (
-          <Link href="/feedback" className="text-body-sm text-body underline">
+        <h1 className="font-serif text-display-lg text-ink">Review work</h1>
+        {(sub || attempt || assessmentParam) && (
+          <Link href="/submit" className="text-[0px] text-body underline">
+            <span className="text-body-sm">Back to assessments -&gt;</span>
             See all your feedback →
           </Link>
         )}
@@ -183,7 +183,7 @@ export default async function StudentFeedbackPage({
 
       {visible.length === 0 && (
         <p className="text-body-md text-muted">
-          {sub ? "That submission isn't ready yet." : "No feedback yet."}
+          {sub || assessmentParam ? "That work isn't ready to review yet." : "No reviewed work yet."}
         </p>
       )}
 
@@ -320,13 +320,16 @@ export default async function StudentFeedbackPage({
                 Revise and resubmit →
               </Link>
             )}
-            {c.hasPracticeSet ? (
+            <Link href="/exam-prep" className="text-body-md text-body underline">
+              Generate practice in Exam prep -&gt;
+            </Link>
+            {false && (c.hasPracticeSet ? (
               <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
                 Go to your practice set →
               </Link>
             ) : (
               <RequestRevisionButton submissionId={c.submissionId} />
-            )}
+            ))}
           </div>
 
           <FeedbackFlagButton feedbackId={c.feedbackId} />

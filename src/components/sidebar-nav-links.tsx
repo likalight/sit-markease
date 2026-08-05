@@ -11,7 +11,6 @@ const EDUCATOR_LINKS = [
 
 const STUDENT_LINKS = [
   { href: "/submit", label: "Submit work" },
-  { href: "/feedback", label: "My feedback" },
   { href: "/exam-prep", label: "Exam prep" },
   { href: "/settings", label: "Settings" },
 ];

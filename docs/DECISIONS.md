@@ -2,6 +2,12 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Student review folded into My assessments
+
+The student sidebar no longer has a separate "My feedback" tab. `/submit` is now the assessment home for both formative and summative assignments: formative rows can start/continue attempts, and any reviewed/released work gets a "Review assessment" action from that same row. Summative rows are visible but cannot be self-submitted; they unlock review only after educator release.
+
+Exam prep now owns practice generation. The review page links students to Exam prep instead of generating practice inline, and the practice-generation API blocks unreleased summative submissions even if a final grade row exists.
+
 ## Assessment-level rubric PDF as source of truth
 
 The rubric import flow now supports uploading one assessment-level mark-scheme PDF/image set, capped at 15 rendered pages by default (`AIMS_RUBRIC_MAX_PAGES`). The import extracts question-by-question source material, updates existing questions by position, creates missing questions, structures editable criteria, and persists those criteria only as normal rubric rows that the grading stage already uses. This makes the uploaded rubric PDF the source that script mapping and rubric grading go against, rather than a one-question convenience prefill.

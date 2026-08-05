@@ -19,23 +19,20 @@ export default async function DashboardPage() {
       {user.role === "educator" && (
         <div className="flex flex-col gap-2">
           <Link href="/review" className="text-body-sm text-body underline">
-            Review queue (uncertain cases only) →
+            Review queue (uncertain cases only) -&gt;
           </Link>
           <Link href="/assignments" className="text-body-sm text-body underline">
-            Assignments you've issued →
+            Assignments you've issued -&gt;
           </Link>
         </div>
       )}
       {user.role === "student" && (
         <div className="flex flex-col gap-2">
           <Link href="/submit" className="text-body-sm text-body underline">
-            Submit your work →
-          </Link>
-          <Link href="/feedback" className="text-body-sm text-body underline">
-            My feedback →
+            Submit or review your work -&gt;
           </Link>
           <Link href="/exam-prep" className="text-body-sm text-body underline">
-            Exam prep →
+            Exam prep -&gt;
           </Link>
         </div>
       )}

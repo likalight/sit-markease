@@ -35,6 +35,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       { status: 400 }
     );
   }
+  const question = await db.getQuestionWithRubric((submission as any).question_id);
+  const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
+  if ((assessment as any)?.assessment_mode !== "formative" && (assessment as any)?.status !== "released") {
+    return NextResponse.json(
+      { error: { code: "NOT_RELEASED", message: "this assessment has not been released yet" } },
+      { status: 403 }
+    );
+  }
 
   const result = await generatePracticeSet(submissionId);
 

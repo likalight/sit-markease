@@ -98,7 +98,7 @@ export function AssessmentScriptUpload({
       }
 
       setProgress("Feedback is ready.");
-      router.push(attemptId ? `/feedback?attempt=${attemptId}` : ids.length ? `/feedback?sub=${ids[0]}` : "/feedback");
+      router.push("/submit");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
