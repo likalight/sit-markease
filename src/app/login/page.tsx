@@ -1,109 +1,34 @@
 import Link from "next/link";
-import { env } from "@/lib/db/env";
-import { signInAction, signInAsEducatorAction, signUpAction } from "./actions";
+import { DemoEntry } from "@/components/demo-entry";
 import { Logo } from "@/components/logo";
 
-// Full email/password account creation — for onboarding real students beyond
-// the 3 fixed test IDs on /enter/student. Most testing right now should use
-// that quicker gate instead; this page exists for the eventual real-class
-// rollout, not as the primary entry point.
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const fixtureMode = env.isFixtureMode();
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
-      <div>
-        <Logo className="mb-sm h-12 w-12" />
-        <h1 className="font-serif text-display-sm text-ink">SIT MarkEase</h1>
-        <p className="text-body-sm text-muted">
-          Full account sign-up — for a real class, not the 3-ID test gate.
-        </p>
-        <p className="mt-xs text-body-sm text-muted">
-          Just testing? <Link href="/enter/student" className="underline">Use the quick student ID entry</Link> or{" "}
-          <Link href="/" className="underline">go to the homepage</Link> for one-click educator access.
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-lg px-6 py-section">
+      <div className="text-center">
+        <Link href="/" className="inline-flex items-center gap-xs">
+          <Logo className="h-10 w-10" />
+          <span className="font-serif text-title-lg text-ink">SIT MarkEase</span>
+        </Link>
+        <h1 className="mt-md font-serif text-display-sm text-ink">Open the guided prototype</h1>
+        <p className="mx-auto mt-xs max-w-lg text-body-sm text-muted">
+          Reviewers can enter as the instructor or Student 111. The role switch remains available inside the app.
         </p>
       </div>
 
       {error && (
-        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-3 py-2 text-body-sm text-disputed">
+        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-md py-sm text-center text-body-sm text-disputed">
           {error}
         </p>
       )}
 
-      {fixtureMode ? (
-        <div className="flex flex-col gap-lg">
-          <form action={signInAction} className="flex flex-col gap-2">
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="rounded-sm bg-ink px-3 py-2 text-body-sm font-medium text-on-dark">
-              Sign in
-            </button>
-          </form>
-
-          <form action={signUpAction} className="flex flex-col gap-2 border-t border-hairline pt-md">
-            <p className="text-caption-caps text-muted-soft">New student</p>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Name
-              <input name="name" type="text" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
-              Sign up
-            </button>
-          </form>
-
-          <form action={signInAsEducatorAction} className="border-t border-hairline pt-md">
-            <button type="submit" className="text-caption text-muted-soft underline">
-              Educator? Continue as Dr. Tan (demo)
-            </button>
-          </form>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-lg">
-          <form action={signInAction} className="flex flex-col gap-3">
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Password
-              <input name="password" type="password" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="mt-2 rounded-sm bg-ink px-3 py-2 text-body-sm font-medium text-on-dark">
-              Sign in
-            </button>
-          </form>
-
-          <form action={signUpAction} className="flex flex-col gap-3 border-t border-hairline pt-lg">
-            <p className="text-caption-caps text-muted-soft">New student</p>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Name
-              <input name="name" type="text" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Password
-              <input name="password" type="password" required minLength={8} className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
-              Sign up
-            </button>
-          </form>
-        </div>
-      )}
+      <DemoEntry />
     </main>
   );
 }

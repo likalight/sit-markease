@@ -6,6 +6,7 @@ import { RubricEditor } from "@/components/rubric-editor";
 import { AssessmentRubricPdfImport } from "@/components/assessment-rubric-pdf-import";
 import { SubmitButton } from "@/components/submit-button";
 import { setAssessmentStatusAction } from "../../actions";
+import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 export default async function AssessmentRubricPage({
   params,
@@ -82,9 +83,20 @@ export default async function AssessmentRubricPage({
         </div>
       </div>
 
+      <DemoGuidePanel
+        eyebrow="Rubric source"
+        title="The mark scheme becomes the grading contract"
+        body="For the demo, reviewers do not need to upload their own PDF. The visible criteria below are what the OCR/vision pipeline grades against, and the instructor can amend them before opening the assessment."
+        steps={[
+          { title: "Upload PDF when needed", body: "The importer parses a mark scheme into question-by-question rubric rows." },
+          { title: "Amend criteria", body: "The teacher can edit names, marks, and level descriptions before issuing work." },
+          { title: "Open or issue", body: "Only rubric-backed questions appear in student or instructor upload flows.", href: `/assignments/${assessmentId}/setup`, action: "Issue settings" },
+        ]}
+      />
+
       <AssessmentRubricPdfImport assessmentId={assessmentId} />
 
-      <div className="flex flex-col gap-md">
+      <div className="demo-highlight flex flex-col gap-md">
         {withRubrics.map(({ question, rubric, criteria }) => (
           <RubricEditor
             key={question.id}

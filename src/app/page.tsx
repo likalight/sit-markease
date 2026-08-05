@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { enterAsStudentAction, enterAsEducatorAction } from "@/app/enter/actions";
-import { SubmitButton } from "@/components/submit-button";
+import { DemoEntry } from "@/components/demo-entry";
 
 export const dynamic = "force-dynamic";
 
@@ -82,13 +81,13 @@ export default async function LandingPage({
         <ShapeAccent className="-left-20 top-24 h-40 w-40 -rotate-6" />
 
         <div className="relative flex flex-col gap-md text-center">
-          <p className="mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Built at SIT</p>
+          <p className="mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Public reviewer prototype</p>
           <h1 className="mx-auto max-w-2xl font-serif text-display-xl text-ink">
-            Photograph it. Get graded — and taught.
+            A guided demo of AI grading, review, and targeted practice.
           </h1>
           <p className="mx-auto max-w-lg text-body-md text-muted">
-            Any subject with a checkable answer — math, physics, engineering, nursing dosage calculations,
-            accounting. Photograph the work, get it graded for real, get taught exactly what to fix.
+            Start as the instructor or Student 111, switch roles any time, and use built-in demo scripts so no reviewer
+            has to upload or download anything.
           </p>
         </div>
 
@@ -98,40 +97,7 @@ export default async function LandingPage({
           </p>
         )}
 
-        <div className="relative mx-auto grid w-full max-w-2xl gap-md sm:grid-cols-2">
-          <form
-            id="student-login"
-            action={enterAsStudentAction}
-            className="flex scroll-mt-24 flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
-          >
-            <p className="font-serif text-title-md text-ink">Student login</p>
-            <p className="text-body-sm text-muted">Enter your 3-digit demo ID.</p>
-            <input
-              name="studentId"
-              inputMode="numeric"
-              maxLength={3}
-              required
-              placeholder="111"
-              className="rounded-sm border border-hairline bg-canvas px-md py-sm text-center text-title-md tabular-nums tracking-widest"
-            />
-            <SubmitButton pendingLabel="Logging in…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
-              Log in
-            </SubmitButton>
-          </form>
-
-          <form
-            id="instructor-login"
-            action={enterAsEducatorAction}
-            className="flex scroll-mt-24 flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
-          >
-            <p className="font-serif text-title-md text-ink">Instructor login</p>
-            <p className="text-body-sm text-muted">One click into the review queue — no setup needed for the demo.</p>
-            <div className="flex-1" />
-            <SubmitButton pendingLabel="Logging in…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
-              Log in
-            </SubmitButton>
-          </form>
-        </div>
+        <DemoEntry />
       </section>
 
       {/* The problem */}

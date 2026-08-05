@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { AttemptTimer } from "@/components/attempt-timer";
 import { AssessmentScriptUpload } from "@/components/assessment-script-upload";
+import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 export default async function AssessmentWorkPage({ params, searchParams }: { params: Promise<{ assessmentId: string }>; searchParams: Promise<{ attempt?: string }> }) {
   const user = await getCurrentUser();
@@ -34,6 +35,16 @@ export default async function AssessmentWorkPage({ params, searchParams }: { par
           ))}
         </ol>
       </section>
+      <DemoGuidePanel
+        eyebrow="Formative loop"
+        title="Submit once, then follow the feedback loop"
+        body="For the prototype review, the built-in script stands in for Student 111's photographed work. The app still reads the image, maps it to the rubric-backed question, grades it, and unlocks review/practice from My assessments."
+        steps={[
+          { title: "Use built-in demo script", body: "No local files are needed for reviewers." },
+          { title: "Wait for processing", body: "The app reads handwriting, grades against the rubric, and generates feedback." },
+          { title: "Return to My assessments", body: "Review assessment appears once feedback is ready.", href: "/submit", action: "My assessments" },
+        ]}
+      />
       {submitted ? (
         <p className="border border-verified/30 bg-verified-soft px-md py-sm text-body-sm text-verified">This attempt has been submitted.</p>
       ) : (

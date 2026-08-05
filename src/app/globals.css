@@ -58,3 +58,11 @@ body {
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+.demo-highlight {
+  box-shadow: 0 0 0 1px rgba(221, 45, 74, 0.16), 0 10px 30px rgba(52, 18, 14, 0.08);
+}
+
+.demo-highlight:hover {
+  box-shadow: 0 0 0 2px rgba(221, 45, 74, 0.32), 0 14px 36px rgba(52, 18, 14, 0.1);
+}

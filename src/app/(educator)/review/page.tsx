@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getReviewQueueGroupedByQuestion } from "@/lib/pipeline/review-queue";
 import { ConfidenceBar } from "@/components/confidence-bar";
+import { DemoGuidePanel } from "@/components/demo-guide-panel";
 
 // docs/DESIGN.md §3 `review-queue-row` / §2 product density. Grouped by
 // question, Gradescope-style — an instructor works through one question's
@@ -22,11 +23,21 @@ export default async function ReviewQueuePage() {
         <h1 className="text-title-lg text-body-strong">Review queue</h1>
         <p className="text-body-sm text-muted">{total} submission(s) awaiting approval, grouped by question.</p>
       </div>
+      <DemoGuidePanel
+        eyebrow="Summative safety gate"
+        title="Nothing reaches the student until the instructor approves"
+        body="The queue groups scripts by question so the reviewer can apply one rubric consistently. Low confidence work rises first, and every grade still needs cited evidence."
+        steps={[
+          { title: "Open a submission", body: "Review the original script beside the AI transcription." },
+          { title: "Adjust if needed", body: "The instructor can edit steps, criteria scores, and final feedback." },
+          { title: "Approve and release", body: "Final grades are written only after explicit instructor action." },
+        ]}
+      />
 
       {groups.length === 0 ? (
         <p className="text-body-sm text-muted">Nothing to review — upload a submission and process it first.</p>
       ) : (
-        <div className="flex flex-col gap-lg">
+        <div className="demo-highlight flex flex-col gap-lg">
           {groups.map((group) => (
             <div key={group.questionId} className="rounded-lg border border-hairline">
               <div className="flex items-center justify-between border-b border-hairline px-md py-sm">
