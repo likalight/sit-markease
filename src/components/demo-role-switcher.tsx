@@ -9,7 +9,6 @@ export function DemoRoleSwitcher({ user }: { user: CurrentUser }) {
       <div className="grid grid-cols-2 gap-xxs">
         <form action={enterDemoAction}>
           <input type="hidden" name="role" value="educator" />
-          <input type="hidden" name="next" value="/demo" />
           <button
             type="submit"
             className={`rounded-sm px-sm py-xxs text-caption font-medium ${
@@ -22,7 +21,6 @@ export function DemoRoleSwitcher({ user }: { user: CurrentUser }) {
         <form action={enterDemoAction}>
           <input type="hidden" name="role" value="student" />
           <input type="hidden" name="studentId" value="111" />
-          <input type="hidden" name="next" value="/demo" />
           <button
             type="submit"
             className={`rounded-sm px-sm py-xxs text-caption font-medium ${

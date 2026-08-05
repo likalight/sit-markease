@@ -2,10 +2,6 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
-## Reviewer demo is organized by assessment mode, not by app navigation
-
-Guide panels inside the normal pages still assumed reviewers understood the product map. For public prototype judging, the app now has a `/demo` hub that explains the two actual mental models first: formative practice and summative review. Each mode shows Instructor and Student 111 views side by side, with buttons that switch role and open the relevant screen. Homepage/login enter the hub by default, and both sidebars include "Demo guide" as the first navigation item.
-
 ## Browser renders reviewer-uploaded PDFs before API submission
 
 Even after compressing sidecar PDF rendering, live reviewer uploads could still hit `Sidecar /pdf/to-images failed: 502` whenever Render had not redeployed, was cold, or choked on a scanned PDF. Visible upload controls now render PDFs in the browser with `pdfjs-dist` and submit compressed JPEG page images to the existing APIs. Whole-script upload, assessment-level rubric import, per-question rubric import, and the new-question document helper all use this path; legacy single-question uploads render the first PDF page client-side. The server-side sidecar PDF conversion remains as a compatibility fallback for direct API callers, but the public prototype no longer depends on it for normal reviewer interaction.

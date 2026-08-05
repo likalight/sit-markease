@@ -33,7 +33,6 @@ export async function AppSidebar() {
           <div className="grid grid-cols-2 gap-xxs md:hidden">
             <form action={enterDemoAction}>
               <input type="hidden" name="role" value="educator" />
-              <input type="hidden" name="next" value="/demo" />
               <button
                 type="submit"
                 disabled={user.role === "educator"}
@@ -45,7 +44,6 @@ export async function AppSidebar() {
             <form action={enterDemoAction}>
               <input type="hidden" name="role" value="student" />
               <input type="hidden" name="studentId" value="111" />
-              <input type="hidden" name="next" value="/demo" />
               <button
                 type="submit"
                 disabled={user.role === "student"}

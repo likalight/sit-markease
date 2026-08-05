@@ -4,14 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const EDUCATOR_LINKS = [
-  { href: "/demo", label: "Demo guide" },
   { href: "/review", label: "Review queue" },
   { href: "/assignments", label: "Assignments" },
   { href: "/insights", label: "Class insights" },
 ];
 
 const STUDENT_LINKS = [
-  { href: "/demo", label: "Demo guide" },
   { href: "/submit", label: "Submit work" },
   { href: "/exam-prep", label: "Exam prep" },
   { href: "/settings", label: "Settings" },

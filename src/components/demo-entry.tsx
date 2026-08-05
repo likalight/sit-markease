@@ -11,12 +11,11 @@ export function DemoEntry() {
     <form action={enterDemoAction} className="mx-auto flex w-full max-w-xl flex-col gap-md rounded-lg border border-primary-hairline bg-surface-card px-lg py-lg text-left shadow-sm">
       <input type="hidden" name="role" value={role} />
       <input type="hidden" name="studentId" value="111" />
-      <input type="hidden" name="next" value="/demo" />
       <div>
         <p className="text-caption-caps text-muted-soft">Reviewer demo</p>
         <h2 className="mt-xxs font-serif text-title-lg text-ink">Walk through SIT MarkEase</h2>
         <p className="mt-xs text-body-sm text-muted">
-          No files to download. Continue into the mode-by-mode guide, then jump between Instructor and Student 111.
+          No files to download. Pick a role, continue, and use the guided panels inside the app.
         </p>
       </div>
 
@@ -44,12 +43,13 @@ export function DemoEntry() {
       <div className="rounded-sm border border-hairline bg-canvas px-md py-sm">
         {role === "educator" ? (
           <p className="text-body-sm text-body">
-            You will start at the demo guide, then open the instructor screens for rubric setup, script upload, review,
-            and release.
+            Start as the instructor: inspect the Math/Physics assignments, review uploaded scripts, approve summative
+            work, and release results.
           </p>
         ) : (
           <p className="text-body-sm text-body">
-            You will start at the demo guide, then open Student 111's assessments, feedback, and exam-prep flow.
+            Start as Student 111: see issued assessments, continue the formative attempt, submit with the built-in demo
+            script, then review feedback.
           </p>
         )}
       </div>
