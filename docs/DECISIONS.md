@@ -2,6 +2,10 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Sidecar PDF rendering now returns compressed page images
+
+Live script/rubric uploads exposed another PDF bottleneck after direct-to-storage upload was added: Vercel no longer received the huge browser upload, but it still downloaded the PDF and sent the whole file to the sidecar as base64 JSON, then the sidecar returned every page as 200 DPI PNG base64 in one response. A 10-15 page scanned PDF can make that Render response large enough to fail as `Sidecar /pdf/to-images failed: 502`. The endpoint now accepts render options and defaults to 144 DPI, max-width-bounded JPEG output; rubric imports, per-question rubric extraction, script mapping, and single-question PDF ingest all request compressed page images. Script/review storage preserves the rendered page MIME type instead of assuming every sidecar page is PNG.
+
 ## Script PDFs upload directly to storage
 
 Large scanned script PDFs can exceed Vercel's request body limit before a route handler runs, producing "Request Entity Too Large" / non-JSON failures despite the app's 15-page cap. Script upload now requests short-lived Supabase Storage signed upload URLs, sends the selected PDF/images directly from the browser to the `submissions` bucket, and then calls the existing student/educator processing routes with lightweight storage references. The processing routes still accept the older multipart path for compatibility, but the UI uses direct-to-storage upload by default.
