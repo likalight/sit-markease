@@ -6,9 +6,17 @@ function required(name: string): string {
   return value;
 }
 
+function requiredOne(names: string[]): string {
+  for (const name of names) {
+    const value = process.env[name];
+    if (value) return value;
+  }
+  throw new Error(`Missing required env var: ${names.join(" or ")}`);
+}
+
 export const env = {
-  supabaseUrl: () => required("NEXT_PUBLIC_SUPABASE_URL"),
-  supabaseAnonKey: () => required("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+  supabaseUrl: () => requiredOne(["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL"]),
+  supabaseAnonKey: () => requiredOne(["NEXT_PUBLIC_SUPABASE_ANON_KEY", "SUPABASE_ANON_KEY"]),
   supabaseServiceRoleKey: () => required("SUPABASE_SERVICE_ROLE_KEY"),
   sidecarUrl: () => process.env.SIDECAR_URL ?? "http://localhost:8000",
   isFixtureMode: () => process.env.AIMS_FIXTURE_MODE === "true",
