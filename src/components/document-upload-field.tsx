@@ -11,6 +11,15 @@ export function DocumentUploadField() {
   const [status, setStatus] = useState<"idle" | "extracting" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
+  async function readJsonResponse(response: Response) {
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      return { error: { message: text || "The server returned a non-JSON response." } };
+    }
+  }
+
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -21,7 +30,7 @@ export function DocumentUploadField() {
       const formData = new FormData();
       formData.append("file", file);
       const res = await fetch("/api/assignments/extract-document", { method: "POST", body: formData });
-      const data = await res.json();
+      const data = await readJsonResponse(res);
       if (!res.ok) throw new Error(data.error?.message ?? "extraction failed");
 
       const setValue = (name: string, value: string) => {

@@ -408,9 +408,10 @@ const DOCUMENT_EXTRACT_SHAPE = `Respond with ONLY this JSON shape, no markdown f
   "raw_rubric_notes": "<the marking scheme / point breakdown, transcribed as plain text, one criterion per line>"
 }`;
 
-export function documentExtractUserPrompt(ocrHint?: string): string {
-  const instructions =
-    "This image is a real marking scheme / rubric document for a course assignment. It typically contains the question, a model answer or expected result, and a point breakdown, all mixed together. Extract each field separately.";
+export function documentExtractUserPrompt(ocrHint?: string, targetQuestion?: string): string {
+  const instructions = targetQuestion
+    ? `This image set is a real marking scheme / rubric document for a course assignment. Extract the marking scheme, model answer, and point breakdown that apply to this existing question only: ${targetQuestion}`
+    : "This image set is a real marking scheme / rubric document for a course assignment. It typically contains the question, a model answer or expected result, and a point breakdown, all mixed together. Extract each field separately.";
   const body = ocrHint ? `${ocrHint}\n\n${instructions}` : instructions;
   return `${body}\n\n${DOCUMENT_EXTRACT_SHAPE}`;
 }

@@ -9,17 +9,30 @@ type Criterion = { key: string; name: string; weight: number; max_score: number;
 export function RubricEditor({
   assessmentId,
   rubricId,
+  questionId,
   questionPromptText,
   initialCriteria,
 }: {
   assessmentId: string;
   rubricId: string;
+  questionId: string;
   questionPromptText: string;
   initialCriteria: Criterion[];
 }) {
   const [criteria, setCriteria] = useState<Criterion[]>(initialCriteria);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
+
+  async function readJsonResponse(response: Response) {
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      return { error: { message: text || "The server returned a non-JSON response." } };
+    }
+  }
 
   function updateCriterion(index: number, patch: Partial<Criterion>) {
     setCriteria((prev) => prev.map((c, i) => (i === index ? { ...c, ...patch } : c)));
@@ -77,9 +90,40 @@ export function RubricEditor({
     setSaved(true);
   }
 
+  async function importRubric(file: File | undefined) {
+    if (!file) return;
+    setImporting(true);
+    setImportMessage("Reading rubric document...");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch(`/api/questions/${questionId}/rubric-from-document`, { method: "POST", body });
+      const json = await readJsonResponse(response);
+      if (!response.ok) throw new Error(json.error?.message ?? "could not import rubric");
+      setCriteria(json.criteria ?? []);
+      setSaved(false);
+      setImportMessage("Rubric imported. Review and save when it looks right.");
+    } catch (error) {
+      setImportMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setImporting(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-sm rounded-lg border border-hairline p-md">
       <p className="text-body-sm text-muted">{questionPromptText}</p>
+      <label className="flex flex-col gap-xs rounded-sm border border-dashed border-hairline px-sm py-xs text-body-sm text-body">
+        Import rubric PDF
+        <input
+          type="file"
+          accept="application/pdf,image/*"
+          disabled={importing}
+          onChange={(event) => importRubric(event.target.files?.[0])}
+          className="text-caption"
+        />
+        {importMessage && <span className="text-caption text-muted-soft">{importMessage}</span>}
+      </label>
 
       <div className="flex flex-col gap-sm">
         {criteria.map((c, ci) => (

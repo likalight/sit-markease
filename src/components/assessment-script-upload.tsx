@@ -21,35 +21,85 @@ export function AssessmentScriptUpload({
   const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  async function readJsonResponse(response: Response) {
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      const message = text.startsWith("Request Entity Too Large")
+        ? "That file is too large for direct upload. Use compressed page images or a smaller PDF for this demo."
+        : text || "The server returned a non-JSON response.";
+      return { error: { message } };
+    }
+  }
+
+  async function compressImage(file: File) {
+    const bitmap = await createImageBitmap(file);
+    const maxSide = 1800;
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext("2d");
+    if (!context) return file;
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+    bitmap.close();
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
+  }
+
+  async function prepareFile(file: File) {
+    if (file.type.startsWith("image/")) return compressImage(file);
+    if (file.type === "application/pdf" && file.size > 4 * 1024 * 1024) {
+      throw new Error("That PDF is too large for direct upload. Export it smaller, or upload compressed page images.");
+    }
+    return file;
+  }
+
   async function upload(files: FileList | null) {
     if (!files?.length) return;
     setLoading(true);
     setError(null);
-    setProgress("Reading pages and detecting question boundaries…");
+    setProgress("Preparing script files...");
     const body = new FormData();
-    Array.from(files).forEach((file) => body.append("files", file));
-    if (attemptId) body.append("attemptId", attemptId);
-    if (kind === "summative") body.append("studentId", studentId);
+
     try {
-      const response = await fetch(`/api/assessments/${assessmentId}/scripts/${kind === "formative" ? "student" : "educator"}`, { method: "POST", body });
-      const json = await response.json();
+      const preparedFiles = await Promise.all(Array.from(files).map(prepareFile));
+      preparedFiles.forEach((file) => body.append("files", file));
+      if (attemptId) body.append("attemptId", attemptId);
+      if (kind === "summative") body.append("studentId", studentId);
+
+      setProgress("Reading pages and detecting question boundaries...");
+      const response = await fetch(`/api/assessments/${assessmentId}/scripts/${kind === "formative" ? "student" : "educator"}`, {
+        method: "POST",
+        body,
+      });
+      const json = await readJsonResponse(response);
       if (!response.ok) throw new Error(json.error?.message ?? "upload failed");
+
       if (kind === "summative") {
         router.push(`/scripts/${json.scriptUploadId}/mapping`);
         return;
       }
+
       if (!json.confident) {
         setProgress("Submitted. The question mapping needs an instructor check before feedback can be generated.");
         setLoading(false);
         router.refresh();
         return;
       }
+
       const ids = json.submissionIds as string[];
       for (let index = 0; index < ids.length; index++) {
-        setProgress(`Grading question ${index + 1} of ${ids.length}…`);
+        setProgress(`Grading question ${index + 1} of ${ids.length}...`);
         const processed = await fetch(`/api/submissions/${ids[index]}/process`, { method: "POST" });
-        if (!processed.ok) throw new Error(`question ${index + 1} could not be processed`);
+        const processedJson = await readJsonResponse(processed);
+        if (!processed.ok) {
+          throw new Error(processedJson.error?.message ?? `question ${index + 1} could not be processed`);
+        }
       }
+
       setProgress("Feedback is ready.");
       router.push(attemptId ? `/feedback?attempt=${attemptId}` : ids.length ? `/feedback?sub=${ids[0]}` : "/feedback");
       router.refresh();
@@ -72,10 +122,10 @@ export function AssessmentScriptUpload({
       <input ref={inputRef} type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(event) => upload(event.target.files)} />
       <div>
         <button type="button" disabled={loading || (kind === "summative" && !studentId)} onClick={() => inputRef.current?.click()} className="rounded-sm bg-ink px-md py-sm text-body-sm font-medium text-on-dark disabled:opacity-50">
-          {loading ? "Processing script…" : "Upload complete script"}
+          {loading ? "Processing script..." : "Upload complete script"}
         </button>
       </div>
-      <p className="text-caption text-muted-soft">Attach one PDF or several page images. Questions may share a page or continue across pages.</p>
+      <p className="text-caption text-muted-soft">Attach one smaller PDF or several page images. Images are compressed before upload; questions may share a page or continue across pages.</p>
       {progress && <p className="text-body-sm text-muted">{progress}</p>}
       {error && <p className="border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
     </div>

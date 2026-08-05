@@ -14,7 +14,7 @@ async function main() {
   const due = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
 
   await db.updateAssessment(MATH_SUMMATIVE, {
-    title: "2018 H2 Maths 9758/01 Paper 1",
+    title: "Math",
     assessment_mode: "summative",
     status: "open",
     opens_at: null,
@@ -24,7 +24,7 @@ async function main() {
     archived_at: null,
   });
   await db.updateAssessment(PHYSICS_FULL, {
-    title: "Physics 9702/21 M/J/19 — Formative Paper",
+    title: "Physics",
     assessment_mode: "formative",
     status: "open",
     opens_at: now.toISOString(),

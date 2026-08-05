@@ -87,6 +87,7 @@ export default async function AssessmentRubricPage({
             key={question.id}
             assessmentId={assessmentId}
             rubricId={(rubric as any)?.id}
+            questionId={question.id}
             questionPromptText={question.prompt_text}
             initialCriteria={(criteria as any[]).map((c) => ({
               key: c.key,

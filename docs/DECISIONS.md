@@ -2,6 +2,14 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Demo polish: rubric PDFs, faster mapping, and active-only insights
+
+Rubric PDF/image extraction is now available directly on each question's rubric editor, not only during new-assignment creation. The import route reads the uploaded document, targets the existing question prompt, structures criteria, and returns them into the editable UI; it does not persist until the educator explicitly saves.
+
+Whole-script mapping now skips Python CV preprocessing by default and uses a fast normalized page image for mapping/cropping, with the previous sidecar preprocessing available behind `AIMS_SCRIPT_PREPROCESS=true`. This keeps the demo responsive while preserving the original source pages for the side-by-side mapping/review view.
+
+Insights now hides archived assessments, matching `/assignments`. The guarded demo configurator also shortens the visible assessment names to `Math` and `Physics`.
+
 ## Full-assessment delivery, private rosters, timers, and whole-script mapping
 
 The demo now has one product flow per assessment mode instead of one upload per question. Assessments can be issued to a private student roster with opening/due times; formative assessments also have a server-authoritative duration and attempt allowance. Students start one assessment attempt and upload one PDF or several page images for the whole response. Summative intake uses the same whole-script shape, but the educator uploads on the student's behalf.

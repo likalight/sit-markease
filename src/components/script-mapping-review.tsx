@@ -20,6 +20,15 @@ export function ScriptMappingReview({ scriptUploadId, pages, questions, initialM
   const page = pages.find((item) => item.pageIndex === selectedPage) ?? pages[0];
   const overlays = useMemo(() => mappings.flatMap((mapping, mappingIndex) => mapping.regions.filter((region) => region.page_index === selectedPage).map((region) => ({ mapping, mappingIndex, region }))), [mappings, selectedPage]);
 
+  async function readJsonResponse(response: Response) {
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      return { error: { message: text || "The server returned a non-JSON response." } };
+    }
+  }
+
   function addMissing() {
     const used = new Set(mappings.map((mapping) => mapping.questionId));
     const question = questions.find((item) => !used.has(item.id));
@@ -32,17 +41,18 @@ export function ScriptMappingReview({ scriptUploadId, pages, questions, initialM
     setMessage("Saving mappings…");
     try {
       const saved = await fetch(`/api/scripts/${scriptUploadId}/mappings`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mappings }) });
-      const savedJson = await saved.json();
+      const savedJson = await readJsonResponse(saved);
       if (!saved.ok) throw new Error(savedJson.error?.message ?? "could not save mappings");
       setMessage("Creating question submissions…");
       const confirmed = await fetch(`/api/scripts/${scriptUploadId}/confirm`, { method: "POST" });
-      const confirmedJson = await confirmed.json();
+      const confirmedJson = await readJsonResponse(confirmed);
       if (!confirmed.ok) throw new Error(confirmedJson.error?.message ?? "could not confirm mappings");
       const ids = confirmedJson.submissionIds as string[];
       for (let index = 0; index < ids.length; index++) {
         setMessage(`Grading question ${index + 1} of ${ids.length}…`);
         const result = await fetch(`/api/submissions/${ids[index]}/process`, { method: "POST" });
-        if (!result.ok) throw new Error(`question ${index + 1} could not be processed`);
+        const resultJson = await readJsonResponse(result);
+        if (!result.ok) throw new Error(resultJson.error?.message ?? `question ${index + 1} could not be processed`);
       }
       setMessage("All questions are ready for review.");
       router.push("/review");

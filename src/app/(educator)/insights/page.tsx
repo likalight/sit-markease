@@ -18,7 +18,7 @@ export default async function InsightsPage({
   if (!user || user.role !== "educator") redirect("/login");
 
   const { assessment: assessmentParam } = await searchParams;
-  const assessments = await db.listAssessmentsForOwner(user.id);
+  const assessments = (await db.listAssessmentsForOwner(user.id)).filter((assessment: any) => !assessment.archived_at);
 
   if (assessments.length === 0) {
     return (

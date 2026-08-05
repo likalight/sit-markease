@@ -39,20 +39,22 @@ async function gatherHintSources(imageBase64: string): Promise<OcrHintSource[]> 
   return sources;
 }
 
-export async function extractQuestionAndRubric(bytes: Buffer, contentType: string): Promise<DocumentExtract> {
-  let imageBase64: string;
-  let mimeType: "image/png" | "image/jpeg" = "image/png";
+export async function extractQuestionAndRubric(
+  bytes: Buffer,
+  contentType: string,
+  options?: { targetQuestion?: string }
+): Promise<DocumentExtract> {
+  let images: { mimeType: "image/png" | "image/jpeg"; base64: string }[];
 
   if (contentType === "application/pdf") {
     const converted = await sidecar.pdfToImages(bytes.toString("base64"));
     if (converted.images_b64.length === 0) throw new Error("PDF had no pages");
-    imageBase64 = converted.images_b64[0];
+    images = converted.images_b64.slice(0, 6).map((base64) => ({ mimeType: "image/png", base64 }));
   } else {
-    imageBase64 = bytes.toString("base64");
-    mimeType = contentType === "image/jpeg" ? "image/jpeg" : "image/png";
+    images = [{ mimeType: contentType === "image/jpeg" ? "image/jpeg" : "image/png", base64: bytes.toString("base64") }];
   }
 
-  const sources = await gatherHintSources(imageBase64);
+  const sources = await gatherHintSources(images[0].base64);
   const ocrHint = sources.length > 0 ? renderOcrHints(sources) : undefined;
 
   return callStructured({
@@ -60,8 +62,8 @@ export async function extractQuestionAndRubric(bytes: Buffer, contentType: strin
     promptVersion: PROMPT_VERSIONS.documentExtract,
     role: "primary",
     system: documentExtractSystemPrompt(),
-    prompt: documentExtractUserPrompt(ocrHint),
-    images: [{ mimeType, base64: imageBase64 }],
+    prompt: documentExtractUserPrompt(ocrHint, options?.targetQuestion),
+    images,
     schema: DocumentExtractSchema,
     nativeSchema: documentExtractNativeSchema,
     temperature: 0.1,

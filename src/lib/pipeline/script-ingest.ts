@@ -8,6 +8,8 @@ import { PROMPT_VERSIONS, scriptMappingSystemPrompt, scriptMappingUserPrompt } f
 import { ingestSubmission } from "./s1-ingest";
 
 const AUTO_MAPPING_THRESHOLD = Number(process.env.AIMS_MAPPING_CONFIDENCE_THRESHOLD ?? 0.8);
+const PREPROCESS_SCRIPT_PAGES = process.env.AIMS_SCRIPT_PREPROCESS === "true";
+const MAPPING_IMAGE_WIDTH = Number(process.env.AIMS_MAPPING_IMAGE_WIDTH ?? 1600);
 
 async function documentPages(bytes: Buffer, contentType: string) {
   if (contentType === "application/pdf") {
@@ -15,6 +17,23 @@ async function documentPages(bytes: Buffer, contentType: string) {
     return converted.images_b64.map((base64) => Buffer.from(base64, "base64"));
   }
   return [await sharp(bytes).png().toBuffer()];
+}
+
+async function prepareScriptPage(original: Buffer) {
+  if (PREPROCESS_SCRIPT_PAGES) {
+    const preprocessed = await sidecar.preprocess(original.toString("base64"));
+    return {
+      bytes: Buffer.from(preprocessed.processed_b64, "base64"),
+      qualityScore: preprocessed.quality_score,
+    };
+  }
+
+  const bytes = await sharp(original)
+    .rotate()
+    .resize({ width: MAPPING_IMAGE_WIDTH, withoutEnlargement: true })
+    .png()
+    .toBuffer();
+  return { bytes, qualityScore: null };
 }
 
 export async function ingestAssessmentScript(args: {
@@ -43,8 +62,8 @@ export async function ingestAssessmentScript(args: {
 
     for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
       const original = pages[pageIndex];
-      const preprocessed = await sidecar.preprocess(original.toString("base64"));
-      const processed = Buffer.from(preprocessed.processed_b64, "base64");
+      const processedPage = await prepareScriptPage(original);
+      const processed = processedPage.bytes;
       const metadata = await sharp(processed).metadata();
       const originalPath = `scripts/${script.id}/original-${pageIndex}.png`;
       const processedPath = `scripts/${script.id}/processed-${pageIndex}.png`;
@@ -57,7 +76,7 @@ export async function ingestAssessmentScript(args: {
         processed_path: processedPath,
         width: metadata.width ?? null,
         height: metadata.height ?? null,
-        quality_score: preprocessed.quality_score,
+        quality_score: processedPage.qualityScore,
       });
       images.push({ mimeType: "image/png", base64: processed.toString("base64") });
     }
