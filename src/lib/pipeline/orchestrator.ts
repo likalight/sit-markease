@@ -28,15 +28,15 @@ import { generateFeedback } from "./s6-feedback";
 // feedback with no human reviewer in the immediate loop. This is a
 // deliberate, mode-gated exception, not a reversion of the summative-mode
 // fix above; summative submissions are completely unaffected.
-async function autoReleaseIfFormative(submissionId: string) {
+async function autoReleaseIfFormative(submissionId: string): Promise<boolean> {
   const submission = await db.getSubmission(submissionId);
-  if (!submission) return;
+  if (!submission) return false;
   const question = await db.getQuestionWithRubric(submission.question_id);
   const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
-  if ((assessment as any)?.assessment_mode !== "formative") return;
+  if ((assessment as any)?.assessment_mode !== "formative") return false;
 
   const grade = await db.getGradeRecommendation(submissionId);
-  if (!grade) return;
+  if (!grade) return false;
 
   await db.createFinalGrade({
     submission_id: submissionId,
@@ -48,11 +48,18 @@ async function autoReleaseIfFormative(submissionId: string) {
     review_seconds: 0,
   });
   await db.updateSubmission(submissionId, { status: "released" });
+  return true;
 }
 
 async function continuePipelineAfterTranscription(submissionId: string, transcribeResult: TranscribeResult) {
   if (transcribeResult.status === "needs_human_transcription" || transcribeResult.status === "failed") {
-    return { ...transcribeResult, assess: { status: "failed" }, diagnose: { status: "failed" }, feedback: { status: "failed" } };
+    return {
+      ...transcribeResult,
+      assess: { status: "failed" },
+      diagnose: { status: "failed" },
+      feedback: { status: "failed" },
+      autoReleased: false,
+    };
   }
 
   const assessResult = await assessSubmission(submissionId);
@@ -75,11 +82,16 @@ async function continuePipelineAfterTranscription(submissionId: string, transcri
   }
   const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId, preferredTone) : { status: "failed" as const };
 
-  if (feedbackResult.status === "generated") {
-    await autoReleaseIfFormative(submissionId);
-  }
+  // Threaded through to the API response so the client actually knows
+  // release happened — this was silently dropped before (the function ran
+  // and correctly wrote final_grades, but its result was never captured or
+  // returned), so every formative submission's immediate on-screen response
+  // showed the generic "needs educator check" banner regardless of whether
+  // it had, in fact, already been released. Found live testing the
+  // formative journey end to end.
+  const autoReleased = feedbackResult.status === "generated" ? await autoReleaseIfFormative(submissionId) : false;
 
-  return { ...transcribeResult, assess: assessResult, diagnose: diagnoseResult, feedback: feedbackResult };
+  return { ...transcribeResult, assess: assessResult, diagnose: diagnoseResult, feedback: feedbackResult, autoReleased };
 }
 
 export async function runFullPipeline(submissionId: string) {

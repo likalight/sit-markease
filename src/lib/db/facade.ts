@@ -48,16 +48,30 @@ export const db = {
   // assignment's question is not submittable, even if it's the most
   // recently created one overall — this is what makes "open for
   // submissions" a real gate instead of dead schema (docs/DECISIONS.md).
+  //
+  // Formative-only, on purpose: this is the sole backer of /submit, the
+  // self-service page — summative questions must never appear there, since
+  // summative intake is instructor-upload-only (see the educator-on-behalf-of
+  // route, docs/DECISIONS.md). Found live: adding a new open summative
+  // assessment silently became "the current question" here and put a
+  // summative question in front of a self-submitting student, bypassing the
+  // instructor-approval gate entirely — this filter is the fix.
   async getCurrentQuestion() {
     if (fx()) {
-      const openAssessmentIds = new Set(
-        (localStore.all("assessments") as any[]).filter((a) => a.status === "open").map((a) => a.id)
+      const openFormativeIds = new Set(
+        (localStore.all("assessments") as any[])
+          .filter((a) => a.status === "open" && a.assessment_mode === "formative")
+          .map((a) => a.id)
       );
-      const open = (localStore.all("questions") as any[]).filter((q) => openAssessmentIds.has(q.assessment_id));
+      const open = (localStore.all("questions") as any[]).filter((q) => openFormativeIds.has(q.assessment_id));
       return open[open.length - 1] ?? null;
     }
     const admin = supabaseAdmin();
-    const { data: openAssessments } = await admin.from("assessments").select("id").eq("status", "open");
+    const { data: openAssessments } = await admin
+      .from("assessments")
+      .select("id")
+      .eq("status", "open")
+      .eq("assessment_mode", "formative");
     const openIds = (openAssessments ?? []).map((a: any) => a.id);
     if (openIds.length === 0) return null;
     // `position` is scoped per-assessment (each restarts at 1), so it can't
@@ -71,6 +85,38 @@ export const db = {
       .limit(1)
       .maybeSingle();
     return data;
+  },
+
+  // All questions a student can currently choose to self-submit against —
+  // every question belonging to every open formative assessment, not just
+  // the single most-recent one getCurrentQuestion() picks. /submit was
+  // hardwired to that one fixed question with no picker at all; this backs
+  // a real selector once more than one formative question is open at once.
+  async listOpenFormativeQuestions() {
+    if (fx()) {
+      const openFormativeAssessments = (localStore.all("assessments") as any[]).filter(
+        (a) => a.status === "open" && a.assessment_mode === "formative"
+      );
+      const byId = new Map(openFormativeAssessments.map((a) => [a.id, a]));
+      return (localStore.all("questions") as any[])
+        .filter((q) => byId.has(q.assessment_id))
+        .map((q) => ({ ...q, assessment_title: byId.get(q.assessment_id)?.title ?? "" }));
+    }
+    const admin = supabaseAdmin();
+    const { data: openAssessments } = await admin
+      .from("assessments")
+      .select("id, title")
+      .eq("status", "open")
+      .eq("assessment_mode", "formative");
+    const assessments = openAssessments ?? [];
+    if (assessments.length === 0) return [];
+    const titleById = new Map(assessments.map((a: any) => [a.id, a.title]));
+    const { data } = await admin
+      .from("questions")
+      .select("*")
+      .in("assessment_id", assessments.map((a: any) => a.id))
+      .order("created_at", { ascending: true });
+    return (data ?? []).map((q: any) => ({ ...q, assessment_title: titleById.get(q.assessment_id) ?? "" }));
   },
 
   // Every new question needs a module + assessment container. Rather than
