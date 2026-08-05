@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseBrowser } from "@/lib/db/supabase-browser";
 
 export function AssessmentScriptUpload({
   assessmentId,
@@ -76,16 +75,23 @@ export function AssessmentScriptUpload({
       const signJson = await readJsonResponse(signResponse);
       if (!signResponse.ok) throw new Error(signJson.error?.message ?? "could not prepare upload");
 
-      const supabase = supabaseBrowser();
       const uploadedFiles = [];
       for (let index = 0; index < preparedFiles.length; index++) {
         const file = preparedFiles[index];
         const signed = signJson.uploads[index];
         setProgress(`Uploading file ${index + 1} of ${preparedFiles.length}...`);
-        const { error: uploadError } = await supabase.storage
-          .from("submissions")
-          .uploadToSignedUrl(signed.path, signed.token, file);
-        if (uploadError) throw uploadError;
+        const uploadBody = new FormData();
+        uploadBody.append("cacheControl", "3600");
+        uploadBody.append("", file);
+        const uploadResponse = await fetch(signed.signedUrl, {
+          method: "PUT",
+          headers: { "x-upsert": "false" },
+          body: uploadBody,
+        });
+        if (!uploadResponse.ok) {
+          const uploadText = await uploadResponse.text();
+          throw new Error(uploadText || `file ${index + 1} could not be uploaded`);
+        }
         uploadedFiles.push({ path: signed.path, contentType: signed.contentType || file.type || "application/octet-stream" });
       }
 
