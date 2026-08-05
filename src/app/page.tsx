@@ -14,62 +14,49 @@ function ShapeAccent({ className = "" }: { className?: string }) {
   );
 }
 
-// The real 8-step journey (docs/DECISIONS.md, aims-deck.html) — replaces
-// the old generic "how it works" diagram + interactive toggle with the
-// actual pipeline, actual tool names, in actual order. Every line here is
-// something the app genuinely does today, not aspirational copy.
-const JOURNEY = [
+const PROBLEMS = [
   {
-    n: 1,
-    title: "Student submits",
-    body: "A photo, a PDF, or typed LaTeX of their handwritten working.",
-    tools: null,
+    title: "Manual grading doesn't scale",
+    body: "Large-enrolment modules can't give timely, individual feedback on open-ended, handwritten work — not at real class sizes.",
   },
   {
-    n: 2,
-    title: "AI reads & scores",
-    body: "pix2text and AWS Textract each independently read the script; the grading model transcribes it for real, grounded by RAG retrieval over the module's own worked examples.",
-    tools: "pix2text · Textract · RAG · OpenAI",
+    title: "Feedback collapses into a mark",
+    body: "A number and a tick tell a student they got it wrong. They don't tell them why, or what to do about it.",
   },
   {
-    n: 3,
-    title: "Instructor reviews",
-    body: "The script sits beside the AI's transcription and reasoning, on one screen.",
-    tools: null,
-  },
-  {
-    n: 4,
-    title: "Instructor approves & releases",
-    body: "Nothing reaches a student without this explicit action — every time, no exceptions, logged to an audit trail.",
-    tools: null,
-  },
-  {
-    n: 5,
-    title: "Student sees the gap",
-    body: "The exact misconception, named — not just a mark taken off.",
-    tools: null,
-  },
-  {
-    n: 6,
-    title: "Requests revision",
-    body: "RAG retrieves relevant material for that specific gap; the AI generates a fresh practice question from it.",
-    tools: "RAG · OpenAI",
-  },
-  {
-    n: 7,
-    title: "Verified before it ships",
-    body: "SymPy checks it symbolically first, an LLM as fallback — anything that fails is discarded, never shown.",
-    tools: "SymPy · OpenAI",
-  },
-  {
-    n: 8,
-    title: "Walks in exam-ready",
-    body: "Weak points already practised — not discovered for the first time on the day.",
-    tools: null,
+    title: "No practice targets the actual gap",
+    body: "Generic revision material isn't the same as a fresh question built for the exact misconception a student just showed.",
   },
 ];
 
-const STACK = ["Next.js", "Supabase", "OpenAI", "pix2text", "AWS Textract", "RAG", "SymPy", "Python / FastAPI"];
+const DISCIPLINES = ["Mathematics", "Physics", "Engineering", "Nursing", "Accounting", "Business"];
+
+const STACK = [
+  {
+    name: "OpenAI",
+    body: "Reads the handwriting for real and grades it against the rubric — not a keyword match, an actual read.",
+  },
+  {
+    name: "pix2text + AWS Textract",
+    body: "Two independent OCR hints feed the model's read; neither replaces it — the image stays ground truth.",
+  },
+  {
+    name: "RAG",
+    body: "Local embeddings over the module's own corpus ground both rubric scoring and practice generation in real material.",
+  },
+  {
+    name: "SymPy",
+    body: "Verifies the final answer symbolically wherever it's checkable — not just \"looks right.\"",
+  },
+  {
+    name: "Supabase",
+    body: "Postgres, Auth, and Storage for the whole app.",
+  },
+  {
+    name: "Python / FastAPI sidecar",
+    body: "OpenCV line detection, SymPy, and local embeddings — deployed separately from the Next.js app.",
+  },
+];
 
 export default async function LandingPage({
   searchParams,
@@ -80,21 +67,13 @@ export default async function LandingPage({
 
   return (
     <main className="flex flex-col overflow-x-clip bg-canvas">
-      {/* Nav — no generic "sign in": only the two real entry points, jumping
-          straight to their forms in the hero below. */}
-      <nav className="mx-auto flex w-full max-w-[1160px] items-center justify-between px-6 py-md">
+      {/* Nav — brand only. The two real entry points live in the hero below;
+          repeating them here was redundant clutter, not a shortcut. */}
+      <nav className="mx-auto flex w-full max-w-[1160px] items-center px-6 py-md">
         <Link href="/" className="flex items-center gap-xs">
           <Logo className="h-9 w-9" />
           <span className="font-serif text-title-lg text-ink">SIT MarkEase</span>
         </Link>
-        <div className="flex items-center gap-md">
-          <a href="#student-login" className="text-body-sm text-body underline">
-            Student login
-          </a>
-          <a href="#instructor-login" className="text-body-sm text-body underline">
-            Instructor login
-          </a>
-        </div>
       </nav>
 
       {/* Hero + embedded entry */}
@@ -108,8 +87,8 @@ export default async function LandingPage({
             Photograph it. Get graded — and taught.
           </h1>
           <p className="mx-auto max-w-lg text-body-md text-muted">
-            Any subject with a checkable answer. An AI reads the work, verifies the answer for real, names
-            the exact misconception, and hands back practice targeting it.
+            Any subject with a checkable answer — math, physics, engineering, nursing dosage calculations,
+            accounting. Photograph the work, get it graded for real, get taught exactly what to fix.
           </p>
         </div>
 
@@ -155,44 +134,94 @@ export default async function LandingPage({
         </div>
       </section>
 
-      {/* The real journey */}
+      {/* The problem */}
       <section className="w-full bg-surface-soft">
-        <div className="mx-auto max-w-[720px] px-6 py-section">
-          <h2 className="mb-xxs text-center font-serif text-display-sm text-ink">One script's journey</h2>
-          <p className="mb-lg text-center text-body-sm text-muted">
-            Student → AI → instructor → student again, repeating weekly, consolidating for the exam.
-          </p>
-          <ol className="flex flex-col gap-md">
-            {JOURNEY.map((step) => (
-              <li key={step.n} className="flex gap-md rounded-lg border border-hairline bg-surface-card px-lg py-md">
-                <span className="flex h-8 w-8 flex-none items-center justify-center rounded-pill bg-primary font-sans text-body-sm font-bold text-on-primary">
-                  {step.n}
-                </span>
-                <div className="flex flex-col gap-xxs">
-                  <div className="flex flex-wrap items-baseline gap-sm">
-                    <p className="text-title-sm font-semibold text-body-strong">{step.title}</p>
-                    {step.tools && (
-                      <span className="rounded-sm border border-primary/30 px-xs py-[1px] font-mono text-caption text-primary">
-                        {step.tools}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-body-sm text-muted">{step.body}</p>
-                </div>
-              </li>
+        <div className="mx-auto max-w-[960px] px-6 py-section">
+          <h2 className="mb-lg text-center font-serif text-display-sm text-ink">Why this exists</h2>
+          <div className="grid gap-md sm:grid-cols-3">
+            {PROBLEMS.map((p) => (
+              <div key={p.title} className="rounded-lg border border-hairline bg-surface-card px-lg py-lg">
+                <p className="mb-xs text-title-sm font-semibold text-body-strong">{p.title}</p>
+                <p className="text-body-sm text-muted">{p.body}</p>
+              </div>
             ))}
-          </ol>
+          </div>
         </div>
       </section>
 
-      {/* Built with — real stack, plain list */}
-      <section className="mx-auto w-full max-w-[1160px] px-6 py-section">
-        <h2 className="mb-md text-center font-serif text-display-sm text-ink">Built with</h2>
-        <div className="flex flex-wrap items-center justify-center gap-sm">
-          {STACK.map((tool) => (
-            <span key={tool} className="rounded-pill border border-hairline px-md py-xs font-mono text-caption text-body">
-              {tool}
-            </span>
+      {/* Two paths, one engine — the real current architecture, not the old
+          linear 8-step flow this section used to describe. */}
+      <section className="w-full">
+        <div className="mx-auto max-w-[960px] px-6 py-section">
+          <h2 className="mb-xxs text-center font-serif text-display-sm text-ink">One engine, two release paths</h2>
+          <p className="mb-lg text-center text-body-sm text-muted">
+            Every submission takes the same first step. What happens next depends on what's at stake.
+          </p>
+
+          <div className="mb-md flex flex-col items-center gap-xs rounded-lg border border-hairline bg-surface-card px-lg py-md text-center">
+            <p className="text-title-sm font-semibold text-body-strong">Submit → AI reads, scores &amp; writes feedback</p>
+            <p className="font-mono text-caption text-muted-soft">pix2text · Textract · RAG · OpenAI · SymPy check</p>
+          </div>
+
+          <div className="mb-md grid gap-md sm:grid-cols-2">
+            <div className="rounded-lg border border-hairline bg-surface-card px-lg py-lg">
+              <p className="mb-xxs font-serif text-title-md italic text-verified">Formative</p>
+              <p className="mb-sm text-caption-caps text-muted-soft">Weekly practice</p>
+              <ul className="flex flex-col gap-xs text-body-sm text-body">
+                <li>Releases instantly — no instructor gate, no confidence check.</li>
+                <li>A guiding question, not the answer — Socratic-style hints.</li>
+                <li>Revise and resubmit the same question, as many times as it takes.</li>
+                <li>Every attempt logged for the instructor to review later.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border border-hairline bg-surface-card px-lg py-lg">
+              <p className="mb-xxs font-serif text-title-md italic text-disputed">Summative</p>
+              <p className="mb-sm text-caption-caps text-muted-soft">Closed-book CA / exam</p>
+              <ul className="flex flex-col gap-xs text-body-sm text-body">
+                <li>Instructor reviews, grouped by question, lowest-confidence first.</li>
+                <li>Can adjust the score or the read transcription directly.</li>
+                <li>Approves the mark and the exact feedback text before release.</li>
+                <li>Nothing reaches the student without that explicit action.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-hairline bg-surface-soft px-lg py-md text-center">
+            <p className="text-body-sm text-body">
+              <span className="font-medium text-body-strong">Either way:</span> once it's graded, the student can
+              request a fresh, verified practice set targeting the specific gap — checked by SymPy or an LLM before
+              anything ships.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Any discipline at SIT */}
+      <section className="w-full bg-surface-soft">
+        <div className="mx-auto max-w-[960px] px-6 py-section text-center">
+          <h2 className="mb-xs font-serif text-display-sm text-ink">Any discipline at SIT</h2>
+          <p className="mb-lg text-body-sm text-muted">
+            Only the rubric changes — the same pipeline reads, grades, and diagnoses every one of them.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-sm">
+            {DISCIPLINES.map((d) => (
+              <span key={d} className="rounded-pill border border-hairline bg-surface-card px-md py-xs text-body-sm text-body">
+                {d}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Built with — explained, not just name-dropped */}
+      <section className="mx-auto w-full max-w-[960px] px-6 py-section">
+        <h2 className="mb-lg text-center font-serif text-display-sm text-ink">Built with</h2>
+        <div className="grid gap-md sm:grid-cols-2">
+          {STACK.map((s) => (
+            <div key={s.name} className="flex flex-col gap-xxs">
+              <p className="font-mono text-body-sm font-semibold text-ink">{s.name}</p>
+              <p className="text-body-sm text-muted">{s.body}</p>
+            </div>
           ))}
         </div>
       </section>
@@ -201,14 +230,14 @@ export default async function LandingPage({
       <footer className="w-full bg-surface-dark">
         <div className="mx-auto flex max-w-[1160px] items-center justify-between px-6 py-lg text-caption text-on-dark-soft">
           <span>SIT MarkEase</span>
-          <div className="flex items-center gap-md">
-            <a href="#student-login" className="underline">
-              Student login
-            </a>
-            <a href="#instructor-login" className="underline">
-              Instructor login
-            </a>
-          </div>
+          <a
+            href="https://github.com/likalight/sit-markease"
+            className="underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
         </div>
       </footer>
     </main>

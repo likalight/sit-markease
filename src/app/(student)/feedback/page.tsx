@@ -310,17 +310,20 @@ export default async function StudentFeedbackPage({
             {c.nextAction}
           </div>
 
-          {c.isFormative ? (
-            <Link href="/submit" className="text-body-md text-body underline">
-              Revise and resubmit →
-            </Link>
-          ) : c.hasPracticeSet ? (
-            <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
-              Go to your practice set →
-            </Link>
-          ) : (
-            <RequestRevisionButton submissionId={c.submissionId} />
-          )}
+          <div className="flex flex-wrap items-center gap-md">
+            {c.isFormative && (
+              <Link href="/submit" className="text-body-md text-body underline">
+                Revise and resubmit →
+              </Link>
+            )}
+            {c.hasPracticeSet ? (
+              <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
+                Go to your practice set →
+              </Link>
+            ) : (
+              <RequestRevisionButton submissionId={c.submissionId} />
+            )}
+          </div>
 
           <FeedbackFlagButton feedbackId={c.feedbackId} />
         </div>

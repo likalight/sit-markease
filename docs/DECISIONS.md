@@ -2,6 +2,10 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Practice-set generation reinstated for formative, not just summative
+
+Reverses the "matching Nicholas's split... under closed-book/summative specifically" call below — explicit user direction this session was that a formative student should also be able to request a fresh practice set after a submission is graded, not only resubmit the same question. `feedback/page.tsx`'s action row now shows "Revise and resubmit →" whenever `c.isFormative`, and independently, the practice-set action (link if one exists, else `RequestRevisionButton`) for every card regardless of mode — the route, `s7-practice.ts`, and the practice page already had zero `assessment_mode` awareness, so this was a UI-only gate to remove, not a pipeline change.
+
 ## Four Gradescope-parity features added to the review console
 
 Direct comparison against Gradescope's own rubric panel surfaced four real gaps in the review console: no manual point override independent of rubric clicks, no way to add a rubric item while grading (rubrics were only ever authored once, by AI, at question-creation time), no way to browse back to an already-approved submission, and no instructor-only note distinct from the student-facing feedback text. All four closed:
