@@ -55,6 +55,57 @@ accounting, nursing dosage calculations, and plain-math problems all run through
 only the rubric changes. Educators can create a new question end-to-end — paste the question, a model
 solution, and rough rubric notes, and AI structures a weighted rubric from it.
 
+## User journey
+
+Two modes, one shared pipeline (`assessment_mode: 'formative' | 'summative'`) — a weekly practice
+question releases instantly with a Socratic hint; a real graded assessment always waits on an
+instructor. Screenshots below are the actual running app, not mockups.
+
+### Student — formative (weekly practice)
+
+<table>
+<tr>
+<td width="50%">
+
+**1. Submit** — pick an open question, photograph or type the working.
+
+</td>
+<td width="50%">
+
+**2. Feedback** — released instantly. Score by part, what went right, where it broke down, a
+guiding question (not the answer), and a direct **revise & resubmit** link.
+
+</td>
+</tr>
+<tr>
+<td><img src=".github/assets/journey-submit.png" alt="Submit page with question picker" /></td>
+<td><img src=".github/assets/journey-feedback.png" alt="Instant formative feedback" /></td>
+</tr>
+</table>
+
+### Instructor — summative (real graded assessment)
+
+<table>
+<tr>
+<td width="50%">
+
+**1. Review queue** — grouped by question, lowest-confidence first. Formative work never appears
+here at all — only what genuinely needs a human decision.
+
+</td>
+<td width="50%">
+
+**2. Review console** — the real script beside a real AI transcription, part-by-part annotation,
+a clickable RAG-matched rubric, and the exact release text — editable before it ships.
+
+</td>
+</tr>
+<tr>
+<td><img src=".github/assets/journey-review-queue.png" alt="Instructor review queue" /></td>
+<td><img src=".github/assets/journey-review-console.png" alt="Instructor review console" /></td>
+</tr>
+</table>
+
 ## Try it live
 
 **[sit-markease.vercel.app](https://sit-markease.vercel.app)**
