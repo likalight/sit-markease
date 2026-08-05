@@ -26,7 +26,7 @@ export default async function PracticeSetPage({
   const attemptByItemId = new Map(attempts.map((a: any) => [a.practice_item_id, a]));
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-xl px-6 py-section">
+    <main data-tour-id="practice-page-body" className="mx-auto flex max-w-2xl flex-col gap-xl px-6 py-section">
       <div>
         <h1 className="font-serif text-display-lg text-ink">Your practice set</h1>
         <p className="text-body-md text-muted">

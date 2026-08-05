@@ -26,8 +26,17 @@ export default async function ExamPrepPage() {
     const question = await db.getQuestionWithRubric(submission.question_id);
     const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
     const practiceSet = await db.getPracticeSetForSubmission(submission.id);
-    reviewedSubmissions.push({ submission, question, assessment, practiceSet });
+    const misconceptionTags = await db.listMisconceptionTags(submission.id);
+    reviewedSubmissions.push({ submission, question, assessment, practiceSet, hasMisconception: misconceptionTags.length > 0 });
   }
+
+  // Practice generation only ever produces something for a submission with
+  // an actual detected gap (docs/DECISIONS.md, s7-practice.ts) — pointing
+  // the guided demo at whichever reviewed item happens to be first risks
+  // landing on a fully-correct answer with nothing to target, which
+  // correctly no-ops rather than generating anything. Prefer one that will
+  // actually produce a result.
+  const tourTargetIndex = reviewedSubmissions.findIndex((r) => r.hasMisconception && !r.practiceSet);
 
   const byMisconception = new Map<string, { name: string; severity: string; items: any[] }>();
 
@@ -76,7 +85,7 @@ export default async function ExamPrepPage() {
           <p className="text-body-md text-muted">Nothing ready yet. Reviewed formative work and released summative work will appear here.</p>
         ) : (
           <div className="divide-y divide-hairline border-y border-hairline">
-            {reviewedSubmissions.map(({ submission, question, assessment, practiceSet }) => (
+            {reviewedSubmissions.map(({ submission, question, assessment, practiceSet }, index) => (
               <article key={submission.id} className="grid gap-md py-md md:grid-cols-[1fr_auto] md:items-center">
                 <div>
                   <p className="text-title-sm text-body-strong">
@@ -89,7 +98,11 @@ export default async function ExamPrepPage() {
                     Open practice
                   </Link>
                 ) : (
-                  <RequestRevisionButton submissionId={submission.id} label="Generate practice set" />
+                  <RequestRevisionButton
+                    submissionId={submission.id}
+                    label="Generate practice set"
+                    dataTourId={index === tourTargetIndex ? "generate-practice-button" : undefined}
+                  />
                 )}
               </article>
             ))}

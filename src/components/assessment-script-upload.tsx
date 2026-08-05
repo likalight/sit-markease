@@ -133,6 +133,31 @@ export function AssessmentScriptUpload({
       if (!response.ok) throw new Error(json.error?.message ?? "upload failed");
 
       if (kind === "summative") {
+        // The AI already detected and saved a page-to-question mapping —
+        // that's the actual point of running OCR/vision on it. Only send
+        // the instructor to the manual box-review screen when the model
+        // itself wasn't confident (a real question left unmapped, or an
+        // unassigned region) — a genuine ambiguity a human should resolve,
+        // not a routine confirmation step for every single upload.
+        if (json.confident) {
+          setProgress("Confirming mapping and grading...");
+          const confirmed = await fetch(`/api/scripts/${json.scriptUploadId}/confirm`, { method: "POST" });
+          const confirmedJson = await readJsonResponse(confirmed);
+          if (!confirmed.ok) throw new Error(confirmedJson.error?.message ?? "could not confirm mapping");
+          const summativeIds = confirmedJson.submissionIds as string[];
+          setProgress(`Grading ${summativeIds.length} question${summativeIds.length === 1 ? "" : "s"}...`);
+          await Promise.all(
+            summativeIds.map(async (id, index) => {
+              const processed = await fetch(`/api/submissions/${id}/process`, { method: "POST" });
+              const processedJson = await readJsonResponse(processed);
+              if (!processed.ok) throw new Error(processedJson.error?.message ?? `question ${index + 1} could not be processed`);
+            })
+          );
+          setProgress("All questions graded and ready for review.");
+          router.push("/review");
+          router.refresh();
+          return;
+        }
         router.push(`/scripts/${json.scriptUploadId}/mapping`);
         return;
       }

@@ -320,7 +320,7 @@ export default async function StudentFeedbackPage({
                 Revise and resubmit →
               </Link>
             )}
-            <Link href="/exam-prep" className="text-body-md text-body underline">
+            <Link href="/exam-prep" data-tour-id="exam-prep-link" className="text-body-md text-body underline">
               Generate practice in Exam prep -&gt;
             </Link>
             {false && (c.hasPracticeSet ? (

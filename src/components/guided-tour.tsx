@@ -54,11 +54,37 @@ export function GuidedTour() {
       const fresh = { mode: bootstrapMode as TourMode, step: 0 };
       writeStoredState(fresh);
       setTourState(fresh);
+      // Strip ?tour= immediately — otherwise reloading this exact page
+      // later (still carrying the query param) re-bootstraps to step 0
+      // and silently wipes any real progress already made.
+      window.history.replaceState(null, "", pathname);
       return;
     }
     setTourState(readStoredState());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const rawStep = tourState ? TOUR_STEPS[tourState.mode]?.[tourState.step] : null;
+
+  // Some steps' real page can be skipped entirely by the product itself
+  // (e.g. a confident script mapping goes straight to /review, bypassing
+  // the manual mapping-review page a less-confident upload would need) —
+  // if the current step's page isn't where we landed, but a LATER step's
+  // page is, jump the tracker forward to it instead of getting stuck
+  // waiting on a target that was never going to appear on this run.
+  useEffect(() => {
+    if (!tourState) return;
+    const steps = TOUR_STEPS[tourState.mode];
+    const current = steps[tourState.step];
+    if (!current || current.matches(pathname)) return;
+    const aheadIndex = steps.findIndex((candidate, i) => i > tourState.step && candidate.matches(pathname));
+    if (aheadIndex !== -1) {
+      const skipped = { mode: tourState.mode, step: aheadIndex };
+      writeStoredState(skipped);
+      setTourState(skipped);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, tourState?.step]);
 
   const step = tourState ? TOUR_STEPS[tourState.mode]?.[tourState.step] : null;
   const active = !!(step && step.matches(pathname));
@@ -102,9 +128,37 @@ export function GuidedTour() {
         const box = el.getBoundingClientRect();
         setRect({ top: box.top, left: box.left, width: box.width, height: box.height });
         if (step!.advanceOn === "click-target") {
-          const handler = () => advance();
-          el.addEventListener("click", handler, { capture: true, once: true });
-          cleanupClick = () => el.removeEventListener("click", handler, { capture: true } as any);
+          if (step!.switchTo && step!.redirectAfterSwitch) {
+            // This target is a real form submit (e.g. "Release all results")
+            // — its own server action needs time to actually complete before
+            // we sign out and redirect. Firing switchRoleAction immediately
+            // on click raced that in-flight submission and aborted it before
+            // it ever wrote the release, leaving status stuck at "open."
+            // Wait for the element to actually leave the DOM (the real
+            // completion signal — the form stops rendering once released)
+            // before switching roles.
+            const target = el;
+            const handler = () => {
+              const observer = new MutationObserver(() => {
+                if (!document.body.contains(target)) {
+                  observer.disconnect();
+                  clearTimeout(fallback);
+                  advance();
+                }
+              });
+              observer.observe(document.body, { childList: true, subtree: true });
+              const fallback = setTimeout(() => {
+                observer.disconnect();
+                advance();
+              }, 15000);
+            };
+            el.addEventListener("click", handler, { capture: true, once: true });
+            cleanupClick = () => el.removeEventListener("click", handler, { capture: true } as any);
+          } else {
+            const handler = () => advance();
+            el.addEventListener("click", handler, { capture: true, once: true });
+            cleanupClick = () => el.removeEventListener("click", handler, { capture: true } as any);
+          }
         }
         return;
       }

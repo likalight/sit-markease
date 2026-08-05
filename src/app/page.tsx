@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { enterAsStudentAction, enterAsEducatorAction } from "@/app/enter/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { startTourAction } from "@/lib/demo-tour/actions";
 
@@ -119,40 +118,6 @@ export default async function LandingPage({
           </div>
         </div>
 
-        <div className="relative mx-auto grid w-full max-w-2xl gap-md sm:grid-cols-2">
-          <form
-            id="student-login"
-            action={enterAsStudentAction}
-            className="flex scroll-mt-24 flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
-          >
-            <p className="font-serif text-title-md text-ink">Student login</p>
-            <p className="text-body-sm text-muted">Enter your 3-digit demo ID.</p>
-            <input
-              name="studentId"
-              inputMode="numeric"
-              maxLength={3}
-              required
-              placeholder="111"
-              className="rounded-sm border border-hairline bg-canvas px-md py-sm text-center text-title-md tabular-nums tracking-widest"
-            />
-            <SubmitButton pendingLabel="Logging in…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
-              Log in
-            </SubmitButton>
-          </form>
-
-          <form
-            id="instructor-login"
-            action={enterAsEducatorAction}
-            className="flex scroll-mt-24 flex-col gap-sm rounded-lg border border-hairline bg-surface-card px-lg py-lg text-left"
-          >
-            <p className="font-serif text-title-md text-ink">Instructor login</p>
-            <p className="text-body-sm text-muted">One click into the review queue — no setup needed for the demo.</p>
-            <div className="flex-1" />
-            <SubmitButton pendingLabel="Logging in…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
-              Log in
-            </SubmitButton>
-          </form>
-        </div>
       </section>
 
       {/* The problem */}
