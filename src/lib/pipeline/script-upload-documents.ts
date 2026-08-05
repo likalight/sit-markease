@@ -4,7 +4,7 @@ export type UploadedScriptDocument = { bytes: Buffer; contentType: string };
 
 function rejectPdf(contentType: string) {
   if (contentType.toLowerCase() === "application/pdf") {
-    throw new Error("PDF reached the server without browser rendering. Hard refresh this page, then choose the PDF again or use the built-in demo script.");
+    throw new Error("PDF reached the server without browser rendering. Hard refresh this page, then choose the PDF again or use compressed page images.");
   }
 }
 

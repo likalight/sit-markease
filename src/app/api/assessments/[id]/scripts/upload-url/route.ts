@@ -32,7 +32,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (files.length === 0) return jsonError("no files requested", 400);
   if (files.some(isPdfUpload)) {
     return jsonError(
-      "PDFs must be rendered in the browser before script upload. Hard refresh this page, then choose the PDF again or use the built-in demo script.",
+      "PDFs must be rendered in the browser before script upload. Hard refresh this page, then choose the PDF again or use compressed page images.",
       400
     );
   }

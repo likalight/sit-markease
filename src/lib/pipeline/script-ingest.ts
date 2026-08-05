@@ -19,7 +19,7 @@ type DocumentPage = {
 
 async function documentPages(bytes: Buffer, contentType: string): Promise<DocumentPage[]> {
   if (contentType === "application/pdf") {
-    throw new Error("PDF reached script processing without browser rendering. Hard refresh this page, then choose the PDF again or use the built-in demo script.");
+    throw new Error("PDF reached script processing without browser rendering. Hard refresh this page, then choose the PDF again or use compressed page images.");
   }
   return [{ bytes: await sharp(bytes).png().toBuffer(), contentType: "image/png" }];
 }
