@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RubricCriterionSchema } from "./rubric";
 
 export const AssessmentRubricQuestionSchema = z.object({
   position: z.number().int().positive(),
@@ -8,6 +9,7 @@ export const AssessmentRubricQuestionSchema = z.object({
   expected_answer_latex: z.string(),
   max_score: z.number().positive(),
   raw_rubric_notes: z.string(),
+  criteria: z.array(RubricCriterionSchema).min(1),
 });
 
 export const AssessmentRubricDocumentSchema = z.object({

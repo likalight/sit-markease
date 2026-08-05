@@ -99,12 +99,24 @@ const ASSESSMENT_RUBRIC_DOCUMENT_SHAPE = `Respond with ONLY this JSON shape, no 
       "model_solution": "<worked solution / expected answer text from the mark scheme>",
       "expected_answer_latex": "<final answer as LaTeX, or empty string>",
       "max_score": 10,
-      "raw_rubric_notes": "<mark allocations and grading notes for this question>"
+      "raw_rubric_notes": "<mark allocations and grading notes for this question>",
+      "criteria": [
+        {
+          "key": "<short_snake_case_key>",
+          "name": "<criterion name>",
+          "weight": 50,
+          "max_score": 5,
+          "levels": [
+            { "level": "full", "score": 5, "descriptor": "<full-credit evidence>" },
+            { "level": "none", "score": 0, "descriptor": "<missing/incorrect evidence>" }
+          ]
+        }
+      ]
     }
   ],
   "warnings": ["<short warning about missing/ambiguous source content>"]
 }
-Use one object per main assessment question. Preserve subparts inside prompt_text/model_solution/raw_rubric_notes.`;
+Use one object per main assessment question. Preserve subparts inside prompt_text/model_solution/raw_rubric_notes. Criteria weights must sum to 100 per question. Criteria max_score values should sum to that question's max_score.`;
 
 export function assessmentRubricDocumentUserPrompt(args: { assessmentTitle: string; pageCount: number }): string {
   return [

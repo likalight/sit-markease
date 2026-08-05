@@ -87,6 +87,7 @@ export interface CallStructuredArgs<T> {
   nativeSchema?: unknown;
   temperature?: number;
   submissionId?: string;
+  maxOutputTokens?: number;
 }
 
 export async function callStructured<T>(args: CallStructuredArgs<T>): Promise<T> {
@@ -140,6 +141,7 @@ export async function callStructured<T>(args: CallStructuredArgs<T>): Promise<T>
     schema: args.schema,
     nativeSchema: args.nativeSchema,
     temperature: args.temperature,
+    maxOutputTokens: args.maxOutputTokens,
   };
 
   try {

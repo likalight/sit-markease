@@ -2,6 +2,10 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Rubric PDF import optimized to one model pass
+
+The first assessment-level rubric PDF importer extracted questions, then called `structureRubric()` once per question. For an 11-question Maths paper that meant roughly 12 serial AI calls inside one Vercel function request, which is too slow and caused `FUNCTION_INVOCATION_TIMEOUT`. The importer now asks the assessment-rubric extraction stage to return structured editable criteria directly for every question, reducing the hot path to one model call plus database writes. Rubric page images are resized to 1200px JPEG instead of 1600px PNG, and the stage can request a larger JSON response via `AIMS_RUBRIC_IMPORT_MAX_OUTPUT_TOKENS`.
+
 ## Student review folded into My assessments
 
 The student sidebar no longer has a separate "My feedback" tab. `/submit` is now the assessment home for both formative and summative assignments: formative rows can start/continue attempts, and any reviewed/released work gets a "Review assessment" action from that same row. Summative rows are visible but cannot be self-submitted; they unlock review only after educator release.

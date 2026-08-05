@@ -9,10 +9,9 @@ import {
   assessmentRubricDocumentUserPrompt,
   PROMPT_VERSIONS,
 } from "./prompts";
-import { structureRubric } from "./rubric-structure";
 
 const MAX_RUBRIC_PAGES = Number(process.env.AIMS_RUBRIC_MAX_PAGES ?? 15);
-const RUBRIC_IMAGE_WIDTH = Number(process.env.AIMS_RUBRIC_IMAGE_WIDTH ?? 1600);
+const RUBRIC_IMAGE_WIDTH = Number(process.env.AIMS_RUBRIC_IMAGE_WIDTH ?? 1200);
 
 async function documentImages(bytes: Buffer, contentType: string) {
   const pageBuffers =
@@ -26,8 +25,12 @@ async function documentImages(bytes: Buffer, contentType: string) {
 
   return Promise.all(
     pageBuffers.map(async (page) => ({
-      mimeType: "image/png" as const,
-      base64: (await sharp(page).rotate().resize({ width: RUBRIC_IMAGE_WIDTH, withoutEnlargement: true }).png().toBuffer()).toString("base64"),
+      mimeType: "image/jpeg" as const,
+      base64: (await sharp(page)
+        .rotate()
+        .resize({ width: RUBRIC_IMAGE_WIDTH, withoutEnlargement: true })
+        .jpeg({ quality: 78, mozjpeg: true })
+        .toBuffer()).toString("base64"),
     }))
   );
 }
@@ -38,7 +41,9 @@ export async function importAssessmentRubricDocument(args: {
   bytes: Buffer;
   contentType: string;
 }) {
+  const startedAt = Date.now();
   const images = await documentImages(args.bytes, args.contentType);
+  console.log(`[rubric-import] rendered ${images.length} page(s) in ${Date.now() - startedAt}ms`);
   const extracted = await callStructured({
     stage: "assessment_rubric_document",
     promptVersion: PROMPT_VERSIONS.assessmentRubricDocument,
@@ -49,20 +54,15 @@ export async function importAssessmentRubricDocument(args: {
     schema: AssessmentRubricDocumentSchema,
     nativeSchema: assessmentRubricDocumentNativeSchema,
     temperature: 0.1,
+    maxOutputTokens: Number(process.env.AIMS_RUBRIC_IMPORT_MAX_OUTPUT_TOKENS ?? 12000),
   });
+  console.log(`[rubric-import] extracted ${extracted.questions.length} question(s) in ${Date.now() - startedAt}ms`);
 
   const existingQuestions = (await db.listQuestionsForAssessment(args.assessmentId)) as any[];
   const byPosition = new Map(existingQuestions.map((question) => [question.position, question]));
   const imported: { questionId: string; position: number; label: string; criteriaCount: number }[] = [];
 
   for (const item of extracted.questions.sort((a, b) => a.position - b.position)) {
-    const structured = await structureRubric({
-      promptText: item.prompt_text,
-      modelSolution: item.model_solution,
-      maxScore: item.max_score,
-      rawRubricNotes: item.raw_rubric_notes,
-    });
-
     const existing = byPosition.get(item.position);
     const question = existing
       ? await db.updateQuestion(existing.id, {
@@ -87,7 +87,7 @@ export async function importAssessmentRubricDocument(args: {
     const rubric = full?.rubric ?? (await db.createRubric((question as any).id));
     await db.replaceRubricCriteria(
       (rubric as any).id,
-      structured.criteria.map((criterion) => ({
+      item.criteria.map((criterion) => ({
         key: criterion.key,
         name: criterion.name,
         weight: criterion.weight,
@@ -99,9 +99,10 @@ export async function importAssessmentRubricDocument(args: {
       questionId: (question as any).id,
       position: item.position,
       label: item.label,
-      criteriaCount: structured.criteria.length,
+      criteriaCount: item.criteria.length,
     });
   }
+  console.log(`[rubric-import] persisted ${imported.length} question(s) in ${Date.now() - startedAt}ms`);
 
   return { imported, warnings: extracted.warnings, pageCount: images.length };
 }

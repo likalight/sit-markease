@@ -248,6 +248,31 @@ export const assessmentRubricDocumentNativeSchema = {
           expected_answer_latex: { type: SchemaType.STRING },
           max_score: { type: SchemaType.NUMBER },
           raw_rubric_notes: { type: SchemaType.STRING },
+          criteria: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                key: { type: SchemaType.STRING },
+                name: { type: SchemaType.STRING },
+                weight: { type: SchemaType.NUMBER },
+                max_score: { type: SchemaType.NUMBER },
+                levels: {
+                  type: SchemaType.ARRAY,
+                  items: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                      level: { type: SchemaType.STRING },
+                      score: { type: SchemaType.NUMBER },
+                      descriptor: { type: SchemaType.STRING },
+                    },
+                    required: ["level", "score", "descriptor"],
+                  },
+                },
+              },
+              required: ["key", "name", "weight", "max_score", "levels"],
+            },
+          },
         },
         required: [
           "position",
@@ -257,6 +282,7 @@ export const assessmentRubricDocumentNativeSchema = {
           "expected_answer_latex",
           "max_score",
           "raw_rubric_notes",
+          "criteria",
         ],
       },
     },

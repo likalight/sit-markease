@@ -10,5 +10,13 @@ For every detected question, return:
 - the expected final answer if stated
 - the total marks
 - raw rubric notes with all mark allocations and evidence requirements
+- structured grading criteria that can be used directly for automated grading
+
+Each criterion must have:
+- a short snake_case key
+- a human-readable name
+- a weight, with weights across that question summing to 100
+- max_score, with criteria max scores summing to the question's max_score
+- at least two levels, including a full-credit level and a zero/no-credit level where possible
 
 Do not grade any student work. Do not correct the source document. Keep ambiguity in warnings.
