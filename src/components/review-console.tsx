@@ -418,7 +418,7 @@ export function ReviewConsole(props: {
           </button>
         </div>
       </div>
-      <div className="grid min-h-0 flex-1 grid-cols-[1fr_1fr_1fr]">
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_360px]">
       {/* Left: script-viewer, on a ruled-paper backdrop matching the
           deck's "handwritten script — scanned" dashboard mockup */}
       <div

@@ -223,6 +223,23 @@ export const db = {
     return count ?? 0;
   },
 
+  // All question rows belonging to one assessment, ordered by position —
+  // backs both the regrouped /assignments list (one card per assessment,
+  // not per question) and the rubric review page's "N questions" view.
+  async listQuestionsForAssessment(assessmentId: string) {
+    if (fx()) {
+      return localStore
+        .find("questions", (q: any) => q.assessment_id === assessmentId)
+        .sort((a: any, b: any) => a.position - b.position);
+    }
+    const { data } = await supabaseAdmin()
+      .from("questions")
+      .select("*")
+      .eq("assessment_id", assessmentId)
+      .order("position");
+    return data ?? [];
+  },
+
   async createQuestion(row: {
     assessment_id: string;
     position: number;
@@ -258,6 +275,117 @@ export const db = {
     const { data, error } = await supabaseAdmin().from("rubric_criteria").insert(rows).select("*");
     if (error) throw error;
     return data ?? [];
+  },
+
+  // Replace an entire rubric's criteria in one go — the rubric review/edit
+  // screen (docs/DECISIONS.md "rubric review before opening") always saves
+  // the whole edited set, so a delete-then-reinsert is simpler and safer
+  // than tracking per-row updates/deletes for a handful of criteria.
+  async replaceRubricCriteria(
+    rubricId: string,
+    criteria: { key: string; name: string; weight: number; max_score: number; levels: unknown }[]
+  ) {
+    if (fx()) {
+      localStore.removeWhere("rubric_criteria", (c: any) => c.rubric_id === rubricId);
+      if (criteria.length === 0) return [];
+      return localStore.insertMany(
+        "rubric_criteria",
+        criteria.map((c) => ({ rubric_id: rubricId, ...c }))
+      );
+    }
+    const admin = supabaseAdmin();
+    const { error: deleteError } = await admin.from("rubric_criteria").delete().eq("rubric_id", rubricId);
+    if (deleteError) throw deleteError;
+    if (criteria.length === 0) return [];
+    const { data, error } = await admin
+      .from("rubric_criteria")
+      .insert(criteria.map((c) => ({ rubric_id: rubricId, ...c })))
+      .select("*");
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  // Aggregate-only class analytics for one assessment — score distribution,
+  // weakest rubric criteria (by avg score/max_score across the whole class),
+  // and top misconceptions. No student names/IDs anywhere in the result, per
+  // docs/PRD.md's "not surveillance — for curriculum improvement, not for
+  // ranking or flagging individuals." Follows the same group-by-then-
+  // aggregate, N+1-per-question style already used in
+  // src/lib/pipeline/review-queue.ts, rather than introducing a new
+  // batched-query convention.
+  async getAssessmentInsights(assessmentId: string) {
+    const assessment = await this.getAssessment(assessmentId);
+    const questions = await this.listQuestionsForAssessment(assessmentId);
+
+    const scoreHistogram = Array.from({ length: 10 }, (_, i) => ({ bucket: i, count: 0 }));
+    const criteriaAccum = new Map<string, { name: string; sumScore: number; sumMax: number; count: number }>();
+    const misconceptionCounts = new Map<string, number>();
+    let submissionCount = 0;
+
+    for (const question of questions as any[]) {
+      const withRubric = await this.getQuestionWithRubric(question.id);
+      const criteriaMeta = new Map((withRubric?.criteria ?? []).map((c: any) => [c.key, c.name]));
+
+      const submissions = await this.listSubmissionsForQuestion(question.id);
+      for (const submission of submissions as any[]) {
+        const finalGrade = await this.getFinalGrade(submission.id);
+        if (finalGrade) {
+          submissionCount++;
+          const pct = question.max_score ? (finalGrade as any).total / question.max_score : 0;
+          const bucketIndex = Math.min(9, Math.max(0, Math.floor(pct * 10)));
+          scoreHistogram[bucketIndex].count++;
+        }
+
+        const gradeRec = await this.getGradeRecommendation(submission.id);
+        if (gradeRec) {
+          const criteriaResults = await this.listCriterionResults((gradeRec as any).id);
+          for (const cr of criteriaResults as any[]) {
+            const uniqueKey = `${question.id}:${cr.criterion_key}`;
+            const existing = criteriaAccum.get(uniqueKey) ?? {
+              name: criteriaMeta.get(cr.criterion_key) ?? cr.criterion_key,
+              sumScore: 0,
+              sumMax: 0,
+              count: 0,
+            };
+            existing.sumScore += cr.score;
+            existing.sumMax += cr.max_score;
+            existing.count += 1;
+            criteriaAccum.set(uniqueKey, existing);
+          }
+        }
+
+        const tags = await this.listMisconceptionTags(submission.id);
+        for (const tag of tags as any[]) {
+          misconceptionCounts.set(tag.misconception_id, (misconceptionCounts.get(tag.misconception_id) ?? 0) + 1);
+        }
+      }
+    }
+
+    const criteriaBreakdown = Array.from(criteriaAccum.values())
+      .map((v) => ({ name: v.name, avgPct: v.sumMax > 0 ? v.sumScore / v.sumMax : 0, sampleSize: v.count }))
+      .sort((a, b) => a.avgPct - b.avgPct);
+
+    let topMisconceptions: { name: string; severity: string; count: number }[] = [];
+    if ((assessment as any)?.module_id && misconceptionCounts.size > 0) {
+      const misconceptions = await this.listMisconceptions((assessment as any).module_id);
+      const byId = new Map((misconceptions as any[]).map((m: any) => [m.id, m]));
+      topMisconceptions = Array.from(misconceptionCounts.entries())
+        .map(([id, count]) => ({
+          name: byId.get(id)?.name ?? "Unknown",
+          severity: byId.get(id)?.severity ?? "procedural",
+          count,
+        }))
+        .sort((a, b) => b.count - a.count);
+    }
+
+    return {
+      assessmentTitle: (assessment as any)?.title ?? "",
+      mode: (assessment as any)?.assessment_mode ?? "summative",
+      submissionCount,
+      scoreHistogram,
+      criteriaBreakdown,
+      topMisconceptions,
+    };
   },
 
   async findUserByRole(role: "educator" | "student") {

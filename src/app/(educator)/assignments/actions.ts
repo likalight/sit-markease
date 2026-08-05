@@ -19,4 +19,5 @@ export async function setAssessmentStatusAction(formData: FormData) {
 
   await db.updateAssessmentStatus(assessmentId, status);
   revalidatePath("/assignments");
+  revalidatePath(`/assignments/${assessmentId}/rubric`);
 }

@@ -132,4 +132,10 @@ export const localStore = {
   findOne(table: keyof StoreSchema, predicate: (row: any) => boolean) {
     return load()[table].find(predicate) ?? null;
   },
+
+  removeWhere(table: keyof StoreSchema, predicate: (row: any) => boolean) {
+    const store = load();
+    store[table] = store[table].filter((row: any) => !predicate(row));
+    save(store);
+  },
 };

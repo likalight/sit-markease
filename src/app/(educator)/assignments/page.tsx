@@ -11,43 +11,61 @@ export default async function AssignmentsPage() {
 
   const questions = await db.listAllQuestions();
 
+  // One row per ASSESSMENT, not per question — a 7-question assessment used
+  // to render as 7 identical-titled cards. Group first, then aggregate each
+  // group's submission/score stats across all of its questions.
+  const byAssessment = new Map<string, any[]>();
+  for (const q of questions as any[]) {
+    const group = byAssessment.get(q.assessment_id) ?? [];
+    group.push(q);
+    byAssessment.set(q.assessment_id, group);
+  }
+
   const rows = await Promise.all(
-    questions.map(async (q: any) => {
-      const assessment = await db.getAssessment(q.assessment_id);
-      const submissions = await db.listSubmissionsForQuestion(q.id);
+    Array.from(byAssessment.entries()).map(async ([assessmentId, groupQuestions]) => {
+      const assessment = await db.getAssessment(assessmentId);
+      let submissionCount = 0;
       let released = 0;
       let pending = 0;
       let totalScore = 0;
+      let totalMax = 0;
       let scoredCount = 0;
-      for (const s of submissions) {
-        const finalGrade = await db.getFinalGrade(s.id);
-        if (finalGrade) {
-          released += 1;
-          totalScore += (finalGrade as any).total;
-          scoredCount += 1;
-        } else {
-          const grade = await db.getGradeRecommendation(s.id);
-          if (grade) pending += 1; // has a recommendation but not yet released — in the queue
+
+      for (const q of groupQuestions) {
+        const submissions = await db.listSubmissionsForQuestion(q.id);
+        submissionCount += submissions.length;
+        for (const s of submissions) {
+          const finalGrade = await db.getFinalGrade(s.id);
+          if (finalGrade) {
+            released += 1;
+            totalScore += (finalGrade as any).total;
+            totalMax += q.max_score;
+            scoredCount += 1;
+          } else {
+            const grade = await db.getGradeRecommendation(s.id);
+            if (grade) pending += 1;
+          }
         }
       }
+
       return {
-        id: q.id,
-        assessmentId: q.assessment_id,
+        assessmentId,
         assignmentName: assessment?.title ?? "Untitled assignment",
-        status: assessment?.status ?? "draft",
+        status: (assessment as any)?.status ?? "draft",
         mode: (assessment as any)?.assessment_mode ?? "summative",
-        promptText: q.prompt_text,
-        maxScore: q.max_score,
-        submissionCount: submissions.length,
+        questionCount: groupQuestions.length,
+        submissionCount,
         released,
         pending,
-        avgScore: scoredCount ? totalScore / scoredCount : null,
+        avgPct: scoredCount && totalMax ? totalScore / totalMax : null,
       };
     })
   );
 
+  rows.sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
+
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-lg px-6 py-xl">
+    <main className="mx-auto flex max-w-4xl flex-col gap-lg px-6 py-xl">
       <div className="flex items-baseline justify-between">
         <div>
           <h1 className="text-title-lg text-body-strong">Assignments</h1>
@@ -68,67 +86,83 @@ export default async function AssignmentsPage() {
           No assignments yet — <Link href="/assignments/new" className="underline">create one</Link>.
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-hairline border border-hairline">
-          {rows.map((r) => (
-            <li key={r.id} className="flex flex-col gap-xs px-md py-sm">
-              <div className="flex items-baseline justify-between">
-                <span className="flex items-center gap-xs text-caption-caps text-muted-soft">
-                  {r.assignmentName}
-                  <span className="rounded-sm border border-hairline px-xs py-[1px] text-caption text-muted-soft">
-                    {r.mode}
-                  </span>
-                </span>
-                {r.avgScore !== null && (
-                  <span className="text-data-sm tabular-nums text-body-strong">
-                    avg {r.avgScore.toFixed(1)}/{r.maxScore}
-                  </span>
-                )}
-              </div>
-              <p className="text-body-sm text-body">{r.promptText}</p>
-              <div className="flex items-center justify-between gap-md">
-                <div className="flex items-center gap-md text-caption text-muted">
-                  <span>{r.submissionCount} submitted</span>
-                  {r.mode === "formative" ? (
-                    <Link href={`/assignments/${r.assessmentId}/attempts`} className="underline">
-                      {r.released} auto-released — view attempts →
-                    </Link>
-                  ) : (
-                    <>
-                      <span className="text-verified">{r.released} reviewed &amp; released</span>
-                      <Link href={`/assignments/${r.assessmentId}/upload`} className="underline">
-                        Upload a script →
+        <div className="overflow-x-auto border border-hairline">
+          <table className="w-full border-collapse text-body-sm">
+            <thead>
+              <tr className="border-b border-hairline bg-surface-soft text-left text-caption-caps text-muted-soft">
+                <th className="px-md py-xs font-medium">Name</th>
+                <th className="px-md py-xs font-medium">Mode</th>
+                <th className="px-md py-xs font-medium">Questions</th>
+                <th className="px-md py-xs text-right font-medium">Submitted</th>
+                <th className="px-md py-xs text-right font-medium">Avg score</th>
+                <th className="px-md py-xs font-medium">Status</th>
+                <th className="px-md py-xs font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.assessmentId} className="border-b border-hairline last:border-b-0 hover:bg-surface-soft/60">
+                  <td className="px-md py-sm text-body text-body-strong">{r.assignmentName}</td>
+                  <td className="px-md py-sm">
+                    <span className="rounded-sm border border-hairline px-xs py-[1px] text-caption text-muted-soft">
+                      {r.mode}
+                    </span>
+                  </td>
+                  <td className="px-md py-sm tabular-nums text-muted">{r.questionCount}</td>
+                  <td className="px-md py-sm text-right tabular-nums text-muted">{r.submissionCount}</td>
+                  <td className="px-md py-sm text-right tabular-nums text-body-strong">
+                    {r.avgPct !== null ? `${Math.round(r.avgPct * 100)}%` : "—"}
+                  </td>
+                  <td className="px-md py-sm">
+                    <form action={setAssessmentStatusAction}>
+                      <input type="hidden" name="assessmentId" value={r.assessmentId} />
+                      <input type="hidden" name="status" value={r.status === "open" ? "draft" : "open"} />
+                      {r.status === "open" ? (
+                        <SubmitButton
+                          pendingLabel="Closing…"
+                          className="rounded-sm border border-verified/40 bg-verified-soft px-sm py-xxs text-caption font-medium text-verified"
+                        >
+                          Open — close
+                        </SubmitButton>
+                      ) : (
+                        <SubmitButton
+                          pendingLabel="Opening…"
+                          className="rounded-sm border border-hairline px-sm py-xxs text-caption font-medium text-body"
+                        >
+                          Draft — open
+                        </SubmitButton>
+                      )}
+                    </form>
+                  </td>
+                  <td className="px-md py-sm">
+                    <div className="flex flex-col gap-xxs text-caption">
+                      <Link href={`/assignments/${r.assessmentId}/rubric`} className="underline">
+                        Review rubric →
                       </Link>
-                    </>
-                  )}
-                  {r.pending > 0 && (
-                    <Link href="/review" className="text-disputed underline">
-                      {r.pending} awaiting your review →
-                    </Link>
-                  )}
-                </div>
-                <form action={setAssessmentStatusAction}>
-                  <input type="hidden" name="assessmentId" value={r.assessmentId} />
-                  <input type="hidden" name="status" value={r.status === "open" ? "draft" : "open"} />
-                  {r.status === "open" ? (
-                    <SubmitButton
-                      pendingLabel="Closing…"
-                      className="rounded-sm border border-verified/40 bg-verified-soft px-sm py-xxs text-caption font-medium text-verified"
-                    >
-                      Open for submissions — close
-                    </SubmitButton>
-                  ) : (
-                    <SubmitButton
-                      pendingLabel="Opening…"
-                      className="rounded-sm border border-hairline px-sm py-xxs text-caption font-medium text-body"
-                    >
-                      Draft — open for submissions
-                    </SubmitButton>
-                  )}
-                </form>
-              </div>
-            </li>
-          ))}
-        </ul>
+                      {r.mode === "formative" ? (
+                        <Link href={`/assignments/${r.assessmentId}/attempts`} className="underline">
+                          {r.released} auto-released — view attempts →
+                        </Link>
+                      ) : (
+                        <>
+                          <span className="text-verified">{r.released} reviewed &amp; released</span>
+                          <Link href={`/assignments/${r.assessmentId}/upload`} className="underline">
+                            Upload a script →
+                          </Link>
+                        </>
+                      )}
+                      {r.pending > 0 && (
+                        <Link href="/review" className="text-disputed underline">
+                          {r.pending} awaiting your review →
+                        </Link>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   );

@@ -2,6 +2,15 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Gradescope-style app shell + rubric authoring/review + Cohort dashboard (E4/M10)
+
+Three changes together, from direct instructor feedback on the live app:
+
+- **Persistent left sidebar, replacing the top nav bar** (`src/components/app-sidebar.tsx`, `sidebar-nav-links.tsx`), same colors/fonts/spacing tokens, Gradescope's structural convention instead of ours. `NavHeader` is deleted (fully superseded); both `(student)` and `(educator)` layouts now share one fixed-height, sidebar+scrollable-content shell shape.
+- **Rubric review/edit before opening for submissions** — previously a rubric was set once by AI at question-creation time with no way to change it short of the mid-review "+Add rubric item" (which needs a submission to already exist). New `replaceRubricCriteria` facade method (delete-then-reinsert, rubrics are small) backs a new `/assignments/:id/rubric` page; `new/actions.ts` now redirects there instead of straight to `/assignments`. The same page also gained "+ Add another question" (`/assignments/:id/questions/new`), closing a real gap: every multi-question assessment before this only existed via one-off scripts, since `/assignments/new` always created a brand-new assessment rather than appending to an existing one.
+- **`/assignments` regrouped from one-row-per-question to one-row-per-assessment**, and rendered as a real `<table>` — a 7-question assessment used to render as 7 identical-titled rows (`db.listAllQuestions()` had no grouping). Also deleted one dead draft assessment (3 abandoned questions, superseded by a narrower replacement that was created instead of editing the original) that was inflating the same list.
+- **Cohort dashboard, PRD's E4/M10** — specified in `docs/PRD.md` (heatmap/agreement/novel-candidates API routes, `(educator)/dashboard/`) but never built; `dashboard/` sat empty all session. Shipped a focused v1 instead, at `/insights`: score distribution, weakest rubric criteria (by avg `score/max_score` across the whole class, grouped by `criterion_key`), and top misconceptions — aggregate-only, no student names anywhere, per the PRD's explicit "not surveillance" framing. Agreement chart and novel-candidate queue deliberately deferred, not required for this pass.
+
 ## Practice-set generation reinstated for formative, not just summative
 
 Reverses the "matching Nicholas's split... under closed-book/summative specifically" call below — explicit user direction this session was that a formative student should also be able to request a fresh practice set after a submission is graded, not only resubmit the same question. `feedback/page.tsx`'s action row now shows "Revise and resubmit →" whenever `c.isFormative`, and independently, the practice-set action (link if one exists, else `RequestRevisionButton`) for every card regardless of mode — the route, `s7-practice.ts`, and the practice page already had zero `assessment_mode` awareness, so this was a UI-only gate to remove, not a pipeline change.

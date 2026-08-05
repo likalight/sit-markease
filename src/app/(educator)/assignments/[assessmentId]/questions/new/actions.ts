@@ -5,21 +5,16 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { structureRubric } from "@/lib/pipeline/rubric-structure";
 
-// Educator-facing "create a new question in any subject" — the concrete
-// fix for the app being permanently locked to one seeded math question
-// (docs/DECISIONS.md). Pastes a question + model solution + rough rubric
-// notes, AI structures the rubric into weighted criteria, and the new
-// question immediately becomes what students submit against
-// (db.getCurrentQuestion() picks the most recently created one).
-export async function createQuestionAction(formData: FormData) {
+// Add a question to an EXISTING assessment — every /assignments/new
+// submission previously always created a brand-new assessment with exactly
+// one question, with no way to build a real multi-question paper through
+// the product itself (every multi-question assessment so far was built by
+// a one-off script). Same steps as createQuestionAction minus the
+// assessment-creation step.
+export async function addQuestionAction(assessmentId: string, formData: FormData) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "educator") {
-    redirect("/login");
-  }
+  if (!user || user.role !== "educator") redirect("/login");
 
-  const assignmentName = String(formData.get("assignmentName") ?? "").trim();
-  const modeRaw = String(formData.get("mode") ?? "summative");
-  const mode: "formative" | "summative" = modeRaw === "formative" ? "formative" : "summative";
   const promptText = String(formData.get("promptText") ?? "").trim();
   const modelSolution = String(formData.get("modelSolution") ?? "").trim();
   const expectedAnswerLatex = String(formData.get("expectedAnswerLatex") ?? "").trim();
@@ -27,35 +22,30 @@ export async function createQuestionAction(formData: FormData) {
   const rawRubricNotes = String(formData.get("rubricNotes") ?? "").trim();
   const topicTagsRaw = String(formData.get("topicTags") ?? "").trim();
 
-  if (!assignmentName || !promptText || !modelSolution || !rawRubricNotes || !maxScore || maxScore <= 0) {
+  if (!promptText || !modelSolution || !rawRubricNotes || !maxScore || maxScore <= 0) {
     redirect(
-      `/assignments/new?error=${encodeURIComponent(
-        "fill in the assignment name, question, model solution, total points, and rubric notes"
+      `/assignments/${assessmentId}/questions/new?error=${encodeURIComponent(
+        "fill in the question, model solution, total points, and rubric notes"
       )}`
     );
   }
 
-  const topicTags = topicTagsRaw
-    ? topicTagsRaw.split(",").map((t) => t.trim()).filter(Boolean)
-    : [];
+  const topicTags = topicTagsRaw ? topicTagsRaw.split(",").map((t) => t.trim()).filter(Boolean) : [];
 
   let structured;
   try {
     structured = await structureRubric({ promptText, modelSolution, maxScore, rawRubricNotes });
   } catch (err) {
     redirect(
-      `/assignments/new?error=${encodeURIComponent(
+      `/assignments/${assessmentId}/questions/new?error=${encodeURIComponent(
         `couldn't structure that rubric — ${err instanceof Error ? err.message : String(err)}`
       )}`
     );
   }
 
-  const module_ = await db.findOrCreateDefaultModule(user!.id);
-  const assessment = await db.createAssessment((module_ as any).id, assignmentName, mode);
-  const existingCount = await db.countQuestionsForAssessment((assessment as any).id);
-
+  const existingCount = await db.countQuestionsForAssessment(assessmentId);
   const question = await db.createQuestion({
-    assessment_id: (assessment as any).id,
+    assessment_id: assessmentId,
     position: existingCount + 1,
     prompt_text: promptText,
     prompt_latex: null,
@@ -77,5 +67,5 @@ export async function createQuestionAction(formData: FormData) {
     }))
   );
 
-  redirect(`/assignments/${(assessment as any).id}/rubric`);
+  redirect(`/assignments/${assessmentId}/rubric`);
 }
