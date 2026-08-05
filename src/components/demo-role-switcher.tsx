@@ -29,7 +29,7 @@ export function DemoRoleSwitcher({ user }: { user: CurrentUser }) {
               !isEducator ? "bg-primary text-on-primary" : "text-muted hover:bg-surface-soft hover:text-body"
             }`}
           >
-            Student
+            Student 111
           </button>
         </form>
       </div>

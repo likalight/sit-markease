@@ -87,7 +87,7 @@ export default async function AssignmentsPage() {
       <DemoGuidePanel
         eyebrow="Instructor walkthrough"
         title="Start here: two papers, two release models"
-        body="Reviewers can follow the full flow without preparing files. Math is summative: the instructor uploads the student's script, checks the AI mapping, reviews the grade, then releases it. Physics is formative: the student submits and can review feedback/practice after marking."
+        body="Reviewers can follow the full flow without preparing files. Math is summative: the instructor uploads Student 111's script, checks the AI mapping, reviews the grade, then releases it. Physics is formative: Student 111 submits and can review feedback/practice after marking."
         steps={[
           {
             title: "Inspect the rubric",

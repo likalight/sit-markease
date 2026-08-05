@@ -4,7 +4,7 @@ Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
 ## Reviewer demo is organized by assessment mode, not by app navigation
 
-Guide panels inside the normal pages still assumed reviewers understood the product map. For public prototype judging, the app now has a `/demo` hub that explains the two actual mental models first: formative practice and summative review. Each mode shows Instructor and Student views side by side, with buttons that switch role and open the relevant screen. Homepage/login enter the hub by default, and both sidebars include "Demo guide" as the first navigation item.
+Guide panels inside the normal pages still assumed reviewers understood the product map. For public prototype judging, the app now has a `/demo` hub that explains the two actual mental models first: formative practice and summative review. Each mode shows Instructor and Student 111 views side by side, with buttons that switch role and open the relevant screen. Homepage/login enter the hub by default, and both sidebars include "Demo guide" as the first navigation item.
 
 ## Browser renders reviewer-uploaded PDFs before API submission
 
@@ -12,7 +12,7 @@ Even after compressing sidecar PDF rendering, live reviewer uploads could still 
 
 ## Public reviewer mode replaces the split login surface
 
-For prototype submission, reviewers should be able to click one public URL and understand the app without installation, file downloads, or account choreography. The homepage and `/login` now use one guided demo entry with a role toggle (`Instructor` / `Student`), and the authenticated shell has a persistent role switcher. Core pages include reviewer guide panels that explain the formative and summative journeys in context. Script upload controls keep the real file path but add a built-in student demo script button that runs through the same upload/processing APIs.
+For prototype submission, reviewers should be able to click one public URL and understand the app without installation, file downloads, or account choreography. The homepage and `/login` now use one guided demo entry with a role toggle (`Instructor` / `Student 111`), and the authenticated shell has a persistent role switcher. Core pages include reviewer guide panels that explain the formative and summative journeys in context. Script upload controls keep the real file path but add a built-in Student 111 demo script button that runs through the same upload/processing APIs.
 
 ## Sidecar PDF rendering now returns compressed page images
 

@@ -51,7 +51,7 @@ export async function AppSidebar() {
                 disabled={user.role === "student"}
                 className="w-full rounded-sm border border-hairline px-xs py-xxs text-caption disabled:bg-primary disabled:text-on-primary"
               >
-                Student
+                Student 111
               </button>
             </form>
           </div>

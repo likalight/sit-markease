@@ -31,9 +31,9 @@ export default async function EducatorUploadPage({ params }: { params: Promise<{
       <DemoGuidePanel
         eyebrow="Summative intake"
         title="Instructor uploads the exam script"
-        body="This is the closed-book path. The student cannot upload a summative script themselves. The instructor attaches the script, confirms which page regions belong to which questions, then reviews the AI marking before release."
+        body="This is the closed-book path. Student 111 cannot upload a summative script themselves. The instructor attaches the script, confirms which page regions belong to which questions, then reviews the AI marking before release."
         steps={[
-          { title: "Select student", body: "The demo roster is preloaded." },
+          { title: "Select Student 111", body: "The demo roster is preloaded." },
           { title: "Use built-in demo script", body: "No PDF or scan is needed from the reviewer." },
           { title: "Confirm mapping", body: "The next screen keeps source pages visible beside the detected question regions." },
         ]}
