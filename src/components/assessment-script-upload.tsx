@@ -187,7 +187,7 @@ export function AssessmentScriptUpload({
           {loading ? "Processing script..." : "Upload complete script"}
         </button>
       </div>
-      <p className="text-caption text-muted-soft">For reviewer demos, use the built-in Student 111 script. Real testing still supports one PDF or several page images, up to 15 pages total.</p>
+      <p className="text-caption text-muted-soft">For reviewer demos, use the built-in student script. Real testing still supports one PDF or several page images, up to 15 pages total.</p>
       {progress && <p className="text-body-sm text-muted">{progress}</p>}
       {error && <p className="border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
     </div>

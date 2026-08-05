@@ -18,7 +18,7 @@ export default async function LoginPage({
         </Link>
         <h1 className="mt-md font-serif text-display-sm text-ink">Open the guided prototype</h1>
         <p className="mx-auto mt-xs max-w-lg text-body-sm text-muted">
-          Reviewers can enter as the instructor or Student 111. The role switch remains available inside the app.
+          Reviewers can enter as the instructor or student. The role switch remains available inside the app.
         </p>
       </div>
 

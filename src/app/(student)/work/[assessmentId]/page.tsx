@@ -38,7 +38,7 @@ export default async function AssessmentWorkPage({ params, searchParams }: { par
       <DemoGuidePanel
         eyebrow="Formative loop"
         title="Submit once, then follow the feedback loop"
-        body="For the prototype review, the built-in script stands in for Student 111's photographed work. The app still reads the image, maps it to the rubric-backed question, grades it, and unlocks review/practice from My assessments."
+        body="For the prototype review, the built-in script stands in for the student's photographed work. The app still reads the image, maps it to the rubric-backed question, grades it, and unlocks review/practice from My assessments."
         steps={[
           { title: "Use built-in demo script", body: "No local files are needed for reviewers." },
           { title: "Wait for processing", body: "The app reads handwriting, grades against the rubric, and generates feedback." },

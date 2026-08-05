@@ -61,7 +61,7 @@ function ModeCard({
         </div>
         <div className="flex flex-col gap-sm">
           <div>
-            <p className="text-title-sm font-semibold text-body-strong">Student 111 view</p>
+            <p className="text-title-sm font-semibold text-body-strong">Student view</p>
             <p className="text-caption text-muted-soft">What the learner experiences.</p>
           </div>
           {student.map((action) => (
@@ -102,7 +102,7 @@ export default async function DemoPage() {
               Understand the app through two assessment modes.
             </h1>
             <p className="mt-sm max-w-2xl text-body-md text-muted">
-              Do not start with the sidebar. Start here. Each mode shows what the instructor does and what Student 111
+              Do not start with the sidebar. Start here. Each mode shows what the instructor does and what the student
               sees, with buttons that switch roles and open the right screen.
             </p>
           </div>
@@ -119,7 +119,7 @@ export default async function DemoPage() {
           </div>
           <div className="rounded-sm border border-hairline bg-surface-soft px-md py-sm">
             <p className="text-title-sm font-semibold text-body-strong">2. Compare roles</p>
-            <p className="mt-xxs text-caption text-muted">Instructor setup/review sits beside Student 111's experience.</p>
+            <p className="mt-xxs text-caption text-muted">Instructor setup/review sits beside the student's experience.</p>
           </div>
           <div className="rounded-sm border border-hairline bg-surface-soft px-md py-sm">
             <p className="text-title-sm font-semibold text-body-strong">3. Follow the buttons</p>
@@ -130,7 +130,7 @@ export default async function DemoPage() {
         <ModeCard
           badge="Mode 1"
           title="Formative: Physics practice"
-          description="Low-stakes practice. The instructor issues work and uploads/edits the rubric; Student 111 attempts it, submits work, then uses feedback and exam prep to close the gap."
+          description="Low-stakes practice. The instructor issues work and uploads/edits the rubric; the student attempts it, submits work, then uses feedback and exam prep to close the gap."
           instructor={[
             {
               role: "educator",
@@ -149,7 +149,7 @@ export default async function DemoPage() {
             {
               role: "student",
               href: "/submit",
-              label: "Open Student 111 assessments",
+              label: "Open student assessments",
               body: "Start or continue the Physics attempt.",
             },
             {
@@ -164,7 +164,7 @@ export default async function DemoPage() {
         <ModeCard
           badge="Mode 2"
           title="Summative: Math paper"
-          description="Higher-stakes assessment. The instructor uploads Student 111's script, confirms question mapping, reviews the source image beside the transcription, then approves and releases results."
+          description="Higher-stakes assessment. The instructor uploads the student's script, confirms question mapping, reviews the source image beside the transcription, then approves and releases results."
           instructor={[
             {
               role: "educator",
@@ -175,7 +175,7 @@ export default async function DemoPage() {
             {
               role: "educator",
               href: summativeId ? `/assignments/${summativeId}/upload` : "/assignments",
-              label: "Upload Student 111 script",
+              label: "Upload student script",
               body: "Use the built-in demo script; no local file needed.",
             },
             {
@@ -190,7 +190,7 @@ export default async function DemoPage() {
               role: "student",
               href: "/submit",
               label: "See summative status",
-              body: "Student 111 sees the Math paper, but cannot self-upload it.",
+              body: "The student sees the Math paper, but cannot self-upload it.",
             },
             {
               role: "student",

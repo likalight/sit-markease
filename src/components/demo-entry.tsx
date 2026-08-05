@@ -16,7 +16,7 @@ export function DemoEntry() {
         <p className="text-caption-caps text-muted-soft">Reviewer demo</p>
         <h2 className="mt-xxs font-serif text-title-lg text-ink">Walk through SIT MarkEase</h2>
         <p className="mt-xs text-body-sm text-muted">
-          No files to download. Continue into the mode-by-mode guide, then jump between Instructor and Student 111.
+          No files to download. Continue into the mode-by-mode guide, then jump between Instructor and Student.
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export function DemoEntry() {
             role === "student" ? "bg-primary text-on-primary" : "text-muted hover:text-body"
           }`}
         >
-          Student 111
+          Student
         </button>
       </div>
 
@@ -49,13 +49,13 @@ export function DemoEntry() {
           </p>
         ) : (
           <p className="text-body-sm text-body">
-            You will start at the demo guide, then open Student 111's assessments, feedback, and exam-prep flow.
+            You will start at the demo guide, then open the student's assessments, feedback, and exam-prep flow.
           </p>
         )}
       </div>
 
       <SubmitButton pendingLabel="Opening demo..." className="rounded-sm bg-ink px-md py-sm text-body-sm font-medium text-on-dark">
-        Continue as {role === "educator" ? "Instructor" : "Student 111"}
+        Continue as {role === "educator" ? "Instructor" : "Student"}
       </SubmitButton>
     </form>
   );

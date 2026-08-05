@@ -86,7 +86,7 @@ export default async function LandingPage({
             A guided demo of AI grading, review, and targeted practice.
           </h1>
           <p className="mx-auto max-w-lg text-body-md text-muted">
-            Start as the instructor or Student 111, switch roles any time, and use built-in demo scripts so no reviewer
+            Start as the instructor or student, switch roles any time, and use built-in demo scripts so no reviewer
             has to upload or download anything.
           </p>
         </div>

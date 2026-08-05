@@ -49,9 +49,9 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
         <p className="text-body-sm text-muted">Only assessments issued to you appear here.</p>
       </div>
       <DemoGuidePanel
-        eyebrow="Student 111 walkthrough"
+        eyebrow="Student walkthrough"
         title="See the student side after work is issued"
-        body="Student 111 only sees assigned assessments. Formative work can be started and submitted by the student; summative work appears here only after the instructor releases reviewed results."
+        body="The student only sees assigned assessments. Formative work can be started and submitted by the student; summative work appears here only after the instructor releases reviewed results."
         steps={[
           {
             title: "Start or continue Physics",
