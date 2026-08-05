@@ -16,7 +16,13 @@ import base64
 import io
 
 
-def pdf_to_page_images_b64(pdf_bytes: bytes, dpi: int = 200) -> list[str]:
+def pdf_to_page_images_b64(
+    pdf_bytes: bytes,
+    dpi: int = 144,
+    max_width: int | None = 1600,
+    image_format: str = "jpeg",
+    quality: int = 78,
+) -> list[str]:
     import pypdfium2 as pdfium
 
     scale = dpi / 72
@@ -25,7 +31,16 @@ def pdf_to_page_images_b64(pdf_bytes: bytes, dpi: int = 200) -> list[str]:
     for page in pdf:
         bitmap = page.render(scale=scale)
         image = bitmap.to_pil()
+        if max_width and image.width > max_width:
+            height = round(image.height * (max_width / image.width))
+            image = image.resize((max_width, height))
+        fmt = image_format.upper()
+        if fmt == "JPEG":
+            image = image.convert("RGB")
         buf = io.BytesIO()
-        image.save(buf, format="PNG")
+        if fmt == "JPEG":
+            image.save(buf, format=fmt, quality=quality, optimize=True)
+        else:
+            image.save(buf, format="PNG")
         out.append(base64.b64encode(buf.getvalue()).decode("ascii"))
     return out

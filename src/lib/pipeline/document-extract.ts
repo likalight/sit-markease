@@ -49,12 +49,17 @@ export async function extractQuestionAndRubric(
   let images: { mimeType: "image/png" | "image/jpeg"; base64: string }[];
 
   if (contentType === "application/pdf") {
-    const converted = await sidecar.pdfToImages(bytes.toString("base64"));
+    const converted = await sidecar.pdfToImages(bytes.toString("base64"), {
+      dpi: 144,
+      maxWidth: 1200,
+      imageFormat: "jpeg",
+      quality: 76,
+    });
     if (converted.images_b64.length === 0) throw new Error("PDF had no pages");
     if (converted.images_b64.length > MAX_RUBRIC_PAGES) {
       throw new Error(`rubric PDFs are capped at ${MAX_RUBRIC_PAGES} pages for this workflow`);
     }
-    images = converted.images_b64.map((base64) => ({ mimeType: "image/png", base64 }));
+    images = converted.images_b64.map((base64) => ({ mimeType: "image/jpeg", base64 }));
   } else {
     images = [{ mimeType: contentType === "image/jpeg" ? "image/jpeg" : "image/png", base64: bytes.toString("base64") }];
   }

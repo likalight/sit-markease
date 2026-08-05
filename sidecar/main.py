@@ -7,6 +7,7 @@ the demo (`npm run sidecar:dev`).
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Literal
 
 import base64
 
@@ -78,13 +79,23 @@ def math_verify_item(req: VerifyItemRequest):
 
 class PdfToImagesRequest(BaseModel):
     pdf_b64: str
+    dpi: int = 144
+    max_width: int | None = 1600
+    image_format: Literal["png", "jpeg"] = "jpeg"
+    quality: int = 78
 
 
 @app.post("/pdf/to-images")
 def pdf_to_images(req: PdfToImagesRequest):
     try:
         pdf_bytes = base64.b64decode(req.pdf_b64)
-        images_b64 = pdf_module.pdf_to_page_images_b64(pdf_bytes)
+        images_b64 = pdf_module.pdf_to_page_images_b64(
+            pdf_bytes,
+            dpi=req.dpi,
+            max_width=req.max_width,
+            image_format=req.image_format,
+            quality=req.quality,
+        )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"pdf conversion failed: {e}")
     if not images_b64:

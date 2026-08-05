@@ -16,7 +16,12 @@ const RUBRIC_IMAGE_WIDTH = Number(process.env.AIMS_RUBRIC_IMAGE_WIDTH ?? 1200);
 async function documentImages(bytes: Buffer, contentType: string) {
   const pageBuffers =
     contentType === "application/pdf"
-      ? (await sidecar.pdfToImages(bytes.toString("base64"))).images_b64.map((base64) => Buffer.from(base64, "base64"))
+      ? (await sidecar.pdfToImages(bytes.toString("base64"), {
+          dpi: 144,
+          maxWidth: RUBRIC_IMAGE_WIDTH,
+          imageFormat: "jpeg",
+          quality: 76,
+        })).images_b64.map((base64) => Buffer.from(base64, "base64"))
       : [bytes];
 
   if (pageBuffers.length > MAX_RUBRIC_PAGES) {

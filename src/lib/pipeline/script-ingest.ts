@@ -12,15 +12,28 @@ const PREPROCESS_SCRIPT_PAGES = process.env.AIMS_SCRIPT_PREPROCESS === "true";
 const MAPPING_IMAGE_WIDTH = Number(process.env.AIMS_MAPPING_IMAGE_WIDTH ?? 1600);
 const MAX_SCRIPT_PAGES = Number(process.env.AIMS_SCRIPT_MAX_PAGES ?? 15);
 
-async function documentPages(bytes: Buffer, contentType: string) {
+type DocumentPage = {
+  bytes: Buffer;
+  contentType: "image/png" | "image/jpeg";
+};
+
+async function documentPages(bytes: Buffer, contentType: string): Promise<DocumentPage[]> {
   if (contentType === "application/pdf") {
-    const converted = await sidecar.pdfToImages(bytes.toString("base64"));
+    const converted = await sidecar.pdfToImages(bytes.toString("base64"), {
+      dpi: 144,
+      maxWidth: MAPPING_IMAGE_WIDTH,
+      imageFormat: "jpeg",
+      quality: 76,
+    });
     if (converted.images_b64.length > MAX_SCRIPT_PAGES) {
       throw new Error(`script PDFs are capped at ${MAX_SCRIPT_PAGES} pages for this workflow`);
     }
-    return converted.images_b64.map((base64) => Buffer.from(base64, "base64"));
+    return converted.images_b64.map((base64) => ({
+      bytes: Buffer.from(base64, "base64"),
+      contentType: "image/jpeg",
+    }));
   }
-  return [await sharp(bytes).png().toBuffer()];
+  return [{ bytes: await sharp(bytes).png().toBuffer(), contentType: "image/png" }];
 }
 
 async function prepareScriptPage(original: Buffer) {
@@ -81,12 +94,12 @@ export async function ingestAssessmentScript(args: {
 
     for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
       const original = pages[pageIndex];
-      const processedPage = await prepareScriptPage(original);
+      const processedPage = await prepareScriptPage(original.bytes);
       const processed = processedPage.bytes;
       const metadata = await sharp(processed).metadata();
-      const originalPath = `scripts/${script.id}/original-${pageIndex}.png`;
+      const originalPath = `scripts/${script.id}/original-${pageIndex}.${original.contentType === "image/jpeg" ? "jpg" : "png"}`;
       const processedPath = `scripts/${script.id}/processed-${pageIndex}.png`;
-      await db.uploadImage(originalPath, original, "image/png");
+      await db.uploadImage(originalPath, original.bytes, original.contentType);
       await db.uploadImage(processedPath, processed, "image/png");
       await db.createScriptPage({
         script_upload_id: script.id,

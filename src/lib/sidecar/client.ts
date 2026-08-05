@@ -28,6 +28,13 @@ async function postJson<T>(path: string, body: unknown, schema: { parse(v: unkno
   return schema.parse(await res.json());
 }
 
+export type PdfToImagesOptions = {
+  dpi?: number;
+  maxWidth?: number;
+  imageFormat?: "png" | "jpeg";
+  quality?: number;
+};
+
 export const sidecar = {
   health(): Promise<{ ok: boolean; models_loaded: Record<string, boolean> }> {
     return fetch(`${env.sidecarUrl()}/health`).then((r) => r.json());
@@ -41,8 +48,18 @@ export const sidecar = {
     return postJson("/cv/detect-lines", { image_b64: imageB64 }, DetectLinesResponseSchema);
   },
 
-  pdfToImages(pdfB64: string): Promise<PdfToImagesResponse> {
-    return postJson("/pdf/to-images", { pdf_b64: pdfB64 }, PdfToImagesResponseSchema);
+  pdfToImages(pdfB64: string, options: PdfToImagesOptions = {}): Promise<PdfToImagesResponse> {
+    return postJson(
+      "/pdf/to-images",
+      {
+        pdf_b64: pdfB64,
+        dpi: options.dpi,
+        max_width: options.maxWidth,
+        image_format: options.imageFormat,
+        quality: options.quality,
+      },
+      PdfToImagesResponseSchema
+    );
   },
 
   embed(texts: string[]): Promise<EmbedResponse> {

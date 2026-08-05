@@ -25,7 +25,7 @@ async function ingestOnePage(
   const preprocessResult = await sidecar.preprocess(originalB64);
   const linesResult = await getLineDetector().detect(preprocessResult.processed_b64);
 
-  const originalPath = `${submissionId}/original-${pageIndex}.png`;
+  const originalPath = `${submissionId}/original-${pageIndex}.${contentType === "image/jpeg" ? "jpg" : "png"}`;
   const processedPath = `${submissionId}/processed-${pageIndex}.png`;
 
   await db.uploadImage(originalPath, bytes, contentType);
@@ -73,7 +73,12 @@ export async function ingestSubmission(
   if (contentType === "application/pdf") {
     let converted;
     try {
-      converted = await sidecar.pdfToImages(bytes.toString("base64"));
+      converted = await sidecar.pdfToImages(bytes.toString("base64"), {
+        dpi: 144,
+        maxWidth: 1600,
+        imageFormat: "jpeg",
+        quality: 76,
+      });
     } catch (err) {
       await db.logStageRun({
         submissionId: submission.id,
@@ -84,7 +89,7 @@ export async function ingestSubmission(
       await db.updateSubmission(submission.id, { status: "failed" });
       return { error: "pdf conversion failed" };
     }
-    pageByteSets = converted.images_b64.map((b64) => ({ bytes: Buffer.from(b64, "base64"), contentType: "image/png" }));
+    pageByteSets = converted.images_b64.map((b64) => ({ bytes: Buffer.from(b64, "base64"), contentType: "image/jpeg" }));
   } else {
     pageByteSets = [{ bytes, contentType }];
   }
