@@ -93,7 +93,7 @@ export function TypedSubmissionForm({ questionId }: { questionId: string }) {
               <p className="text-body-sm text-verified">Graded instantly — typed input has no legibility risk.</p>
               <button
                 type="button"
-                onClick={() => router.push("/feedback")}
+                onClick={() => router.push(`/feedback?sub=${result?.submissionId}`)}
                 className="rounded-sm bg-ink px-sm py-xs text-body-sm font-medium text-on-dark"
               >
                 See your feedback

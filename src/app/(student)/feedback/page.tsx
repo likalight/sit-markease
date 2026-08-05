@@ -14,12 +14,19 @@ import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-groupin
 // annotated script with the breakdown step(s) highlighted, feedback blocks,
 // misconception cards with an expandable explainer, "was this helpful?"
 // flag, and a link into the practice set (S2, /practice/[submissionId]).
-export default async function StudentFeedbackPage() {
+export default async function StudentFeedbackPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sub?: string }>;
+}) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
 
+  const { sub } = await searchParams;
   const allSubmissions = await db.listAllSubmissions();
-  const mine = allSubmissions.filter((s: any) => s.student_id === user.id);
+  const mine = allSubmissions.filter(
+    (s: any) => s.student_id === user.id && (!sub || s.id === sub)
+  );
 
   const cards = await Promise.all(
     mine.map(async (submission: any) => {
@@ -163,9 +170,20 @@ export default async function StudentFeedbackPage() {
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
-      <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
+      <div className="flex items-baseline justify-between">
+        <h1 className="font-serif text-display-lg text-ink">Your feedback</h1>
+        {sub && (
+          <Link href="/feedback" className="text-body-sm text-body underline">
+            See all your feedback →
+          </Link>
+        )}
+      </div>
 
-      {visible.length === 0 && <p className="text-body-md text-muted">No feedback yet.</p>}
+      {visible.length === 0 && (
+        <p className="text-body-md text-muted">
+          {sub ? "That submission isn't ready yet." : "No feedback yet."}
+        </p>
+      )}
 
       {visible.map((c) =>
         c.pending ? (

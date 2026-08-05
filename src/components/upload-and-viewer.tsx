@@ -142,7 +142,7 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
               <p className="text-body-sm text-verified">Graded instantly — the read was confident.</p>
               <button
                 type="button"
-                onClick={() => router.push("/feedback")}
+                onClick={() => router.push(`/feedback?sub=${result?.submissionId}`)}
                 className="rounded-sm bg-ink px-sm py-xs text-body-sm font-medium text-on-dark"
               >
                 See your feedback
