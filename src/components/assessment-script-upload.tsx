@@ -144,14 +144,22 @@ export function AssessmentScriptUpload({
         router.refresh();
         return;
       }
-      for (let index = 0; index < ids.length; index++) {
-        setProgress(`Grading question ${index + 1} of ${ids.length}...`);
-        const processed = await fetch(`/api/submissions/${ids[index]}/process`, { method: "POST" });
-        const processedJson = await readJsonResponse(processed);
-        if (!processed.ok) {
-          throw new Error(processedJson.error?.message ?? `question ${index + 1} could not be processed`);
-        }
-      }
+      // Run every question's grading concurrently instead of one-at-a-time —
+      // the per-provider rate limiter (src/lib/ai/rate-limit.ts) already
+      // serializes the actual AI calls to whatever RPM each provider allows,
+      // so firing all N requests together is safe and lets the non-AI
+      // overhead (DB reads/writes, image cropping) overlap across
+      // questions, instead of paying it N times in sequence.
+      setProgress(`Grading ${ids.length} question${ids.length === 1 ? "" : "s"}...`);
+      await Promise.all(
+        ids.map(async (id, index) => {
+          const processed = await fetch(`/api/submissions/${id}/process`, { method: "POST" });
+          const processedJson = await readJsonResponse(processed);
+          if (!processed.ok) {
+            throw new Error(processedJson.error?.message ?? `question ${index + 1} could not be processed`);
+          }
+        })
+      );
 
       setProgress("Feedback is ready.");
       router.push("/submit");

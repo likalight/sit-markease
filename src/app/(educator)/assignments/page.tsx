@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { releaseAssessmentAction, setAssessmentStatusAction } from "./actions";
-import { DEMO_SUMMATIVE_ASSESSMENT_ID } from "@/lib/demo-tour/demo-content";
+import { DEMO_FORMATIVE_ASSESSMENT_ID, DEMO_SUMMATIVE_ASSESSMENT_ID } from "@/lib/demo-tour/demo-content";
 
 export default async function AssignmentsPage() {
   const user = await getCurrentUser();
@@ -144,7 +144,17 @@ export default async function AssignmentsPage() {
                       <Link href={`/assignments/${r.assessmentId}/setup`} className="underline">
                         Issue to students →
                       </Link>
-                      <Link href={`/assignments/${r.assessmentId}/rubric`} className="underline">
+                      <Link
+                        href={`/assignments/${r.assessmentId}/rubric`}
+                        data-tour-id={
+                          r.assessmentId === DEMO_FORMATIVE_ASSESSMENT_ID
+                            ? "review-rubric-formative"
+                            : r.assessmentId === DEMO_SUMMATIVE_ASSESSMENT_ID
+                              ? "review-rubric-summative"
+                              : undefined
+                        }
+                        className="underline"
+                      >
                         Review rubric →
                       </Link>
                       {r.mode === "formative" ? (

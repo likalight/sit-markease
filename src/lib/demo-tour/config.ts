@@ -15,13 +15,53 @@ export type TourStep = {
   end?: boolean;
 };
 
+// Both modes now start with the instructor building the assessment itself
+// (rubric review, then issuing it to students) before the actual
+// submit/upload flow — reviewers asked to see where the question and
+// rubric come from, not just a pre-made assessment appearing out of
+// nowhere. Both tours start signed in as the educator; formative switches
+// to the student partway through (see the "save-issue-settings" step).
 export const TOUR_ENTRY_PATH: Record<TourMode, string> = {
-  formative: "/submit",
+  formative: "/assignments",
   summative: "/assignments",
 };
 
+const AUTHORING_STEPS = (reviewRubricTargetId: string): TourStep[] => [
+  {
+    role: "educator",
+    matches: (p) => p === "/assignments",
+    targetTourId: reviewRubricTargetId,
+    title: "Start with the question and rubric",
+    body: "Every assessment starts here — a question, a model answer, and a rubric the AI already structured. Click \"Review rubric\".",
+    advanceOn: "click-target",
+  },
+  {
+    role: "educator",
+    matches: (p) => p.endsWith("/rubric"),
+    targetTourId: "issue-settings-link",
+    title: "Edit it, then issue it",
+    body: "Weights, criteria, and levels are all editable here before anyone can submit against it. When it looks right, move on to issuing it.",
+    advanceOn: "click-target",
+  },
+];
+
 export const TOUR_STEPS: Record<TourMode, TourStep[]> = {
   formative: [
+    ...AUTHORING_STEPS("review-rubric-formative"),
+    {
+      // The setup form is a plain revalidating submit (no client-side
+      // redirect of its own), so — unlike the summative "approve" button —
+      // it's safe to switch persona on this exact click without racing a
+      // competing navigation.
+      role: "educator",
+      matches: (p) => p.endsWith("/setup"),
+      targetTourId: "save-issue-settings",
+      title: "Issue it to students",
+      body: "Assign which students can access it, then save — this is what actually makes it available. Ready to try it as a student?",
+      advanceOn: "click-target",
+      switchTo: "student",
+      redirectAfterSwitch: "/submit",
+    },
     {
       role: "student",
       matches: (p) => p === "/submit",
@@ -67,6 +107,15 @@ export const TOUR_STEPS: Record<TourMode, TourStep[]> = {
     },
   ],
   summative: [
+    ...AUTHORING_STEPS("review-rubric-summative"),
+    {
+      role: "educator",
+      matches: (p) => p.endsWith("/setup"),
+      targetTourId: "save-issue-settings",
+      title: "Issue it to students",
+      body: "Assign which students this applies to, then save. Summative students never submit for themselves — the instructor uploads on their behalf next.",
+      advanceOn: "click-target",
+    },
     {
       role: "educator",
       matches: (p) => p === "/assignments",

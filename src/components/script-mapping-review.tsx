@@ -48,12 +48,17 @@ export function ScriptMappingReview({ scriptUploadId, pages, questions, initialM
       const confirmedJson = await readJsonResponse(confirmed);
       if (!confirmed.ok) throw new Error(confirmedJson.error?.message ?? "could not confirm mappings");
       const ids = confirmedJson.submissionIds as string[];
-      for (let index = 0; index < ids.length; index++) {
-        setMessage(`Grading question ${index + 1} of ${ids.length}…`);
-        const result = await fetch(`/api/submissions/${ids[index]}/process`, { method: "POST" });
-        const resultJson = await readJsonResponse(result);
-        if (!result.ok) throw new Error(resultJson.error?.message ?? `question ${index + 1} could not be processed`);
-      }
+      // Concurrent, not sequential — see assessment-script-upload.tsx for why
+      // this is safe (the per-provider rate limiter already serializes the
+      // actual AI calls to whatever RPM each provider allows).
+      setMessage(`Grading ${ids.length} question${ids.length === 1 ? "" : "s"}…`);
+      await Promise.all(
+        ids.map(async (id, index) => {
+          const result = await fetch(`/api/submissions/${id}/process`, { method: "POST" });
+          const resultJson = await readJsonResponse(result);
+          if (!result.ok) throw new Error(resultJson.error?.message ?? `question ${index + 1} could not be processed`);
+        })
+      );
       setMessage("All questions are ready for review.");
       router.push("/review");
       router.refresh();

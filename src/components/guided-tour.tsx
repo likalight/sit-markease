@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { TOUR_STEPS, type TourMode } from "@/lib/demo-tour/config";
 import { switchRoleAction } from "@/lib/demo-tour/actions";
@@ -45,6 +45,8 @@ export function GuidedTour() {
   const [rect, setRect] = useState<Rect | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [busy, setBusy] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipSize, setTooltipSize] = useState({ width: 320, height: 200 });
 
   useEffect(() => {
     const bootstrapMode = searchParams.get("tour");
@@ -133,6 +135,20 @@ export function GuidedTour() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, step?.targetTourId, pathname]);
 
+  // Measures the tooltip's actual rendered height (body text length varies
+  // per step) so the below-vs-above placement decision below isn't working
+  // off a guessed constant — a guess that ran short on a longer step let
+  // the "place above" branch overlap the target it was meant to avoid.
+  useEffect(() => {
+    if (!tooltipRef.current) return;
+    const box = tooltipRef.current.getBoundingClientRect();
+    setTooltipSize((prev) =>
+      Math.abs(prev.width - box.width) > 0.5 || Math.abs(prev.height - box.height) > 0.5
+        ? { width: box.width, height: box.height }
+        : prev
+    );
+  });
+
   if (!tourState || !step || !active) return null;
 
   async function handleNext() {
@@ -158,8 +174,15 @@ export function GuidedTour() {
     setTourState(null);
   }
 
-  const tooltipTop = rect ? Math.min(rect.top + rect.height + 12, window.innerHeight - 220) : 24;
-  const tooltipLeft = rect ? Math.min(Math.max(rect.left, 16), window.innerWidth - 336) : 24;
+  let tooltipTop = 24;
+  let tooltipLeft = 24;
+  if (rect) {
+    const fitsBelow = rect.top + rect.height + 12 + tooltipSize.height <= window.innerHeight;
+    tooltipTop = fitsBelow
+      ? rect.top + rect.height + 12
+      : Math.max(12, rect.top - tooltipSize.height - 12);
+    tooltipLeft = Math.min(Math.max(rect.left, 16), window.innerWidth - tooltipSize.width - 16);
+  }
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[100]">
@@ -176,6 +199,7 @@ export function GuidedTour() {
         />
       )}
       <div
+        ref={tooltipRef}
         className="pointer-events-auto absolute w-80 rounded-lg border border-hairline bg-surface-card p-md shadow-overlay"
         style={{ top: tooltipTop, left: tooltipLeft }}
       >

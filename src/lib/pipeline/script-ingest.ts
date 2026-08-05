@@ -90,28 +90,33 @@ export async function ingestAssessmentScript(args: {
     if (pages.length > MAX_SCRIPT_PAGES) {
       throw new Error(`script uploads are capped at ${MAX_SCRIPT_PAGES} pages for this workflow`);
     }
-    const images: { mimeType: "image/png"; base64: string }[] = [];
-
-    for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
-      const original = pages[pageIndex];
-      const processedPage = await prepareScriptPage(original.bytes);
-      const processed = processedPage.bytes;
-      const metadata = await sharp(processed).metadata();
-      const originalPath = `scripts/${script.id}/original-${pageIndex}.${original.contentType === "image/jpeg" ? "jpg" : "png"}`;
-      const processedPath = `scripts/${script.id}/processed-${pageIndex}.png`;
-      await db.uploadImage(originalPath, original.bytes, original.contentType);
-      await db.uploadImage(processedPath, processed, "image/png");
-      await db.createScriptPage({
-        script_upload_id: script.id,
-        page_index: pageIndex,
-        storage_path: originalPath,
-        processed_path: processedPath,
-        width: metadata.width ?? null,
-        height: metadata.height ?? null,
-        quality_score: processedPage.qualityScore,
-      });
-      images.push({ mimeType: "image/png", base64: processed.toString("base64") });
-    }
+    // Per-page work (resize, two storage uploads, a DB insert) has no AI
+    // call in it and no cross-page dependency, so it's safe to run every
+    // page concurrently instead of paying real network latency N times in
+    // sequence — order is preserved via the indexed map, not insertion order.
+    const images: { mimeType: "image/png"; base64: string }[] = await Promise.all(
+      pages.map(async (original, pageIndex) => {
+        const processedPage = await prepareScriptPage(original.bytes);
+        const processed = processedPage.bytes;
+        const metadata = await sharp(processed).metadata();
+        const originalPath = `scripts/${script.id}/original-${pageIndex}.${original.contentType === "image/jpeg" ? "jpg" : "png"}`;
+        const processedPath = `scripts/${script.id}/processed-${pageIndex}.png`;
+        await Promise.all([
+          db.uploadImage(originalPath, original.bytes, original.contentType),
+          db.uploadImage(processedPath, processed, "image/png"),
+        ]);
+        await db.createScriptPage({
+          script_upload_id: script.id,
+          page_index: pageIndex,
+          storage_path: originalPath,
+          processed_path: processedPath,
+          width: metadata.width ?? null,
+          height: metadata.height ?? null,
+          quality_score: processedPage.qualityScore,
+        });
+        return { mimeType: "image/png" as const, base64: processed.toString("base64") };
+      })
+    );
 
     const result = await callStructured({
       stage: "S1c_question_map",

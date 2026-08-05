@@ -2,6 +2,14 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Tour now opens with the instructor authoring the assessment; per-question AI calls parallelized
+
+Two follow-ups from watching the tour live. First: both demo tours previously started mid-story, on an already-built assessment — reviewers asked to see where the question and rubric actually come from. Both tours now start signed in as the educator on `/assignments`, spotlight the real "Review rubric" link, then the real rubric page's "Issue settings" link, then the real "Save issue settings" button on the issue-settings page — the same screens an instructor actually uses, not a special tour-only view. Formative switches to the student right on that save click (safe — that form has no client-side redirect of its own to race); summative stays as the educator and continues straight into the upload flow.
+
+Second: every place that graded multiple questions from one script upload (`assessment-script-upload.tsx`, `script-mapping-review.tsx`) was `await`-ing each `/api/submissions/:id/process` call one at a time, plus a similar sequential loop over script pages during ingest (`script-ingest.ts`) — an 8-question upload paid full AI latency 8 times over. All three now run concurrently (`Promise.all`); the per-provider rate limiter (`src/lib/ai/rate-limit.ts`) already serializes the actual model calls to each provider's real RPM ceiling, so firing every request at once is safe and just lets the non-AI overhead (DB writes, image cropping/upload) overlap instead of stacking.
+
+Also fixed: the tour's tooltip could land directly on top of the button it was telling the reviewer to click, when that button sat near the bottom of the viewport and the tooltip's actual rendered height (which varies with each step's body text) was taller than the placement logic's guessed constant. `guided-tour.tsx` now measures the tooltip's real height via a ref before deciding whether to place it above or below the spotlighted element.
+
 ## Public guided demo tour, real content, formative mapping no longer instructor-gated
 
 Reviewers judging the public prototype need to understand both assessment modes without an account or any typing. Added a spotlight-and-tooltip guided tour (`src/lib/demo-tour/`, `src/components/guided-tour.tsx`) reachable from two one-click buttons on the landing page (`startTourAction`) — no separate `/demo` hub page, no role-switcher UI; the tour overlays the real app, walking the actual formative and summative flows end to end (including a real persona switch mid-tour via the existing student/educator sign-in helpers, refactored into `src/lib/auth/demo-signin.ts` so both the real login buttons and the tour share one sign-in path). "Use sample script" buttons in `AssessmentScriptUpload` fetch a real pre-stored handwritten script and run it through the actual signed-upload → mapping → grading pipeline — no mocked results.
