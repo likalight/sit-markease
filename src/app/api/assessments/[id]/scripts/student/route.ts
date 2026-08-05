@@ -44,7 +44,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       documents,
     });
     await db.updateAssessmentAttempt(attemptId, { status: "submitted", submitted_at: new Date().toISOString() });
-    const submissions = result.confident ? await materializeMappedSubmissions(result.scriptUploadId) : [];
+    // Formative has no instructor gate by design (docs/DECISIONS.md) — the
+    // mapping-confidence check that summative uses to route to a human
+    // review screen doesn't apply here; a student has nowhere to send a
+    // "needs mapping review" state to. Whatever questions were mapped are
+    // materialized and graded; the existing per-submission auto-release
+    // logic is the real safety net for low-confidence individual answers.
+    const submissions = result.mappings.length > 0 ? await materializeMappedSubmissions(result.scriptUploadId) : [];
     return NextResponse.json({ ...result, submissionIds: (submissions as any[]).map((submission) => submission.id) });
   } catch (error) {
     return NextResponse.json({ error: { message: error instanceof Error ? error.message : String(error) } }, { status: 500 });

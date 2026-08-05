@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { AttemptTimer } from "@/components/attempt-timer";
 import { AssessmentScriptUpload } from "@/components/assessment-script-upload";
+import { DEMO_FORMATIVE_ASSESSMENT_ID, DEMO_FORMATIVE_SAMPLE_SCRIPT } from "@/lib/demo-tour/demo-content";
 
 export default async function AssessmentWorkPage({ params, searchParams }: { params: Promise<{ assessmentId: string }>; searchParams: Promise<{ attempt?: string }> }) {
   const user = await getCurrentUser();
@@ -39,7 +40,12 @@ export default async function AssessmentWorkPage({ params, searchParams }: { par
       ) : (
         <section>
           <h2 className="text-title-md text-body-strong">Submit your complete response</h2>
-          <AssessmentScriptUpload assessmentId={assessmentId} kind="formative" attemptId={(attempt as any).id} />
+          <AssessmentScriptUpload
+            assessmentId={assessmentId}
+            kind="formative"
+            attemptId={(attempt as any).id}
+            sampleScriptUrl={assessmentId === DEMO_FORMATIVE_ASSESSMENT_ID ? DEMO_FORMATIVE_SAMPLE_SCRIPT : undefined}
+          />
         </section>
       )}
     </main>

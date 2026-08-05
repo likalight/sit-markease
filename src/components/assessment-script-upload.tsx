@@ -8,11 +8,17 @@ export function AssessmentScriptUpload({
   kind,
   attemptId,
   studentIds = [],
+  sampleScriptUrl,
 }: {
   assessmentId: string;
   kind: "formative" | "summative";
   attemptId?: string;
   studentIds?: string[];
+  // Guided-demo-tour only: a real, pre-stored script (public/demo/...) a
+  // reviewer can submit with one click instead of taking their own photo or
+  // picking a file — still runs the real signed-upload -> boundary-
+  // detection -> grading pipeline, not a mock (CLAUDE.md #5/#8).
+  sampleScriptUrl?: string;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,8 +60,26 @@ export function AssessmentScriptUpload({
     return file;
   }
 
-  async function upload(files: FileList | null) {
-    if (!files?.length) return;
+  async function useSampleScript() {
+    if (!sampleScriptUrl) return;
+    setLoading(true);
+    setError(null);
+    setProgress("Fetching sample script...");
+    try {
+      const response = await fetch(sampleScriptUrl);
+      if (!response.ok) throw new Error("could not load the sample script");
+      const blob = await response.blob();
+      const name = sampleScriptUrl.split("/").pop() || "sample-script.pdf";
+      const file = new File([blob], name, { type: blob.type || "application/pdf" });
+      await upload([file]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setLoading(false);
+    }
+  }
+
+  async function upload(files: FileList | File[] | null) {
+    if (!files || Array.from(files).length === 0) return;
     setLoading(true);
     setError(null);
     setProgress("Preparing script files...");
@@ -113,14 +137,13 @@ export function AssessmentScriptUpload({
         return;
       }
 
-      if (!json.confident) {
-        setProgress("Submitted. The question mapping needs an instructor check before feedback can be generated.");
+      const ids = json.submissionIds as string[];
+      if (ids.length === 0) {
+        setProgress("Submitted, but no questions could be matched to your script — an instructor may need to check this one.");
         setLoading(false);
         router.refresh();
         return;
       }
-
-      const ids = json.submissionIds as string[];
       for (let index = 0; index < ids.length; index++) {
         setProgress(`Grading question ${index + 1} of ${ids.length}...`);
         const processed = await fetch(`/api/submissions/${ids[index]}/process`, { method: "POST" });
@@ -150,7 +173,18 @@ export function AssessmentScriptUpload({
         </label>
       )}
       <input ref={inputRef} type="file" accept="image/*,application/pdf" multiple className="hidden" onChange={(event) => upload(event.target.files)} />
-      <div>
+      <div className="flex flex-wrap items-center gap-sm">
+        {sampleScriptUrl && (
+          <button
+            type="button"
+            data-tour-id="use-sample-script"
+            disabled={loading || (kind === "summative" && !studentId)}
+            onClick={useSampleScript}
+            className="rounded-sm bg-primary px-md py-sm text-body-sm font-medium text-on-primary disabled:opacity-50"
+          >
+            {loading ? "Processing script..." : "Use sample script"}
+          </button>
+        )}
         <button type="button" disabled={loading || (kind === "summative" && !studentId)} onClick={() => inputRef.current?.click()} className="rounded-sm bg-ink px-md py-sm text-body-sm font-medium text-on-dark disabled:opacity-50">
           {loading ? "Processing script..." : "Upload complete script"}
         </button>

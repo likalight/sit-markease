@@ -170,7 +170,7 @@ export default async function StudentFeedbackPage({
   const visible = cards.filter((c): c is NonNullable<typeof c> => c !== null);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
+    <main data-tour-id="feedback-container" className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
       <div className="flex items-baseline justify-between">
         <h1 className="font-serif text-display-lg text-ink">Review work</h1>
         {(sub || attempt || assessmentParam) && (

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { startAssessmentAttemptAction } from "./actions";
+import { DEMO_FORMATIVE_ASSESSMENT_ID, DEMO_SUMMATIVE_ASSESSMENT_ID } from "@/lib/demo-tour/demo-content";
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "No fixed date";
@@ -85,7 +86,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
                   )}
                 </div>
 
-                <div className="flex flex-col gap-xs md:min-w-44">
+                <div className="flex flex-col gap-xs md:min-w-44" data-tour-id={assessment.id === DEMO_FORMATIVE_ASSESSMENT_ID ? "submit-start-attempt" : undefined}>
                   {isFormative && (
                     active ? (
                       <Link href={`/work/${assessment.id}?attempt=${active.id}`} className="rounded-sm bg-ink px-md py-xs text-center text-body-sm font-medium text-on-dark">
@@ -99,7 +100,17 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
                     )
                   )}
                   {reviewCount > 0 && (
-                    <Link href={`/feedback?assessment=${assessment.id}`} className="rounded-sm border border-hairline px-md py-xs text-center text-body-sm font-medium text-body">
+                    <Link
+                      href={`/feedback?assessment=${assessment.id}`}
+                      data-tour-id={
+                        assessment.id === DEMO_FORMATIVE_ASSESSMENT_ID
+                          ? "submit-review-assessment-formative"
+                          : assessment.id === DEMO_SUMMATIVE_ASSESSMENT_ID
+                            ? "submit-review-assessment-summative"
+                            : undefined
+                      }
+                      className="rounded-sm border border-hairline px-md py-xs text-center text-body-sm font-medium text-body"
+                    >
                       Review assessment
                     </Link>
                   )}

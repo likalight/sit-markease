@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { AssessmentScriptUpload } from "@/components/assessment-script-upload";
 import { VALID_STUDENT_IDS, emailForStudentId } from "@/lib/auth/student-roster";
+import { DEMO_SUMMATIVE_ASSESSMENT_ID, DEMO_SUMMATIVE_SAMPLE_SCRIPT } from "@/lib/demo-tour/demo-content";
 
 export default async function EducatorUploadPage({ params }: { params: Promise<{ assessmentId: string }> }) {
   const user = await getCurrentUser();
@@ -36,7 +37,12 @@ export default async function EducatorUploadPage({ params }: { params: Promise<{
           Assign students first on the <Link href={`/assignments/${assessmentId}/setup`} className="underline">issue settings page</Link>.
         </p>
       ) : (
-        <AssessmentScriptUpload assessmentId={assessmentId} kind="summative" studentIds={assignedStudentIds} />
+        <AssessmentScriptUpload
+          assessmentId={assessmentId}
+          kind="summative"
+          studentIds={assignedStudentIds}
+          sampleScriptUrl={assessmentId === DEMO_SUMMATIVE_ASSESSMENT_ID ? DEMO_SUMMATIVE_SAMPLE_SCRIPT : undefined}
+        />
       )}
     </main>
   );

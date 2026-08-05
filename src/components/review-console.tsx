@@ -901,6 +901,7 @@ export function ReviewConsole(props: {
 
           <div className="flex gap-xs">
             <button
+              data-tour-id="approve-next"
               onClick={approveAndAdvance}
               disabled={submitting}
               className="rounded-sm bg-primary px-sm py-xs text-body-sm font-medium text-on-primary disabled:opacity-50"

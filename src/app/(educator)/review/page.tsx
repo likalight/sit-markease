@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getReviewQueueGroupedByQuestion } from "@/lib/pipeline/review-queue";
 import { ConfidenceBar } from "@/components/confidence-bar";
+import { DEMO_SUMMATIVE_TITLE } from "@/lib/demo-tour/demo-content";
 
 // docs/DESIGN.md §3 `review-queue-row` / §2 product density. Grouped by
 // question, Gradescope-style — an instructor works through one question's
@@ -17,7 +18,7 @@ export default async function ReviewQueuePage() {
   const total = groups.reduce((sum, g) => sum + g.entries.length, 0);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-lg px-6 py-xl">
+    <main data-tour-id="review-page-body" className="mx-auto flex max-w-2xl flex-col gap-lg px-6 py-xl">
       <div>
         <h1 className="text-title-lg text-body-strong">Review queue</h1>
         <p className="text-body-sm text-muted">{total} submission(s) awaiting approval, grouped by question.</p>
@@ -36,6 +37,7 @@ export default async function ReviewQueuePage() {
                 </div>
                 <Link
                   href={`/review/${group.entries[0].submissionId}`}
+                  data-tour-id={group.assessmentTitle === DEMO_SUMMATIVE_TITLE ? "review-open" : undefined}
                   className="rounded-sm bg-primary px-sm py-xs text-body-sm font-medium text-on-primary"
                 >
                   Review all {group.entries.length} →

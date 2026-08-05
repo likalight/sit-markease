@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { releaseAssessmentAction, setAssessmentStatusAction } from "./actions";
+import { DEMO_SUMMATIVE_ASSESSMENT_ID } from "@/lib/demo-tour/demo-content";
 
 export default async function AssignmentsPage() {
   const user = await getCurrentUser();
@@ -153,11 +154,18 @@ export default async function AssignmentsPage() {
                       ) : (
                         <>
                           <span className="text-verified">{r.released} reviewed &amp; released</span>
-                          <Link href={`/assignments/${r.assessmentId}/upload`} className="underline">
+                          <Link
+                            href={`/assignments/${r.assessmentId}/upload`}
+                            data-tour-id={r.assessmentId === DEMO_SUMMATIVE_ASSESSMENT_ID ? "assignments-upload-combinatorics" : undefined}
+                            className="underline"
+                          >
                             Upload a script →
                           </Link>
                           {r.submissionCount > 0 && r.pending === 0 && r.status !== "released" && (
-                            <form action={releaseAssessmentAction}>
+                            <form
+                              action={releaseAssessmentAction}
+                              data-tour-id={r.assessmentId === DEMO_SUMMATIVE_ASSESSMENT_ID ? "release-all-results" : undefined}
+                            >
                               <input type="hidden" name="assessmentId" value={r.assessmentId} />
                               <SubmitButton pendingLabel="Releasing…" className="text-left text-primary-active underline">
                                 Release all results →

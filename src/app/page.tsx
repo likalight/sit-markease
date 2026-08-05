@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { enterAsStudentAction, enterAsEducatorAction } from "@/app/enter/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { startTourAction } from "@/lib/demo-tour/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,26 @@ export default async function LandingPage({
             {error}
           </p>
         )}
+
+        <div className="relative mx-auto flex w-full max-w-2xl flex-col gap-sm rounded-lg border border-primary/30 bg-primary-soft px-lg py-lg text-center">
+          <p className="font-serif text-title-md text-ink">Try a guided demo</p>
+          <p className="mx-auto max-w-md text-body-sm text-muted">
+            No account, no typing — one click walks you through a real submission from start to
+            finish, with a real sample script.
+          </p>
+          <div className="mx-auto flex flex-wrap justify-center gap-sm">
+            <form action={startTourAction.bind(null, "formative")}>
+              <SubmitButton pendingLabel="Starting…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
+                See the formative demo →
+              </SubmitButton>
+            </form>
+            <form action={startTourAction.bind(null, "summative")}>
+              <SubmitButton pendingLabel="Starting…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
+                See the summative demo →
+              </SubmitButton>
+            </form>
+          </div>
+        </div>
 
         <div className="relative mx-auto grid w-full max-w-2xl gap-md sm:grid-cols-2">
           <form

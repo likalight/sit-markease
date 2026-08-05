@@ -116,7 +116,7 @@ export function ScriptMappingReview({ scriptUploadId, pages, questions, initialM
         </div>
         <button type="button" onClick={addMissing} className="mt-sm border border-hairline px-sm py-xs text-body-sm">Add missing question</button>
         <div className="mt-lg border-t border-hairline pt-md">
-          <button type="button" disabled={busy || mappings.length === 0} onClick={saveAndGrade} className="rounded-sm bg-primary px-md py-sm text-body-sm font-medium text-on-primary disabled:opacity-50">Confirm mapping and grade</button>
+          <button data-tour-id="confirm-mapping" type="button" disabled={busy || mappings.length === 0} onClick={saveAndGrade} className="rounded-sm bg-primary px-md py-sm text-body-sm font-medium text-on-primary disabled:opacity-50">Confirm mapping and grade</button>
           {message && <p className="mt-sm text-body-sm text-muted">{message}</p>}
         </div>
       </section>
