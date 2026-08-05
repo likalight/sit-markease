@@ -18,21 +18,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!assessment) return jsonError("assessment not found", 404);
 
   const formData = await request.formData();
-  const multiFiles = formData.getAll("files").filter((file): file is File => file instanceof File && file.size > 0);
-  const singleFile = formData.get("file");
-  const files = multiFiles.length > 0 ? multiFiles : singleFile instanceof File && singleFile.size > 0 ? [singleFile] : [];
-  if (files.length === 0) return jsonError("upload a rubric PDF or image", 400);
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return jsonError("upload a rubric PDF or image", 400);
 
   try {
     const result = await importAssessmentRubricDocument({
       assessmentId,
       assessmentTitle: (assessment as any).title ?? "Assessment",
-      documents: await Promise.all(
-        files.map(async (file) => ({
-          bytes: Buffer.from(await file.arrayBuffer()),
-          contentType: file.type || "image/png",
-        }))
-      ),
+      bytes: Buffer.from(await file.arrayBuffer()),
+      contentType: file.type || "image/png",
     });
     return NextResponse.json(result);
   } catch (error) {

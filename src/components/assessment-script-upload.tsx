@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isPdfFile, renderPdfToImageFiles } from "@/lib/pdf/render-client";
 
 export function AssessmentScriptUpload({
   assessmentId,
@@ -50,16 +49,9 @@ export function AssessmentScriptUpload({
     return new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
   }
 
-  async function prepareImageFile(file: File) {
+  async function prepareFile(file: File) {
     if (file.type.startsWith("image/")) return compressImage(file);
     return file;
-  }
-
-  async function prepareSourceFile(file: File) {
-    if (!isPdfFile(file)) return [await prepareImageFile(file)];
-    setProgress(`Rendering ${file.name} into page images...`);
-    const pages = await renderPdfToImageFiles(file, { maxPages: 15, maxWidth: 1600, quality: 0.78 });
-    return Promise.all(pages.map(prepareImageFile));
   }
 
   async function upload(files: FileList | null) {
@@ -69,7 +61,7 @@ export function AssessmentScriptUpload({
     setProgress("Preparing script files...");
 
     try {
-      const preparedFiles = (await Promise.all(Array.from(files).map(prepareSourceFile))).flat();
+      const preparedFiles = await Promise.all(Array.from(files).map(prepareFile));
       const signResponse = await fetch(`/api/assessments/${assessmentId}/scripts/upload-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

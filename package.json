@@ -27,7 +27,6 @@
     "@supabase/supabase-js": "^2.45.4",
     "katex": "^0.18.1",
     "next": "^15.0.3",
-    "pdfjs-dist": "^6.2.108",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "server-only": "^0.0.1",

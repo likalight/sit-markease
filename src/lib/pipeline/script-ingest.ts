@@ -19,7 +19,19 @@ type DocumentPage = {
 
 async function documentPages(bytes: Buffer, contentType: string): Promise<DocumentPage[]> {
   if (contentType === "application/pdf") {
-    throw new Error("PDF reached script processing without browser rendering. Hard refresh this page, then choose the PDF again or use compressed page images.");
+    const converted = await sidecar.pdfToImages(bytes.toString("base64"), {
+      dpi: 144,
+      maxWidth: MAPPING_IMAGE_WIDTH,
+      imageFormat: "jpeg",
+      quality: 76,
+    });
+    if (converted.images_b64.length > MAX_SCRIPT_PAGES) {
+      throw new Error(`script PDFs are capped at ${MAX_SCRIPT_PAGES} pages for this workflow`);
+    }
+    return converted.images_b64.map((base64) => ({
+      bytes: Buffer.from(base64, "base64"),
+      contentType: "image/jpeg",
+    }));
   }
   return [{ bytes: await sharp(bytes).png().toBuffer(), contentType: "image/png" }];
 }

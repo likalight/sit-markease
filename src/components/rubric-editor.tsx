@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { saveRubricAction } from "@/app/(educator)/assignments/[assessmentId]/rubric/actions";
-import { isPdfFile, renderPdfToImageFiles } from "@/lib/pdf/render-client";
 
 type Level = { level: string; score: number; descriptor: string };
 type Criterion = { key: string; name: string; weight: number; max_score: number; levels: Level[] };
@@ -94,14 +93,10 @@ export function RubricEditor({
   async function importRubric(file: File | undefined) {
     if (!file) return;
     setImporting(true);
-    setImportMessage(isPdfFile(file) ? "Rendering rubric PDF in your browser..." : "Reading rubric document...");
+    setImportMessage("Reading rubric document...");
     try {
-      const files = isPdfFile(file)
-        ? await renderPdfToImageFiles(file, { maxPages: 15, maxWidth: 1200, quality: 0.76 })
-        : [file];
-      setImportMessage("Extracting editable rubric criteria...");
       const body = new FormData();
-      files.forEach((page) => body.append("files", page));
+      body.append("file", file);
       const response = await fetch(`/api/questions/${questionId}/rubric-from-document`, { method: "POST", body });
       const json = await readJsonResponse(response);
       if (!response.ok) throw new Error(json.error?.message ?? "could not import rubric");

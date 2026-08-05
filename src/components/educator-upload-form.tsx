@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { isPdfFile, renderPdfToImageFiles } from "@/lib/pdf/render-client";
 
 type Question = { id: string; promptText: string; position: number };
 
@@ -45,11 +44,11 @@ export function EducatorUploadForm({ questions, validStudentIds }: { questions: 
     setLoading(true);
     setResult(null);
 
+    const body = new FormData();
+    body.append("file", file);
+    body.append("studentId", studentId);
+
     try {
-      const uploadFile = isPdfFile(file) ? (await renderPdfToImageFiles(file, { maxPages: 15, maxWidth: 1600 }))[0] : file;
-      const body = new FormData();
-      body.append("file", uploadFile);
-      body.append("studentId", studentId);
       const res = await fetch(`/api/questions/${questionId}/submissions/educator`, { method: "POST", body });
       const json = await res.json();
       if (!res.ok) {

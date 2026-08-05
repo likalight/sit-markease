@@ -12,12 +12,6 @@ function jsonError(message: string, status: number) {
   return NextResponse.json({ error: { message } }, { status });
 }
 
-function isPdfUpload(file: any) {
-  const name = String(file?.name ?? "").toLowerCase();
-  const contentType = String(file?.contentType ?? "").toLowerCase();
-  return name.endsWith(".pdf") || contentType === "application/pdf";
-}
-
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return jsonError("sign in required", 403);
@@ -30,12 +24,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const kind = body.kind === "summative" ? "summative" : "formative";
   const files = Array.isArray(body.files) ? body.files : [];
   if (files.length === 0) return jsonError("no files requested", 400);
-  if (files.some(isPdfUpload)) {
-    return jsonError(
-      "PDFs must be rendered in the browser before script upload. Hard refresh this page, then choose the PDF again or use compressed page images.",
-      400
-    );
-  }
 
   if (kind === "formative") {
     if (user.role !== "student" || (assessment as any).assessment_mode !== "formative" || (assessment as any).status !== "open") {

@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Box } from "@/lib/schemas/geometry";
-import { isPdfFile, renderPdfToImageFiles } from "@/lib/pdf/render-client";
 
 type UploadResult = {
   submissionId: string;
@@ -42,10 +41,10 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
     setLoading(true);
     setResult(null);
 
+    const body = new FormData();
+    body.append("file", file);
+
     try {
-      const uploadFile = isPdfFile(file) ? (await renderPdfToImageFiles(file, { maxPages: 15, maxWidth: 1600 }))[0] : file;
-      const body = new FormData();
-      body.append("file", uploadFile);
       const res = await fetch(`/api/questions/${questionId}/submissions`, {
         method: "POST",
         body,
