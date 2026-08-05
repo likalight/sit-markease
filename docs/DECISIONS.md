@@ -2,6 +2,12 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Assessment-level rubric PDF as source of truth
+
+The rubric import flow now supports uploading one assessment-level mark-scheme PDF/image set, capped at 15 rendered pages by default (`AIMS_RUBRIC_MAX_PAGES`). The import extracts question-by-question source material, updates existing questions by position, creates missing questions, structures editable criteria, and persists those criteria only as normal rubric rows that the grading stage already uses. This makes the uploaded rubric PDF the source that script mapping and rubric grading go against, rather than a one-question convenience prefill.
+
+Script uploads are also capped at 15 rendered pages by default (`AIMS_SCRIPT_MAX_PAGES`). The mapper prompt now includes each question's imported model-solution and rubric-criteria hints, using them only to map script regions to the correct rubric-backed question; grading remains a later rubric-only stage with cited evidence.
+
 ## Demo polish: rubric PDFs, faster mapping, and active-only insights
 
 Rubric PDF/image extraction is now available directly on each question's rubric editor, not only during new-assignment creation. The import route reads the uploaded document, targets the existing question prompt, structures criteria, and returns them into the editable UI; it does not persist until the educator explicitly saves.

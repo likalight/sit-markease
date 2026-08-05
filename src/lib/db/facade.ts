@@ -342,6 +342,13 @@ export const db = {
     return data;
   },
 
+  async updateQuestion(id: string, patch: Record<string, any>) {
+    if (fx()) return localStore.update("questions", id, patch);
+    const { data, error } = await supabaseAdmin().from("questions").update(patch).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  },
+
   async createRubric(questionId: string) {
     if (fx()) return localStore.insert("rubrics", { question_id: questionId, version: 1 });
     const { data, error } = await supabaseAdmin()

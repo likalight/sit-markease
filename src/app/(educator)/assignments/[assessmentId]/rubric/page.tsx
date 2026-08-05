@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { RubricEditor } from "@/components/rubric-editor";
+import { AssessmentRubricPdfImport } from "@/components/assessment-rubric-pdf-import";
 import { SubmitButton } from "@/components/submit-button";
 import { setAssessmentStatusAction } from "../../actions";
 
@@ -80,6 +81,8 @@ export default async function AssessmentRubricPage({
           </div>
         </div>
       </div>
+
+      <AssessmentRubricPdfImport assessmentId={assessmentId} />
 
       <div className="flex flex-col gap-md">
         {withRubrics.map(({ question, rubric, criteria }) => (

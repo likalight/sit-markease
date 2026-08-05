@@ -10,10 +10,14 @@ import { ingestSubmission } from "./s1-ingest";
 const AUTO_MAPPING_THRESHOLD = Number(process.env.AIMS_MAPPING_CONFIDENCE_THRESHOLD ?? 0.8);
 const PREPROCESS_SCRIPT_PAGES = process.env.AIMS_SCRIPT_PREPROCESS === "true";
 const MAPPING_IMAGE_WIDTH = Number(process.env.AIMS_MAPPING_IMAGE_WIDTH ?? 1600);
+const MAX_SCRIPT_PAGES = Number(process.env.AIMS_SCRIPT_MAX_PAGES ?? 15);
 
 async function documentPages(bytes: Buffer, contentType: string) {
   if (contentType === "application/pdf") {
     const converted = await sidecar.pdfToImages(bytes.toString("base64"));
+    if (converted.images_b64.length > MAX_SCRIPT_PAGES) {
+      throw new Error(`script PDFs are capped at ${MAX_SCRIPT_PAGES} pages for this workflow`);
+    }
     return converted.images_b64.map((base64) => Buffer.from(base64, "base64"));
   }
   return [await sharp(bytes).png().toBuffer()];
@@ -46,6 +50,18 @@ export async function ingestAssessmentScript(args: {
 }) {
   const questions = (await db.listQuestionsForAssessment(args.assessmentId)) as any[];
   if (questions.length === 0) throw new Error("assessment has no questions");
+  const questionsWithRubrics = await Promise.all(
+    questions.map(async (question) => {
+      const full = await db.getQuestionWithRubric(question.id);
+      return {
+        ...question,
+        criteria: (full?.criteria ?? []).map((criterion: any) => ({
+          name: criterion.name,
+          max_score: criterion.max_score,
+        })),
+      };
+    })
+  );
 
   const script = await db.createScriptUpload({
     assessment_id: args.assessmentId,
@@ -58,6 +74,9 @@ export async function ingestAssessmentScript(args: {
 
   try {
     const pages = (await Promise.all(args.documents.map((document) => documentPages(document.bytes, document.contentType)))).flat();
+    if (pages.length > MAX_SCRIPT_PAGES) {
+      throw new Error(`script uploads are capped at ${MAX_SCRIPT_PAGES} pages for this workflow`);
+    }
     const images: { mimeType: "image/png"; base64: string }[] = [];
 
     for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
@@ -86,7 +105,7 @@ export async function ingestAssessmentScript(args: {
       promptVersion: PROMPT_VERSIONS.scriptMapping,
       role: "primary",
       system: scriptMappingSystemPrompt(),
-      prompt: scriptMappingUserPrompt(questions, images.length),
+      prompt: scriptMappingUserPrompt(questionsWithRubrics, images.length),
       images,
       schema: ScriptMappingSchema,
       nativeSchema: scriptMappingNativeSchema,

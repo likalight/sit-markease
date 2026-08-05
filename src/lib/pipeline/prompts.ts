@@ -33,6 +33,7 @@ export const PROMPT_VERSIONS = {
   s7Verify: "s7_verify.v1",
   rubricStructure: "rubric_structure.v1",
   documentExtract: "document_extract.v1",
+  assessmentRubricDocument: "assessment_rubric_document.v1",
   scriptMapping: "script_mapping.v1",
 } as const;
 
@@ -56,15 +57,62 @@ const SCRIPT_MAPPING_SHAPE = `Respond with ONLY this JSON shape, no markdown fen
 }
 Return at most one mapping object per question_id; put every disjoint block for that question in its regions array. Page indices are zero-based in the same order as the images.`;
 
-export function scriptMappingUserPrompt(questions: { id: string; position: number; prompt_text: string }[], pageCount: number): string {
+export function scriptMappingUserPrompt(
+  questions: {
+    id: string;
+    position: number;
+    prompt_text: string;
+    model_solution?: string | null;
+    max_score?: number | null;
+    criteria?: { name: string; max_score: number }[];
+  }[],
+  pageCount: number
+): string {
   return [
     `This script has ${pageCount} page image(s), supplied in page_index order from 0 to ${pageCount - 1}.`,
-    `Map the student's answer regions to these assessment questions:`,
-    ...questions.map((q) => `- question_id=${q.id}; display_label=Q${q.position}; prompt=${q.prompt_text}`),
+    `Map the student's answer regions to these assessment questions and their uploaded rubric sources:`,
+    ...questions.map((q) =>
+      [
+        `- question_id=${q.id}; display_label=Q${q.position}; max_score=${q.max_score ?? ""}; prompt=${q.prompt_text}`,
+        q.model_solution ? `  model_solution_hint=${q.model_solution.slice(0, 900)}` : "",
+        q.criteria?.length ? `  rubric_criteria=${q.criteria.map((c) => `${c.name} (${c.max_score})`).join("; ")}` : "",
+      ].filter(Boolean).join("\n")
+    ),
     ``,
-    `Include only questions for which the script contains visible answer work. Keep uncertain blocks unassigned.`,
+    `Use the uploaded rubric/model-solution hints only to identify which answer belongs to which question. Do not solve, correct, or grade. Include only questions for which the script contains visible answer work. Keep uncertain blocks unassigned.`,
     ``,
     SCRIPT_MAPPING_SHAPE,
+  ].join("\n");
+}
+
+export function assessmentRubricDocumentSystemPrompt(): string {
+  return loadPrompt("assessment_rubric_document.v1.md");
+}
+
+const ASSESSMENT_RUBRIC_DOCUMENT_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
+{
+  "questions": [
+    {
+      "position": 1,
+      "label": "Q1",
+      "prompt_text": "<question prompt or best available identifier>",
+      "model_solution": "<worked solution / expected answer text from the mark scheme>",
+      "expected_answer_latex": "<final answer as LaTeX, or empty string>",
+      "max_score": 10,
+      "raw_rubric_notes": "<mark allocations and grading notes for this question>"
+    }
+  ],
+  "warnings": ["<short warning about missing/ambiguous source content>"]
+}
+Use one object per main assessment question. Preserve subparts inside prompt_text/model_solution/raw_rubric_notes.`;
+
+export function assessmentRubricDocumentUserPrompt(args: { assessmentTitle: string; pageCount: number }): string {
+  return [
+    `ASSESSMENT: ${args.assessmentTitle}`,
+    `The uploaded rubric / mark scheme has ${args.pageCount} rendered page image(s), supplied in order.`,
+    `Extract the complete question-by-question rubric source for this assessment.`,
+    ``,
+    ASSESSMENT_RUBRIC_DOCUMENT_SHAPE,
   ].join("\n");
 }
 

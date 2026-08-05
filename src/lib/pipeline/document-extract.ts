@@ -13,6 +13,8 @@ import {
   PROMPT_VERSIONS,
 } from "./prompts";
 
+const MAX_RUBRIC_PAGES = Number(process.env.AIMS_RUBRIC_MAX_PAGES ?? 15);
+
 // Lets an educator upload a real marking-scheme/rubric document (photo or
 // PDF) instead of retyping it, prefilling the same fields the "New
 // question" form already asks for. Mirrors S2's OCR-hint pattern (pix2text
@@ -49,7 +51,10 @@ export async function extractQuestionAndRubric(
   if (contentType === "application/pdf") {
     const converted = await sidecar.pdfToImages(bytes.toString("base64"));
     if (converted.images_b64.length === 0) throw new Error("PDF had no pages");
-    images = converted.images_b64.slice(0, 6).map((base64) => ({ mimeType: "image/png", base64 }));
+    if (converted.images_b64.length > MAX_RUBRIC_PAGES) {
+      throw new Error(`rubric PDFs are capped at ${MAX_RUBRIC_PAGES} pages for this workflow`);
+    }
+    images = converted.images_b64.map((base64) => ({ mimeType: "image/png", base64 }));
   } else {
     images = [{ mimeType: contentType === "image/jpeg" ? "image/jpeg" : "image/png", base64: bytes.toString("base64") }];
   }

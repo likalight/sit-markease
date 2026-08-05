@@ -51,9 +51,6 @@ export function AssessmentScriptUpload({
 
   async function prepareFile(file: File) {
     if (file.type.startsWith("image/")) return compressImage(file);
-    if (file.type === "application/pdf" && file.size > 4 * 1024 * 1024) {
-      throw new Error("That PDF is too large for direct upload. Export it smaller, or upload compressed page images.");
-    }
     return file;
   }
 
@@ -125,7 +122,7 @@ export function AssessmentScriptUpload({
           {loading ? "Processing script..." : "Upload complete script"}
         </button>
       </div>
-      <p className="text-caption text-muted-soft">Attach one smaller PDF or several page images. Images are compressed before upload; questions may share a page or continue across pages.</p>
+      <p className="text-caption text-muted-soft">Attach one PDF or several page images, up to 15 pages total. Images are compressed before upload; questions may share a page or continue across pages.</p>
       {progress && <p className="text-body-sm text-muted">{progress}</p>}
       {error && <p className="border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
     </div>
