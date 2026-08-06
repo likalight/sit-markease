@@ -13,6 +13,14 @@ export type TourStep = {
   switchTo?: "student" | "educator";
   redirectAfterSwitch?: string;
   end?: boolean;
+  // Only needed when the real target form itself conditionally stops
+  // rendering after its own action completes (e.g. "Release all results" —
+  // the form disappears once released). For a form that stays put and just
+  // revalidates in place (e.g. "Save & issue"), waiting for DOM removal
+  // never happens and just burns a 15s fallback timeout for nothing —
+  // firing the switch immediately is correct there, since there's no
+  // competing navigation to race against.
+  waitForFormRemoval?: boolean;
 };
 
 // Both modes now start with the instructor building the assessment itself
@@ -244,6 +252,7 @@ export const TOUR_STEPS: Record<TourMode, TourStep[]> = {
       advanceOn: "click-target",
       switchTo: "student",
       redirectAfterSwitch: "/submit",
+      waitForFormRemoval: true,
     },
     {
       role: "student",

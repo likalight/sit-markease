@@ -128,7 +128,7 @@ export function GuidedTour() {
         const box = el.getBoundingClientRect();
         setRect({ top: box.top, left: box.left, width: box.width, height: box.height });
         if (step!.advanceOn === "click-target") {
-          if (step!.switchTo && step!.redirectAfterSwitch) {
+          if (step!.switchTo && step!.redirectAfterSwitch && step!.waitForFormRemoval) {
             // This target is a real form submit (e.g. "Release all results")
             // — its own server action needs time to actually complete before
             // we sign out and redirect. Firing switchRoleAction immediately
@@ -136,7 +136,10 @@ export function GuidedTour() {
             // it ever wrote the release, leaving status stuck at "open."
             // Wait for the element to actually leave the DOM (the real
             // completion signal — the form stops rendering once released)
-            // before switching roles.
+            // before switching roles. Only steps that set this flag need it
+            // — a form that stays put and just revalidates in place (e.g.
+            // "Save & issue") never satisfies this and previously just burned
+            // the full 15s fallback for nothing, badly stalling the tour.
             const target = el;
             const handler = () => {
               const observer = new MutationObserver(() => {
