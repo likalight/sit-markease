@@ -1,0 +1,80 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "combination_count",
+        "name": "Correct Combination Count",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "The student correctly identifies the combination count for at least one part."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly identifies the combination counts for two parts."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "The student correctly identifies the combination counts for all three parts."
+          }
+        ]
+      },
+      {
+        "key": "arrangement_factor",
+        "name": "Correct Arrangement Factor",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "The student includes the arrangement factor for at least one part."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student includes the arrangement factors for two parts."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "The student includes the arrangement factors for all three parts."
+          }
+        ]
+      },
+      {
+        "key": "final_answer",
+        "name": "Correct Final Numeric Answer",
+        "weight": 40,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "The student provides the final answer for at least one part."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student provides the final answers for two parts."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "The student provides the final answers for all three parts."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 632,
+  "outputTokens": 423,
+  "cachedAt": "2026-08-05T14:33:24.342Z"
+}

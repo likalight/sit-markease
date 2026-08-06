@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "contiguous_blocks",
+        "name": "Identification of Contiguous Blocks",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Identifies some but not all required contiguous blocks."
+          },
+          {
+            "level": "proficient",
+            "score": 3,
+            "descriptor": "Correctly identifies all required contiguous blocks."
+          }
+        ]
+      },
+      {
+        "key": "count_items",
+        "name": "Counting Items to Permute",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Calculates the number of items incorrectly."
+          },
+          {
+            "level": "proficient",
+            "score": 3,
+            "descriptor": "Correctly counts the number of items to permute."
+          }
+        ]
+      },
+      {
+        "key": "final_permutation_value",
+        "name": "Final Permutation Value Calculation",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Provides an incorrect final permutation value."
+          },
+          {
+            "level": "proficient",
+            "score": 3,
+            "descriptor": "Correctly calculates the final permutation value."
+          }
+        ]
+      },
+      {
+        "key": "compatible_incompatible",
+        "name": "Recognizing Compatible vs Incompatible Overlaps",
+        "weight": 10,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Fails to recognize the nature of the overlap."
+          },
+          {
+            "level": "proficient",
+            "score": 3,
+            "descriptor": "Correctly identifies compatible and incompatible overlaps."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 788,
+  "outputTokens": 429,
+  "cachedAt": "2026-08-05T14:33:47.979Z"
+}

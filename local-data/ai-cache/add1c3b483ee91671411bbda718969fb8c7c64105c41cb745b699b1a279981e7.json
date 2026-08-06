@@ -1,0 +1,40 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "setup_correctness",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly substitutes values for one sum but does not provide correct setups for all sums.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "final_value_accuracy",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student calculates the value for one sum correctly but does not provide final values for all sums.",
+        "confidence": 0.7
+      }
+    ],
+    "total_recommended": 2,
+    "max_total": 4,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach is unclear and does not align with the expected sums."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1132,
+  "outputTokens": 229,
+  "cachedAt": "2026-08-05T17:17:42.707Z"
+}

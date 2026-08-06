@@ -86,8 +86,8 @@ export default async function AssessmentSetupPage({ params }: { params: Promise<
           </div>
         </fieldset>
 
-        <div className="flex items-center gap-sm" data-tour-id="save-issue-settings">
-          <SubmitButton pendingLabel="Saving…">Save issue settings</SubmitButton>
+        <div className="flex items-center gap-sm">
+          <SubmitButton pendingLabel="Saving…" dataTourId="save-issue-settings">Save issue settings</SubmitButton>
           <Link href={`/assignments/${assessmentId}/rubric`} className="text-body-sm underline">Review questions and rubrics →</Link>
         </div>
       </form>

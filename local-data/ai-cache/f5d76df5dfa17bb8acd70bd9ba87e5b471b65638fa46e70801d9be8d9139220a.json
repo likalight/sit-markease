@@ -1,0 +1,28 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "[ILLEGIBLE]",
+        "plain_text": "The student wrote something that is not readable.",
+        "role": "setup",
+        "confidence": 0
+      }
+    ],
+    "final_answer": {
+      "latex": "",
+      "present": false
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 20597,
+  "outputTokens": 107,
+  "cachedAt": "2026-08-05T15:09:50.228Z"
+}

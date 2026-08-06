@@ -1,0 +1,22 @@
+{
+  "data": {
+    "detected": [],
+    "novel_candidates": [
+      {
+        "proposed_name": "Lack of context in solution steps",
+        "evidence_step_indices": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "confidence": 0.9
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 732,
+  "outputTokens": 64,
+  "cachedAt": "2026-08-05T02:39:13.758Z"
+}

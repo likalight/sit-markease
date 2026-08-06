@@ -1,0 +1,60 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "c_setup",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly separates the variables by dividing both sides by y and multiplying by dx.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_method",
+        "level": "expert",
+        "score": 6,
+        "max_score": 6,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student integrates both sides correctly with respect to their respective variables.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_ic",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 5,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The student applies the initial condition to the general solution correctly.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_answer",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The final answer is correct, but there is no indication of simplification.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 16,
+    "max_total": 20,
+    "error_carry_forward_applied": false,
+    "needs_human_review": false,
+    "review_reasons": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 951,
+  "outputTokens": 357,
+  "cachedAt": "2026-07-31T08:38:01.674Z"
+}

@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "You did a great job calculating the values in steps 1 and 2! However, there seems to be an issue in step 3 that needs your attention.",
+    "strengths": [
+      {
+        "text": "Correctly calculated the value of (9/4) times 5! by substituting the factorial value and simplifying.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 3,
+        "what_happened": "You calculated 2 times (8/4) times 5! but missed an important detail in your expression.",
+        "why_it_matters": "This step is crucial for ensuring your final answer is accurate, as it builds on previous calculations.",
+        "misconception_key": null
+      }
+    ],
+    "next_action": "Review the calculations in step 3 and check if you substituted the correct values from earlier steps.",
+    "tone": "supportive",
+    "word_count": 146
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 789,
+  "outputTokens": 210,
+  "cachedAt": "2026-08-05T15:35:17.571Z"
+}

@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "c_setup",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly separates the variables by dividing both sides by y and multiplying by dx.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_method",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 6,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The student integrates both sides correctly, although the handling of the constant is not explicitly stated.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "c_ic",
+        "level": "novice",
+        "score": 1,
+        "max_score": 5,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student substitutes the initial condition, but does not apply it correctly to find the constant of integration.",
+        "confidence": 0.6
+      },
+      {
+        "criterion_key": "c_answer",
+        "level": "novice",
+        "score": 1,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The final answer is incorrect as it does not match the expected answer.",
+        "confidence": 0.7
+      }
+    ],
+    "total_recommended": 9,
+    "max_total": 20,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The application of the initial condition is unclear and the final answer does not match the expected result."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 951,
+  "outputTokens": 388,
+  "cachedAt": "2026-07-29T06:58:59.297Z"
+}

@@ -1,0 +1,41 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "\\text{thus the conclusion is not true for 4 integers.}",
+        "plain_text": "States that the conclusion does not hold for four integers.",
+        "role": "result",
+        "confidence": 0.99
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "latex": "8) \\text{pigeons} \\rightarrow 51 \\text{ houses, pigeonholes} \\rightarrow 100 \\text{ addresses} \\text{ by the pigeonhole principle, at least two houses must have consecutive addresses.}",
+        "plain_text": "Introduces a scenario with 51 houses and 100 addresses, applying the pigeonhole principle to conclude that at least two houses must have consecutive addresses.",
+        "role": "setup",
+        "confidence": 0.88
+      }
+    ],
+    "final_answer": {
+      "latex": "",
+      "present": false
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.93
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 37727,
+  "outputTokens": 255,
+  "cachedAt": "2026-08-05T15:33:06.566Z"
+}

@@ -1,0 +1,137 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "differentiation",
+        "name": "Correct Differentiation of y=ux^2",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The differentiation is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The differentiation is correctly performed using the product rule."
+          }
+        ]
+      },
+      {
+        "key": "substitution",
+        "name": "Correct Substitution into the Differential Equation",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The substitution is incorrect or not attempted."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The substitution into the differential equation is correctly executed."
+          }
+        ]
+      },
+      {
+        "key": "simplification",
+        "name": "Correct Simplification to du/dx = f(x)",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The simplification is incorrect or not shown."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The simplification correctly leads to du/dx = -6/x^3."
+          }
+        ]
+      },
+      {
+        "key": "integration",
+        "name": "Correct Integration of du/dx",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The integration is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The integration of du/dx is correctly performed."
+          }
+        ]
+      },
+      {
+        "key": "substitution_back",
+        "name": "Correct Substitution Back to y",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The substitution back to y is incorrect or not attempted."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The substitution back to express y in terms of x is correctly executed."
+          }
+        ]
+      },
+      {
+        "key": "initial_condition",
+        "name": "Correct Application of Initial Condition",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The initial condition is incorrectly applied or not shown."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The initial condition is correctly applied to find the constant C."
+          }
+        ]
+      },
+      {
+        "key": "final_answer",
+        "name": "Correct Final Answer for y",
+        "weight": 16,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The final answer is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The final answer for y in terms of x is correctly stated."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 801,
+  "outputTokens": 772,
+  "cachedAt": "2026-08-06T07:31:24.205Z"
+}

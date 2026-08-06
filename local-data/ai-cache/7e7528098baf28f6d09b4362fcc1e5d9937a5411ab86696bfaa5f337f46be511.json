@@ -1,0 +1,31 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "setup_correctness_issue",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "the terms listed do not match the expected series"
+      },
+      {
+        "misconception_key": "final_value_accuracy_issue",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "severity": "procedural",
+        "observed_signature": "the final numeric values for the sums are incorrect based on the calculations provided"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1245,
+  "outputTokens": 147,
+  "cachedAt": "2026-08-05T18:23:19.464Z"
+}

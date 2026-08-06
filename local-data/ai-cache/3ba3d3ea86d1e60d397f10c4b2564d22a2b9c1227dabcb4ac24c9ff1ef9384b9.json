@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "A car travels a distance of 100 m in 5 seconds. Calculate the speed of the car.",
+        "solution_latex": "v = \\frac{d}{t} = \\frac{100 \\text{ m}}{5 \\text{ s}} = 20 \\text{ m/s}",
+        "hint_ladder": [
+          "Remember the formula for speed.",
+          "What is the distance and time given?",
+          "Substitute the values into the formula."
+        ],
+        "targets_because": "This item requires the student to perform a calculation explicitly, addressing the lack of calculations seen in the misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 5 Q1"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "An object is dropped from a height of 45 m. Calculate the time it takes to reach the ground. (Assume \\( g = 9.81 \\text{ m/s}^2 \\))",
+        "solution_latex": "t = \\sqrt{\\frac{2h}{g}} = \\sqrt{\\frac{2 \\times 45 \\text{ m}}{9.81 \\text{ m/s}^2}} \\approx 3.03 \\text{ s}",
+        "hint_ladder": [
+          "Identify the height and acceleration due to gravity.",
+          "Use the formula for free fall time.",
+          "Substitute the height and gravity values into the formula."
+        ],
+        "targets_because": "This item reinforces the need for calculations by requiring the student to compute time from given height and gravity.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Past Paper 2022 Q2"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "A spring stretches 0.5 m when a force of 10 N is applied. Calculate the spring constant \\( k \\) and its uncertainty if the force has an uncertainty of 0.5 N.",
+        "solution_latex": "\\( k = \\frac{F}{x} = \\frac{10 \\text{ N}}{0.5 \\text{ m}} = 20 \\text{ N/m} \\) and uncertainty \\( \\Delta k = k \\cdot \\frac{\\Delta F}{F} = 20 \\cdot \\frac{0.5}{10} = 1 \\text{ N/m} \\)",
+        "hint_ladder": [
+          "What is the formula for spring constant?",
+          "Identify the values for force and displacement.",
+          "Calculate the uncertainty based on the formula."
+        ],
+        "targets_because": "This problem explicitly requires students to perform calculations for both the spring constant and its uncertainty, addressing the misconception directly.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 6 Q3"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "A projectile is launched at an angle of 30 degrees with an initial velocity of 20 m/s. Calculate the horizontal range and the uncertainty in the range if the velocity has an uncertainty of 1 m/s.",
+        "solution_latex": "\\( R = \\frac{v^2 \\sin(2\\theta)}{g} = \\frac{(20 \\text{ m/s})^2 \\sin(60)}{9.81} \\approx 40.82 \\text{ m} \\) and uncertainty \\( \\Delta R = R \\cdot \\frac{2 \\Delta v}{v} \\approx 40.82 \\cdot \\frac{2 \\cdot 1}{20} \\approx 4.08 \\text{ m} \\)",
+        "hint_ladder": [
+          "What is the formula for the range of a projectile?",
+          "Identify the angle and initial velocity.",
+          "Calculate the uncertainty using the given uncertainty in velocity."
+        ],
+        "targets_because": "This extension problem challenges the student to apply calculations in a more complex scenario, reinforcing the importance of calculations and uncertainty.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Past Paper 2021 Q4"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 638,
+  "outputTokens": 941,
+  "cachedAt": "2026-08-06T12:13:13.899Z"
+}

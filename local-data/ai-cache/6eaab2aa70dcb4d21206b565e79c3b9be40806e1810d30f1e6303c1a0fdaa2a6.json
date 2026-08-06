@@ -1,0 +1,58 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "y = 3x^2 + 5x",
+        "plain_text": "Defines the function y in terms of x.",
+        "role": "setup",
+        "confidence": 0.97
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "dy/dx = 6x + 5",
+        "plain_text": "Calculates the derivative of y with respect to x.",
+        "role": "rule_application",
+        "confidence": 0.98
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "at x=2:",
+        "plain_text": "Specifies the value of x at which to evaluate the derivative.",
+        "role": "substitution",
+        "confidence": 0.94
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "dy/dx = 6(2) + 5",
+        "plain_text": "Substitutes x=2 into the derivative to evaluate it.",
+        "role": "substitution",
+        "confidence": 0.99
+      }
+    ],
+    "final_answer": {
+      "latex": "",
+      "present": false
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.97
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 15190,
+  "outputTokens": 325,
+  "cachedAt": "2026-08-04T15:09:44.964Z"
+}

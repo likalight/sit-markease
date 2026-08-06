@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "If y = x^3, find \\frac{dy}{dx}.",
+        "solution_latex": "\\frac{dy}{dx} = 3x^2",
+        "hint_ladder": [
+          "Use the power rule for differentiation.",
+          "Differentiate the function term by term.",
+          "Remember to multiply by the exponent and reduce it by one."
+        ],
+        "targets_because": "This item focuses on applying the power rule directly, helping to avoid rearranging the equation incorrectly.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 5 Q1"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Differentiate the function y = 4x^2 + 3x - 5.",
+        "solution_latex": "\\frac{dy}{dx} = 8x + 3",
+        "hint_ladder": [
+          "Identify each term in the polynomial.",
+          "Apply the power rule to each term.",
+          "Combine the results to find the derivative."
+        ],
+        "targets_because": "This problem requires the student to differentiate without isolating dy/dx, reinforcing correct simplification techniques.",
+        "provenance": {
+          "type": "retrieved",
+          "source_label": "Lecture Notes Example 3"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Find \\frac{dy}{dx} for y = \\sin(x) + \\cos(x).",
+        "solution_latex": "\\frac{dy}{dx} = \\cos(x) - \\sin(x)",
+        "hint_ladder": [
+          "Recall the derivatives of sine and cosine functions.",
+          "Differentiate each function separately.",
+          "Combine the derivatives according to the sum rule."
+        ],
+        "targets_because": "This item emphasizes finding derivatives of trigonometric functions directly, avoiding the need for rearrangement.",
+        "provenance": {
+          "type": "retrieved",
+          "source_label": "Past Paper Q2"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Given y = e^{2x} + 3x^2, find \\frac{dy}{dx}.",
+        "solution_latex": "\\frac{dy}{dx} = 2e^{2x} + 6x",
+        "hint_ladder": [
+          "Identify the exponential and polynomial terms.",
+          "Use the chain rule for the exponential part.",
+          "Differentiate each term and combine the results."
+        ],
+        "targets_because": "This extension item requires the application of multiple differentiation rules, reinforcing the need to simplify correctly without rearrangement.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 7 Q4"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 614,
+  "outputTokens": 629,
+  "cachedAt": "2026-08-06T14:49:55.882Z"
+}

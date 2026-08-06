@@ -1,0 +1,42 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_i Finding dy/dx",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "justification": "The student correctly applies the quotient rule but does not simplify the derivative correctly to reach the final answer.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "part_ii Evaluating the integral",
+        "level": "novice",
+        "score": 2,
+        "max_score": 4,
+        "evidence_step_indices": [
+          3,
+          4
+        ],
+        "justification": "The student attempts to relate the integral to y but does not correctly find the antiderivative or evaluate the limits accurately.",
+        "confidence": 0.7
+      }
+    ],
+    "total_recommended": 3,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "Errors in simplification and integration limits need clarification."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1080,
+  "outputTokens": 245,
+  "cachedAt": "2026-08-06T12:19:13.023Z"
+}

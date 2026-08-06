@@ -1,0 +1,38 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_misunderstanding_of_progression_type",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Defines the first term and the common ratio of a geometric progression"
+      },
+      {
+        "misconception_key": "mc_candidate_incorrect_formula_usage",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "procedural",
+        "observed_signature": "Attempts to calculate a value using an incorrect formula"
+      }
+    ],
+    "novel_candidates": [
+      {
+        "proposed_name": "missing_final_values",
+        "evidence_step_indices": [
+          4
+        ],
+        "confidence": 0.7
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 997,
+  "outputTokens": 186,
+  "cachedAt": "2026-08-05T15:12:22.758Z"
+}

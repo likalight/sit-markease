@@ -1,0 +1,14 @@
+{
+  "data": {
+    "prompt_text": "finding common difference finding sum of 1st 10 terms",
+    "model_solution": "S_n = n(2a + (n-1)d)\nS_{10} = 10(2a + 9d)\n60 = 10(2a + 9d)\n120 = 10(2a + 9d)\n12 = 2a + 9d\na = 7 - 6d, substitute into\n12 = 2(7 - 6d) + 9d\n= 14 - 12d + 9d\n= 14 - 3d\n3d = 14 - 12\n= 2\nd = 2/3",
+    "expected_answer_latex": "d = \\frac{2}{3}",
+    "max_score": 5,
+    "raw_rubric_notes": "1. Correct formula for sum of n terms (1 point)\n2. Correct substitution and simplification (1 point)\n3. Correct final answer for d (3 points)"
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 38172,
+  "outputTokens": 233,
+  "cachedAt": "2026-08-03T16:28:26.544Z"
+}

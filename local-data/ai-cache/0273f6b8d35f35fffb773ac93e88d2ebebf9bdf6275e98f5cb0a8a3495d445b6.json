@@ -1,0 +1,178 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "mass_calculation",
+        "name": "Mass Calculation",
+        "weight": 14,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correct substitution into the formula but incorrect final answer."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correct substitution and correct final answer of 6.8×10⁻¹⁵ kg."
+          }
+        ]
+      },
+      {
+        "key": "charge_explanation",
+        "name": "Charge Explanation",
+        "weight": 7,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not mention the minimum charge."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "States the minimum charge is 1.6×10⁻¹⁹ C and explains why 8.0×10⁻²⁰ C is impossible."
+          }
+        ]
+      },
+      {
+        "key": "potential_difference",
+        "name": "Potential Difference Calculation",
+        "weight": 14,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correct use of formula but incorrect final answer."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correct use of V = Ed and correct final answer of 1.7×10³ V."
+          }
+        ]
+      },
+      {
+        "key": "equilibrium_explanation",
+        "name": "Equilibrium Explanation",
+        "weight": 7,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not explain the relationship between velocity and resultant force."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Explains that constant velocity implies zero acceleration and resultant force."
+          }
+        ]
+      },
+      {
+        "key": "charge_determination",
+        "name": "Charge Determination",
+        "weight": 21,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correct equation but incorrect numerical answer or sign."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correct equation and numerical answer but incorrect sign."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "Correct equation, numerical answer of 3.2×10⁻¹⁹ C, and correct sign with reasoning."
+          }
+        ]
+      },
+      {
+        "key": "acceleration_explanation",
+        "name": "Acceleration Explanation",
+        "weight": 14,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Mentions that the electric force decreases but lacks clarity."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Explains that weight exceeds electric force, causing downward acceleration."
+          }
+        ]
+      },
+      {
+        "key": "field_lines_description",
+        "name": "Field Lines Description",
+        "weight": 7,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not describe the change in field lines."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Describes that field line separation increases as potential difference decreases."
+          }
+        ]
+      },
+      {
+        "key": "force_x_name",
+        "name": "Force X Name",
+        "weight": 7,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not state the name of force X."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly states that force X is upthrust."
+          }
+        ]
+      },
+      {
+        "key": "force_y_name",
+        "name": "Force Y Name",
+        "weight": 7,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not state the name of force Y."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly states that force Y is air resistance / drag / viscous force."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1339,
+  "outputTokens": 1048,
+  "cachedAt": "2026-08-04T19:37:44.094Z"
+}

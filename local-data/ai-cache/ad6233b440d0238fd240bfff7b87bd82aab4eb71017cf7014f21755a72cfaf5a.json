@@ -1,0 +1,43 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "define_velocity",
+        "level": "proficient",
+        "score": 1,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student defines velocity as the rate of change of displacement, which is a correct definition.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "calculate_k_and_uncertainty",
+        "level": "novice",
+        "score": 0,
+        "max_score": 5,
+        "evidence_step_indices": [
+          2,
+          4,
+          5,
+          6
+        ],
+        "justification": "The calculation of k is not present, and there is no uncertainty determination.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 1,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The calculation of k is missing, which is critical for the second part of the question."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1299,
+  "outputTokens": 241,
+  "cachedAt": "2026-08-06T12:11:36.502Z"
+}

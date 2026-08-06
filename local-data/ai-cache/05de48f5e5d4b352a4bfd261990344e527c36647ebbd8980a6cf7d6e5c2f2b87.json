@@ -1,0 +1,29 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "correct_answer",
+        "name": "Correct Answer",
+        "weight": 100,
+        "max_score": 20,
+        "levels": [
+          {
+            "level": "incorrect",
+            "score": 0,
+            "descriptor": "The answer provided is incorrect."
+          },
+          {
+            "level": "correct",
+            "score": 20,
+            "descriptor": "The answer provided is correct: 3 + 3 = 6."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 366,
+  "outputTokens": 110,
+  "cachedAt": "2026-08-03T16:24:32.055Z"
+}

@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "formula_setup",
+        "name": "Correct Formula Setup",
+        "weight": 33,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The formula is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The correct compound interest formula is used."
+          }
+        ]
+      },
+      {
+        "key": "correct_substitution",
+        "name": "Correct Substitution",
+        "weight": 33,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Substitution is incorrect or incomplete."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "All values are correctly substituted into the formula."
+          }
+        ]
+      },
+      {
+        "key": "final_value",
+        "name": "Correct Final Value",
+        "weight": 34,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The final value is incorrect or not rounded to two decimal places."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The final value is correct and rounded to two decimal places."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 432,
+  "outputTokens": 318,
+  "cachedAt": "2026-08-05T14:32:22.219Z"
+}

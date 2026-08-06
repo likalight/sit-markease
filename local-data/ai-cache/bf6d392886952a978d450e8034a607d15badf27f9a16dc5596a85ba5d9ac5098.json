@@ -1,0 +1,47 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "part_i",
+        "name": "Finding dy/dx",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correctly applies the quotient rule but makes an error in simplification."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly finds dy/dx = (1 - ln x)/x^2 using the quotient rule."
+          }
+        ]
+      },
+      {
+        "key": "part_ii",
+        "name": "Evaluating the integral",
+        "weight": 67,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 2,
+            "descriptor": "Attempts to relate the integral to y but makes significant errors in integration or limits."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "Correctly relates the integral to y, finds the antiderivative, and evaluates the definite integral to reach the exact answer."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 692,
+  "outputTokens": 256,
+  "cachedAt": "2026-08-06T11:55:58.031Z"
+}

@@ -1,0 +1,73 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "sum_pairs_identification",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student identifies pairs that sum to 9, but does not explicitly list all four pairs correctly.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "pigeons_pigeonholes",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student applies the pigeonhole principle but does not clearly identify the pigeons and pigeonholes.",
+        "confidence": 0.6
+      },
+      {
+        "criterion_key": "pigeonhole_conclusion",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student applies the pigeonhole principle but does not provide a clear conclusion based on it.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "final_conclusion",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          5
+        ],
+        "justification": "The student explains a scenario for part (b) but does not clearly state the final conclusion regarding the sum of selected integers.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "counterexample_part_b",
+        "level": "proficient",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          5
+        ],
+        "justification": "The student provides a valid counterexample for part (b) but does not conclude correctly.",
+        "confidence": 0.8
+      }
+    ],
+    "total_recommended": 1,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach lacks clarity in identifying key components of the pigeonhole principle."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1294,
+  "outputTokens": 487,
+  "cachedAt": "2026-08-05T15:32:46.895Z"
+}

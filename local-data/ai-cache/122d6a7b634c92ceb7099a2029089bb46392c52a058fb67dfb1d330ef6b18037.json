@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "pigeonholes_and_pigeons",
+        "name": "Identification of Pigeons and Pigeonholes",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to identify either the pigeons or pigeonholes."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly identifies the pigeons as students and pigeonholes as 101 possible scores."
+          }
+        ]
+      },
+      {
+        "key": "worst_case_reasoning",
+        "name": "Worst-Case Reasoning",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not apply worst-case reasoning correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Uses correct worst-case reasoning of 4 students per score."
+          }
+        ]
+      },
+      {
+        "key": "arithmetic_accuracy",
+        "name": "Arithmetic Accuracy",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Makes errors in the arithmetic calculations."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Performs correct arithmetic to arrive at the total number of students."
+          }
+        ]
+      },
+      {
+        "key": "final_answer",
+        "name": "Correct Final Answer",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Provides an incorrect final answer."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "States the correct final answer of 405 students."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 521,
+  "outputTokens": 445,
+  "cachedAt": "2026-08-05T14:34:32.197Z"
+}

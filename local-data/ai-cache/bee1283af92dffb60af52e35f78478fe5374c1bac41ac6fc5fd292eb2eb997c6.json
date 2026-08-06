@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The solution correctly separates variables, integrates, and applies the initial condition to obtain y = 3e^(2x).",
+    "method": "llm"
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 301,
+  "outputTokens": 41,
+  "cachedAt": "2026-07-28T15:52:16.523Z"
+}

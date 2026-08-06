@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "term_identification",
+        "name": "Identification of terms",
+        "weight": 20,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to identify any of the terms correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly identifies a=3, d=4, n=10."
+          }
+        ]
+      },
+      {
+        "key": "formula_usage",
+        "name": "Correct use of formula",
+        "weight": 40,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Does not state or incorrectly states the formula."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly states and uses the formula a_n=a+(n-1)d."
+          }
+        ]
+      },
+      {
+        "key": "final_arithmetic",
+        "name": "Final arithmetic calculation",
+        "weight": 40,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Incorrect final arithmetic leading to an incorrect answer."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly performs the arithmetic to arrive at 39."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 457,
+  "outputTokens": 333,
+  "cachedAt": "2026-08-04T14:48:28.199Z"
+}

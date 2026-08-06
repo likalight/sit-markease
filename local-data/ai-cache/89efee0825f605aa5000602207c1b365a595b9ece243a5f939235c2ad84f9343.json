@@ -1,0 +1,38 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "pigeonhole_principle_clarity",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          4
+        ],
+        "severity": "conceptual",
+        "observed_signature": "applies the pigeonhole principle but does not clearly identify the pigeons and pigeonholes"
+      },
+      {
+        "misconception_key": "conclusion_statement_error",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          5
+        ],
+        "severity": "notational",
+        "observed_signature": "does not clearly state the final conclusion regarding the sum of selected integers"
+      }
+    ],
+    "novel_candidates": [
+      {
+        "proposed_name": "sum_pairs_identification_error",
+        "evidence_step_indices": [
+          4
+        ],
+        "confidence": 0.6
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1178,
+  "outputTokens": 193,
+  "cachedAt": "2026-08-05T17:36:26.829Z"
+}

@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The stated solution correctly applies the power rule of differentiation to find \frac{dy}{dx} for the function y = x^3.",
+    "method": "llm"
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 246,
+  "outputTokens": 46,
+  "cachedAt": "2026-08-06T14:49:57.576Z"
+}

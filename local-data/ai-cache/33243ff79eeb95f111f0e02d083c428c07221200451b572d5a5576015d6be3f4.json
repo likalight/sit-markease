@@ -1,0 +1,101 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "quotient_rule",
+        "name": "Application of Quotient Rule",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "The student correctly applies the quotient rule but makes an error in simplification."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly applies the quotient rule and simplifies to the final answer."
+          }
+        ]
+      },
+      {
+        "key": "integration_recognition",
+        "name": "Recognition of Integration Relationship",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student fails to recognize the relationship between the integral and y."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly identifies the integration-by-parts relationship."
+          }
+        ]
+      },
+      {
+        "key": "antiderivative_correctness",
+        "name": "Correct Antiderivative",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student provides an incorrect antiderivative."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly finds the antiderivative -1/x - (ln x)/x + C."
+          }
+        ]
+      },
+      {
+        "key": "limit_substitution",
+        "name": "Correct Limit Substitution",
+        "weight": 17,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student incorrectly substitutes the limits or fails to do so."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly substitutes the limits x=1 and x=e."
+          }
+        ]
+      },
+      {
+        "key": "final_answer",
+        "name": "Final Exact Answer",
+        "weight": 10,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student provides an incorrect final answer."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly simplifies the final answer to 1 - 2/e."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 683,
+  "outputTokens": 570,
+  "cachedAt": "2026-08-06T07:31:13.629Z"
+}

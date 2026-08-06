@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "nth_term_equation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student defines terms for a geometric progression instead of an arithmetic progression, indicating a misunderstanding of the problem.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "sum_of_terms_equation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student attempts to calculate a value using an incorrect formula, failing to establish the correct sum of terms equation.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "solving_simultaneous_equations",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The student does not solve any simultaneous equations related to the arithmetic progression.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "final_values",
+        "level": "novice",
+        "score": 0,
+        "max_score": 2,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student does not provide any final values for the first term and common difference of the arithmetic progression.",
+        "confidence": 0.9
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 5,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student used a geometric progression instead of an arithmetic progression, indicating a fundamental misunderstanding of the problem."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1172,
+  "outputTokens": 405,
+  "cachedAt": "2026-08-05T15:09:25.662Z"
+}

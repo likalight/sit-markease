@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "If you invest \\$100 at an interest rate of 5\\% per year for 1 year, how much money will you have at the end of the year?",
+        "solution_latex": "Final Amount = 100 + (100 \\times 0.05) = 100 + 5 = \\$105",
+        "hint_ladder": [
+          "Calculate the interest earned.",
+          "Add the interest to the principal.",
+          "Use the formula: Final Amount = Principal + Interest."
+        ],
+        "targets_because": "This item helps the student focus on simple interest calculation before introducing compound interest.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 2 Q1"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "If you invest \\$100 at an interest rate of 5\\% compounded annually for 2 years, how much money will you have at the end of the second year?",
+        "solution_latex": "Final Amount = 100 \\times (1 + 0.05)^2 = 100 \\times 1.1025 = \\$110.25",
+        "hint_ladder": [
+          "Remember the compound interest formula.",
+          "Identify how many times the interest is applied.",
+          "Calculate the total amount using: Final Amount = Principal \\times (1 + r)^n."
+        ],
+        "targets_because": "This item introduces the context of compound interest over multiple periods, addressing the misconception directly.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Past Paper Q3"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "You deposit \\$2000 in a bank account that offers 3\\% interest compounded annually. How much will you have after 5 years?",
+        "solution_latex": "Final Amount = 2000 \\times (1 + 0.03)^5 = 2000 \\times 1.159274 = \\$2318.55",
+        "hint_ladder": [
+          "Use the compound interest formula.",
+          "Calculate the growth factor for 5 years.",
+          "Final Amount = Principal \\times (1 + r)^n."
+        ],
+        "targets_because": "This item reinforces the concept of compound interest over a longer time frame, solidifying understanding.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Lecture Notes Example 4"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "If you invest \\$1500 at an interest rate of 4\\% compounded quarterly for 3 years, what will be the total amount at the end of the investment?",
+        "solution_latex": "Final Amount = 1500 \\times \\left(1 + \\frac{0.04}{4}\\right)^{4 \\times 3} = 1500 \\times (1 + 0.01)^{12} = 1500 \\times 1.12749 = \\$1691.24",
+        "hint_ladder": [
+          "Break down the compounding periods.",
+          "Adjust the interest rate for quarterly compounding.",
+          "Use the formula: Final Amount = Principal \\times (1 + \\frac{r}{m})^{mt}."
+        ],
+        "targets_because": "This item challenges the student to apply compound interest in a more complex scenario, enhancing their understanding.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 5 Q2"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 613,
+  "outputTokens": 802,
+  "cachedAt": "2026-08-05T18:24:03.128Z"
+}

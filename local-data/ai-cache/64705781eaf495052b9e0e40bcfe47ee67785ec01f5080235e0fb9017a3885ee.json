@@ -1,0 +1,35 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "role": "setup",
+        "plain_text": "separates variables by dividing both sides by y and multiplying by dx"
+      },
+      {
+        "step_index": 2,
+        "role": "rule_application",
+        "plain_text": "integrates both sides with respect to their respective variables"
+      },
+      {
+        "step_index": 3,
+        "role": "result",
+        "plain_text": "solves for the natural logarithm of y, including the constant of integration"
+      },
+      {
+        "step_index": 4,
+        "role": "result",
+        "plain_text": "solves for y by exponentiating both sides"
+      }
+    ],
+    "final_answer": {
+      "latex": "y = 2e^{x^2/2}",
+      "present": true
+    }
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 439,
+  "outputTokens": 173,
+  "cachedAt": "2026-07-31T08:37:57.254Z"
+}

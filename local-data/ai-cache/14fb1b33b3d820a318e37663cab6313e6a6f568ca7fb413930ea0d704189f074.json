@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_final_value_accuracy_issue",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          4,
+          5
+        ],
+        "severity": "procedural",
+        "observed_signature": "does not correctly find the antiderivative or evaluate the limits accurately"
+      },
+      {
+        "misconception_key": "mc_candidate_missing_final_values",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          6
+        ],
+        "severity": "notational",
+        "observed_signature": "simplifies the expression to find the final value of the integral"
+      }
+    ],
+    "novel_candidates": [
+      {
+        "proposed_name": "Derivative Simplification Error",
+        "evidence_step_indices": [
+          1
+        ],
+        "confidence": 0.9
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1254,
+  "outputTokens": 189,
+  "cachedAt": "2026-08-06T12:19:18.560Z"
+}

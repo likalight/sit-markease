@@ -1,0 +1,119 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "expressions_for_distance_time",
+        "name": "Expressions for Distance and Time",
+        "weight": 22,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No correct expressions provided."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly states both expressions for distance and time."
+          }
+        ]
+      },
+      {
+        "key": "deduction_of_speed_equation",
+        "name": "Deduction of Speed Equation",
+        "weight": 11,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No correct deduction provided."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly derives the equation v = fλ."
+          }
+        ]
+      },
+      {
+        "key": "frequency_from_waveform",
+        "name": "Frequency Calculation from Waveform",
+        "weight": 22,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Incorrect method or answer for frequency calculation."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly calculates frequency as approximately 1300 Hz."
+          }
+        ]
+      },
+      {
+        "key": "coherent_waves_explanation",
+        "name": "Explanation of Coherent Waves",
+        "weight": 11,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No explanation or incorrect definition of coherent waves."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly explains that coherent waves have a constant phase difference."
+          }
+        ]
+      },
+      {
+        "key": "phase_difference_minimum_loudness",
+        "name": "Phase Difference at Minimum Loudness",
+        "weight": 11,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Incorrect or no phase difference stated."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly states the phase difference as 180°."
+          }
+        ]
+      },
+      {
+        "key": "distance_s1y_calculation",
+        "name": "Calculation of Distance S1Y",
+        "weight": 22,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Incorrect method or answer for calculating S1Y."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly calculates S1Y as 9.1 m."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 961,
+  "outputTokens": 660,
+  "cachedAt": "2026-08-05T02:25:02.473Z"
+}

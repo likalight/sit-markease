@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "dy/dx = 3x^2 y",
+        "solution_latex": "y = 5e^{x^3}",
+        "hint_ladder": [
+          "Which method separates the variables here?",
+          "Don't forget the constant of integration.",
+          "Apply the initial condition only after integrating."
+        ],
+        "targets_because": "Directly practices integrating to the general solution before touching the initial condition.",
+        "provenance": {
+          "type": "retrieved",
+          "source_label": "Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "dy/dx = 2x y",
+        "solution_latex": "y = e^{x^2}",
+        "hint_ladder": [
+          "Which method separates the variables here?",
+          "Don't forget the constant of integration.",
+          "Apply the initial condition only after integrating."
+        ],
+        "targets_because": "Same order-of-operations skill at target difficulty.",
+        "provenance": {
+          "type": "retrieved",
+          "source_label": "Tutorial 6 Q3"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "dy/dx = 4x^3 y",
+        "solution_latex": "y = 3e^{x^4}",
+        "hint_ladder": [
+          "Which method separates the variables here?",
+          "Don't forget the constant of integration.",
+          "Apply the initial condition only after integrating."
+        ],
+        "targets_because": "Requires integrating to the general solution before touching the initial condition — the exact step this student skipped.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "dy/dx = 6x^5 y",
+        "solution_latex": "y = 7e^{x^6}",
+        "hint_ladder": [
+          "Which method separates the variables here?",
+          "Don't forget the constant of integration.",
+          "Apply the initial condition only after integrating."
+        ],
+        "targets_because": "Extension: higher-degree exponent, same order-of-operations discipline.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 6 Q5"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:10.927Z"
+}

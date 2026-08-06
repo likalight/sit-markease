@@ -1,0 +1,80 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "part_a",
+        "name": "Part A: Sequence a_n = a_{n-1}^2",
+        "weight": 33,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No terms computed correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "One term computed correctly."
+          },
+          {
+            "level": "expert",
+            "score": 4,
+            "descriptor": "All four terms computed correctly."
+          }
+        ]
+      },
+      {
+        "key": "part_b",
+        "name": "Part B: Sequence a_n = n*a_{n-1} + n^2*a_{n-2}",
+        "weight": 33,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No terms computed correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "One term computed correctly."
+          },
+          {
+            "level": "expert",
+            "score": 4,
+            "descriptor": "All four terms computed correctly."
+          }
+        ]
+      },
+      {
+        "key": "part_c",
+        "name": "Part C: Sequence a_n = a_{n-1} + a_{n-3}",
+        "weight": 34,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No terms computed correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "One term computed correctly."
+          },
+          {
+            "level": "expert",
+            "score": 4,
+            "descriptor": "All four terms computed correctly."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 636,
+  "outputTokens": 414,
+  "cachedAt": "2026-08-05T14:32:11.362Z"
+}

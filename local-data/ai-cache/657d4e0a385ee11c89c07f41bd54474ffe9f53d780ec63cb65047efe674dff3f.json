@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "part_i",
+        "name": "Part (i) - Finding A and u3",
+        "weight": 20,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correctly finds A=5 but fails to find u3."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly finds both A=5 and u3=40."
+          }
+        ]
+      },
+      {
+        "key": "part_ii",
+        "name": "Part (ii) - Finding a, b, and c",
+        "weight": 40,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 2,
+            "descriptor": "Forms at least one correct equation but does not solve correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "Forms all three correct equations and solves them to find a=15/2, b=-5, c=-5."
+          }
+        ]
+      },
+      {
+        "key": "part_iii",
+        "name": "Part (iii) - Finding the sum of u_r",
+        "weight": 40,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 2,
+            "descriptor": "Sets up the summation but does not apply the geometric series formula correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "Correctly sets up the summation and applies the geometric series formula to arrive at the final expression."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 985,
+  "outputTokens": 384,
+  "cachedAt": "2026-08-04T07:49:51.898Z"
+}

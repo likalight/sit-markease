@@ -1,0 +1,80 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "velocity_definition",
+        "name": "Definition of Velocity",
+        "weight": 17,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The definition of velocity is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The definition of velocity is accurately stated as the rate of change of displacement with time."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_substitution",
+        "name": "Calculation of k - Substitution",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The substitution into the formula for k is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The substitution into the formula for k is correct but the answer is incorrect."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "The substitution into the formula for k is correct and the answer k = 1.4 is provided."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_uncertainty",
+        "name": "Calculation of k - Uncertainty",
+        "weight": 50,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The percentage and absolute uncertainty calculations are incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The percentage uncertainty is calculated correctly but the absolute uncertainty is incorrect."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Both the percentage and absolute uncertainties are calculated correctly but the final answer is not stated correctly."
+          },
+          {
+            "level": "master",
+            "score": 3,
+            "descriptor": "All calculations are correct, and the final answer is stated as k = 1.4 ± 0.2 with appropriate significant figures."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 733,
+  "outputTokens": 473,
+  "cachedAt": "2026-08-05T02:24:43.846Z"
+}

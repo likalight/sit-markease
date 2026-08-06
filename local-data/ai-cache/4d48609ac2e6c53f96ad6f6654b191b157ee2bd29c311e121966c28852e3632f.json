@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "Your setup and final answer were both correct, but the method has a gap worth fixing.",
+    "strengths": [
+      {
+        "text": "Separated variables correctly: dy/y = x dx.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 2,
+        "what_happened": "You wrote ln|y| = x^2/2 without a constant of integration.",
+        "why_it_matters": "Every indefinite integral has a family of solutions differing by a constant — dropping it means your 'general solution' is actually only one particular case, and you have to guess your way back to the right answer instead of solving for it.",
+        "misconception_key": "mc_constant_of_integration_dropped"
+      }
+    ],
+    "next_action": "Redo step 2 writing +C explicitly, then solve for C using y(0)=2 — you'll land on the same answer, but through a method that works for any initial condition.",
+    "tone": "supportive",
+    "word_count": 95
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:07.967Z"
+}

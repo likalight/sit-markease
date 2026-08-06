@@ -1,0 +1,105 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          3,
+          4
+        ],
+        "latex": "u_{n+1} = 2u_n + An, \\quad u_1 = 5, \\quad u_2 = 15",
+        "plain_text": "Sets up the recurrence relation for the sequence and provides initial conditions.",
+        "role": "setup",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          18,
+          19
+        ],
+        "latex": "15 = 2(5) + A, \\quad A = 5",
+        "plain_text": "Substitutes the values of u_1 into the recurrence relation to solve for A.",
+        "role": "substitution",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          20,
+          22
+        ],
+        "latex": "u_3 = 2u_2 + 2A, \\quad u_3 = 2(15) + 2(5) = 30 + 10 = 40",
+        "plain_text": "Calculates u_3 using the recurrence relation and the value of A.",
+        "role": "rule_application",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          24,
+          28
+        ],
+        "latex": "u_n = a(2^n) + bn + c, \\quad 5 = a(2) + b + c",
+        "plain_text": "States the general form of the nth term and substitutes n=1 to create an equation.",
+        "role": "setup",
+        "confidence": 0.94
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          30,
+          31
+        ],
+        "latex": "15 = a(4) + 2b + c, \\quad 4a + 2b + c = 15",
+        "plain_text": "Substitutes n=2 into the general term equation to create a second equation.",
+        "role": "substitution",
+        "confidence": 0.87
+      },
+      {
+        "step_index": 6,
+        "line_indices": [
+          33,
+          34
+        ],
+        "latex": "40 = a(8) + 3b + c, \\quad 8a + 3b + c = 40",
+        "plain_text": "Substitutes n=3 into the general term equation to create a third equation.",
+        "role": "substitution",
+        "confidence": 0.91
+      },
+      {
+        "step_index": 7,
+        "line_indices": [
+          35
+        ],
+        "latex": "a = 7.5, \\quad b = -5, \\quad c = -5",
+        "plain_text": "Solves the system of equations to find the values of a, b, and c.",
+        "role": "result",
+        "confidence": 0.84
+      },
+      {
+        "step_index": 8,
+        "line_indices": [
+          39,
+          44
+        ],
+        "latex": "\\sum_{r=1}^{n} u_r = 15\\left(2^{n+1}-1\\right) - 5\\frac{n(n+1)}{2} - 5n",
+        "plain_text": "Finds the sum of the sequence in terms of n using the derived formula.",
+        "role": "result",
+        "confidence": 0.81
+      }
+    ],
+    "final_answer": {
+      "latex": "15(2^{n}) - \\frac{5}{2}n^2 - \\frac{5}{2}n - 15",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.85
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 39464,
+  "outputTokens": 854,
+  "cachedAt": "2026-08-04T08:09:25.991Z"
+}

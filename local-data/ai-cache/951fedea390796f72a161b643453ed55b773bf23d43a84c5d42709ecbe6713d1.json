@@ -1,0 +1,50 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_lack_of_specific_calculations_for_a_and_",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "severity": "procedural",
+        "observed_signature": "No calculation for part (a) was attempted."
+      },
+      {
+        "misconception_key": "mc_candidate_lack_of_context_in_solution_steps",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "The student does not correctly identify the model for the free bits in part (a)."
+      },
+      {
+        "misconception_key": "mc_candidate_lack_of_specific_calculations_for_a_and_",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "procedural",
+        "observed_signature": "No calculation for part (b) was attempted."
+      },
+      {
+        "misconception_key": "mc_candidate_lack_of_context_in_solution_steps",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "conceptual",
+        "observed_signature": "The student does not correctly identify the binomial coefficient model for part (b)."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1158,
+  "outputTokens": 310,
+  "cachedAt": "2026-08-05T18:06:53.746Z"
+}

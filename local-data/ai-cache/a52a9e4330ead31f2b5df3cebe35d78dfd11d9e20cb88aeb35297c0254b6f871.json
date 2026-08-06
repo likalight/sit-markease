@@ -1,0 +1,60 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "c_setup",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly separates the variables by dividing both sides by y and multiplying by dx.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_method",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 6,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student integrates both sides correctly, retaining the constant of integration.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_ic",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student applies the initial condition to find the specific solution correctly.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "c_answer",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 5,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The final answer is correct as it matches the expected form.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 14,
+    "max_total": 20,
+    "error_carry_forward_applied": false,
+    "needs_human_review": false,
+    "review_reasons": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 950,
+  "outputTokens": 357,
+  "cachedAt": "2026-07-29T06:58:30.008Z"
+}

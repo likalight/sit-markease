@@ -1,0 +1,11 @@
+{
+  "data": {
+    "detected": [],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 637,
+  "outputTokens": 15,
+  "cachedAt": "2026-08-04T15:09:53.965Z"
+}

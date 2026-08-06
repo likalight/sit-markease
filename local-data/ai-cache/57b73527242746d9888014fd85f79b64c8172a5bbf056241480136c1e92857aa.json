@@ -1,0 +1,69 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "latex": "(\\frac{9}{4}) x 5! = 9 \\times 8 \\times 7 \\times 6 \\times 120 = 126 \\times 120 = 1,120/",
+        "plain_text": "Calculates the value of (9/4) times 5! by substituting the factorial value and simplifying.",
+        "role": "rule_application",
+        "confidence": 0.81
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "latex": "(\\frac{8}{3}) x 5! = 8 \\times 7 \\times 6 \\times 120 = 56 \\times 120 = 6,720/",
+        "plain_text": "Calculates the value of (8/3) times 5! by substituting the factorial value and simplifying.",
+        "role": "rule_application",
+        "confidence": 0.75
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "latex": "2 \\times (\\frac{8}{4}) x 5! = 2 \\times 8 \\times 7 \\times 6 \\times 5 \\times 120 = 2 \\times 70 \\times 120 = 16,800/",
+        "plain_text": "Calculates 2 times (8/4) times 5! by substituting the factorial value and simplifying.",
+        "role": "rule_application",
+        "confidence": 0.76
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          16,
+          17,
+          18
+        ],
+        "latex": "2^9 = 256/",
+        "plain_text": "Calculates 2 raised to the power of 9.",
+        "role": "result",
+        "confidence": 0.64
+      }
+    ],
+    "final_answer": {
+      "latex": "16,800",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.75
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 37936,
+  "outputTokens": 500,
+  "cachedAt": "2026-08-05T15:31:23.560Z"
+}

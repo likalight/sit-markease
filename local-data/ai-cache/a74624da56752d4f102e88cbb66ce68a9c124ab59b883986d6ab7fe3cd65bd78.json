@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "You correctly set up the equation with a value of 1311 and identified the formula to use with n equal to 23. However, the subsequent steps are unclear, which makes it difficult to follow your reasoning.",
+    "strengths": [
+      {
+        "text": "You correctly set up the equation and identified the formula.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 1,
+        "what_happened": "You set up the equation with 1311 and referenced a formula with n equal to 23.",
+        "why_it_matters": "This is a crucial first step as it establishes the foundation for solving the problem.",
+        "misconception_key": null
+      }
+    ],
+    "next_action": "Can you clarify the unreadable parts in steps 2 and 3 to show your calculations more clearly?",
+    "tone": "socratic",
+    "word_count": 148
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 762,
+  "outputTokens": 203,
+  "cachedAt": "2026-08-05T15:09:07.274Z"
+}

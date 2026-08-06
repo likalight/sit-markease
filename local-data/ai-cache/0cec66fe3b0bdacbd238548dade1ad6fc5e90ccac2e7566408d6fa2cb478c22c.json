@@ -1,0 +1,152 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "energy_explanation",
+        "name": "Explanation of Energy Dissipation",
+        "weight": 10,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No explanation of energy dissipation."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly explains that energy is dissipated in the internal resistance."
+          }
+        ]
+      },
+      {
+        "key": "equation_state",
+        "name": "Equation Relating E, I, r, and V",
+        "weight": 10,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No equation stated."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly states the equation E = Ir + V."
+          }
+        ]
+      },
+      {
+        "key": "emf_deduction",
+        "name": "Deduction of e.m.f. from Graph",
+        "weight": 10,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No deduction made from the graph."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly deduces that the e.m.f. is 2.8 V from the graph."
+          }
+        ]
+      },
+      {
+        "key": "internal_resistance_calculation",
+        "name": "Calculation of Internal Resistance",
+        "weight": 20,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No calculation or incorrect method used."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Uses correct method but provides incorrect answer."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Correctly calculates internal resistance as 1.4 Ω."
+          }
+        ]
+      },
+      {
+        "key": "resistance_calculation",
+        "name": "Calculation of Resistance R",
+        "weight": 10,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No calculation or incorrect answer."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculates resistance R as 4.2 Ω."
+          }
+        ]
+      },
+      {
+        "key": "electron_number_calculation",
+        "name": "Calculation of Number of Electrons",
+        "weight": 10,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No calculation or incorrect answer."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculates the number of conduction electrons as 3.1×10¹⁸."
+          }
+        ]
+      },
+      {
+        "key": "energy_time_calculation",
+        "name": "Calculation of Time for Energy to Reach 1.6 kJ",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No calculation or incorrect method used."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Uses correct method but provides incorrect answer."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Correctly substitutes values but provides incorrect answer."
+          },
+          {
+            "level": "master",
+            "score": 3,
+            "descriptor": "Correctly calculates time as 5.4×10³ s."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1089,
+  "outputTokens": 869,
+  "cachedAt": "2026-08-04T19:37:56.336Z"
+}

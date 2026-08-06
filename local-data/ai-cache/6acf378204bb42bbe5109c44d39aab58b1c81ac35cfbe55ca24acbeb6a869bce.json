@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "Your setup was right, but the initial condition got applied at the wrong point in the process.",
+    "strengths": [
+      {
+        "text": "Separated variables correctly: dy/y = x dx.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 2,
+        "what_happened": "You substituted y(0)=2 directly into dy/y = x dx before integrating, producing 2/y = 0.",
+        "why_it_matters": "The initial condition applies to the solved (integrated) function, not to the differential relationship itself — substituting this early throws away the information you need and produces a statement that isn't actually meaningful.",
+        "misconception_key": "mc_ic_applied_before_general"
+      }
+    ],
+    "next_action": "Integrate first to get the general solution with +C, and only then substitute y(0)=2 to solve for C.",
+    "tone": "supportive",
+    "word_count": 90
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:08.704Z"
+}

@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "You did well in setting up the series of numbers to be summed in step 1. However, there seems to be an issue with the application of the formula in step 3.",
+    "strengths": [
+      {
+        "text": "You correctly set up the series of numbers to be summed.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 3,
+        "what_happened": "You applied the formula for the sum of an arithmetic progression.",
+        "why_it_matters": "Using the correct formula is essential to getting the right sum.",
+        "misconception_key": null
+      }
+    ],
+    "next_action": "Can you double-check the values you plugged into the formula in step 3?",
+    "tone": "socratic",
+    "word_count": 109
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 752,
+  "outputTokens": 181,
+  "cachedAt": "2026-08-05T17:17:51.628Z"
+}

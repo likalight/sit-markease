@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Compute the first three terms of the sequence defined by $a_n = a_{n-1}^2$ with $a_0 = 2$.",
+        "solution_latex": "$a_0 = 2, \\quad a_1 = a_0^2 = 2^2 = 4, \\quad a_2 = a_1^2 = 4^2 = 16$; \\text{Thus, the first three terms are } 2, 4, 16.",
+        "hint_ladder": [
+          "Identify the initial term.",
+          "Use the recursive formula to find the next term.",
+          "Calculate each term step by step."
+        ],
+        "targets_because": "This item isolates the computation of terms in a recursive sequence to address the misconception directly.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 5 Q2"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Given the sequence defined by $a_n = a_{n-1}^2$ with $a_0 = 3$, find the first four terms.",
+        "solution_latex": "$a_0 = 3, \\quad a_1 = a_0^2 = 3^2 = 9, \\quad a_2 = a_1^2 = 9^2 = 81, \\quad a_3 = a_2^2 = 81^2 = 6561$; \\text{Thus, the first four terms are } 3, 9, 81, 6561.",
+        "hint_ladder": [
+          "Start with the initial value.",
+          "Apply the recursive formula iteratively.",
+          "Ensure you compute each term before moving to the next."
+        ],
+        "targets_because": "This item requires the student to compute multiple terms, reinforcing the understanding of the recursive relationship.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Past Paper 2022 Q1"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "For the sequence defined by $a_n = a_{n-1}^2$ with $a_0 = 1$, calculate the first five terms.",
+        "solution_latex": "$a_0 = 1, \\quad a_1 = 1^2 = 1, \\quad a_2 = 1^2 = 1, \\quad a_3 = 1^2 = 1, \\quad a_4 = 1^2 = 1$; \\text{Thus, the first five terms are } 1, 1, 1, 1, 1.",
+        "hint_ladder": [
+          "Identify the starting term.",
+          "Use the formula to find each subsequent term.",
+          "Observe the behavior of the sequence as you compute."
+        ],
+        "targets_because": "This item helps to highlight the importance of computing terms in a recursive sequence, especially with a simple base case.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Lecture Notes 3"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "If $a_n = a_{n-1}^2$ and $a_0 = 5$, what is the 6th term of the sequence?",
+        "solution_latex": "$a_0 = 5, \\quad a_1 = 5^2 = 25, \\quad a_2 = 25^2 = 625, \\quad a_3 = 625^2 = 390625, \\quad a_4 = 390625^2 = 152587890625, \\quad a_5 = 152587890625^2 = 23283064365386962890625$; \\text{Thus, the 6th term is } 23283064365386962890625.",
+        "hint_ladder": [
+          "Calculate the first few terms to find a pattern.",
+          "Use the recursive definition to compute each term up to $a_5$.",
+          "Check your calculations at each step."
+        ],
+        "targets_because": "This item extends the practice to higher terms, reinforcing the need for careful term calculation in recursive sequences.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 7 Q4"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 618,
+  "outputTokens": 990,
+  "cachedAt": "2026-08-05T17:27:25.553Z"
+}

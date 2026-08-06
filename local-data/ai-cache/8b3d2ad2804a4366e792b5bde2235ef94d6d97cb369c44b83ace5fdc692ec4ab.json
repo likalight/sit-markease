@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_a_model",
+        "level": "novice",
+        "score": 0,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not correctly identify the model for the free bits in part (a).",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "part_a_calculation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "No calculation for part (a) was attempted.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "part_b_model",
+        "level": "novice",
+        "score": 0,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not correctly identify the binomial coefficient model for part (b).",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "part_b_calculation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "No calculation for part (b) was attempted.",
+        "confidence": 0.8
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 12,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach does not align with the expected models and calculations for the parts of the question."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1562,
+  "outputTokens": 378,
+  "cachedAt": "2026-08-05T18:06:47.785Z"
+}

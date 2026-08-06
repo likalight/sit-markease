@@ -1,0 +1,58 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "dy/y = x\\,dx",
+        "plain_text": "Separate variables: dy/y = x dx",
+        "role": "setup",
+        "confidence": 0.93
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "2/y = 0",
+        "plain_text": "Substitutes the initial condition into the separated (unintegrated) equation, producing a nonsensical statement",
+        "role": "substitution",
+        "confidence": 0.82
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "\\ln|y| = x^2/2",
+        "plain_text": "Integrates the original separated equation anyway, ignoring the nonsensical step 2",
+        "role": "rule_application",
+        "confidence": 0.88
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "y = e^{x^2/2}",
+        "plain_text": "Final answer given with no constant and no reconciliation of step 2",
+        "role": "result",
+        "confidence": 0.86
+      }
+    ],
+    "final_answer": {
+      "latex": "y = e^{x^2/2}",
+      "present": true
+    },
+    "flags": [
+      "initial_condition_applied_before_general_solution"
+    ]
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:02.114Z"
+}

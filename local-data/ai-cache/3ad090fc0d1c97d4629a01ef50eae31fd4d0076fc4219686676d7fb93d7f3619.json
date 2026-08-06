@@ -1,0 +1,57 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "sum_pairs_identification_error",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          4
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Lists pairs of numbers that sum to 9, but does not correctly identify all four pairs."
+      },
+      {
+        "misconception_key": "identify_pigeons_error",
+        "confidence": 0.6,
+        "evidence_step_indices": [
+          5
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Applies the pigeonhole principle but does not explicitly identify the pigeons and pigeonholes."
+      },
+      {
+        "misconception_key": "incorrect_pigeonhole_conclusion",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          6
+        ],
+        "severity": "conceptual",
+        "observed_signature": "States that selecting 4 numbers can avoid selecting pairs that sum to 9."
+      },
+      {
+        "misconception_key": "conclusion_statement_error",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          6
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Does not clearly conclude the final statement."
+      },
+      {
+        "misconception_key": "counterexample_part_b",
+        "confidence": 0.5,
+        "evidence_step_indices": [
+          6
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Provides a selection of 4 numbers but does not conclude correctly about the statement being false."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1316,
+  "outputTokens": 355,
+  "cachedAt": "2026-08-05T18:20:25.908Z"
+}

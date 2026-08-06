@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Calculate \\( 5 + 3 \\) and show your work.",
+        "solution_latex": "5 + 3 = 8",
+        "hint_ladder": [
+          "What is 5 plus 3?",
+          "Write down the numbers you need to add.",
+          "Don't forget to show the calculation step."
+        ],
+        "targets_because": "This item encourages the student to perform a basic calculation and document the steps involved.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Example Problem 1"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "If \\( x = 2 \\) and \\( y = 4 \\), calculate \\( x + y \\) and show all steps.",
+        "solution_latex": "x + y = 2 + 4 = 6",
+        "hint_ladder": [
+          "Identify the values of x and y.",
+          "Set up the equation using these values.",
+          "Make sure to show each calculation step."
+        ],
+        "targets_because": "This problem requires the student to perform a calculation and document their process, addressing the misconception of not showing work.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Solve for \\( z \\) in the equation \\( z + 7 = 12 \\) and show your calculations.",
+        "solution_latex": "z + 7 = 12 \\Rightarrow z = 12 - 7 = 5",
+        "hint_ladder": [
+          "What is the equation you need to solve?",
+          "How do you isolate z?",
+          "Show each step of your calculation."
+        ],
+        "targets_because": "This exercise emphasizes the importance of showing calculations while solving an equation, directly addressing the misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Past Paper Q5"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Given the equation \\( 3x - 5 = 16 \\), calculate \\( x \\) and provide all steps in your solution.",
+        "solution_latex": "3x - 5 = 16 \\Rightarrow 3x = 16 + 5 \\Rightarrow 3x = 21 \\Rightarrow x = \\frac{21}{3} = 7",
+        "hint_ladder": [
+          "Start by adding 5 to both sides of the equation.",
+          "What do you get after isolating 3x?",
+          "Don't forget to divide by 3 to find x."
+        ],
+        "targets_because": "This more complex problem challenges the student to show their calculations while solving a multi-step equation, reinforcing the need to document their work.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 7 Q3"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 627,
+  "outputTokens": 684,
+  "cachedAt": "2026-08-05T18:21:50.063Z"
+}

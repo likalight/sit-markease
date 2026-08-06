@@ -1,0 +1,20 @@
+{
+  "data": {
+    "mappings": [],
+    "unassigned_regions": [
+      {
+        "page_index": 0,
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.2
+      }
+    ],
+    "flags": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 76268,
+  "outputTokens": 70,
+  "cachedAt": "2026-08-05T15:14:44.276Z"
+}

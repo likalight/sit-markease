@@ -1,0 +1,37 @@
+{
+  "data": {
+    "lines": [
+      {
+        "line_index": 1,
+        "latex": "dy/y = x\\,dx",
+        "confidence": 0.95,
+        "illegible": false
+      },
+      {
+        "line_index": 2,
+        "latex": "y(0)=2 \\Rightarrow 2/y = 0",
+        "confidence": 0.85,
+        "illegible": false
+      },
+      {
+        "line_index": 3,
+        "latex": "\\ln|y| = x^2/2",
+        "confidence": 0.9,
+        "illegible": false
+      },
+      {
+        "line_index": 4,
+        "latex": "y = e^{x^2/2}",
+        "confidence": 0.91,
+        "illegible": false
+      }
+    ],
+    "student_identifier": null,
+    "overall_legibility": 0.88
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:02.113Z"
+}

@@ -1,0 +1,40 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "count_terms_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "states to use a formula with n equal to 23"
+      },
+      {
+        "misconception_key": "setup_correctness_issue",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Sets up the equation with a value of 1311"
+      },
+      {
+        "misconception_key": "lack_of_context_in_solution_steps",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          2,
+          3
+        ],
+        "severity": "notational",
+        "observed_signature": "Contains unreadable text that does not contribute to a clear mathematical step"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1227,
+  "outputTokens": 212,
+  "cachedAt": "2026-08-06T00:48:19.007Z"
+}

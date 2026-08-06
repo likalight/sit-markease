@@ -1,0 +1,95 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "energy_explanation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not provide any explanation regarding energy dissipation.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "equation_state",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not state any equation relating E, I, r, and V.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "emf_deduction",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not deduce the e.m.f. from the graph.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "internal_resistance_calculation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 2,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not calculate the internal resistance.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "resistance_calculation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not calculate the resistance R.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "electron_number_calculation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not calculate the number of conduction electrons.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "energy_time_calculation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not calculate the time for energy to reach 1.6 kJ.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 10,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's solution does not address any of the rubric criteria."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1707,
+  "outputTokens": 598,
+  "cachedAt": "2026-08-05T02:39:10.141Z"
+}

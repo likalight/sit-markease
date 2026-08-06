@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "combination_count",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student calculates a combination count for one part, but the calculation is incorrect.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "arrangement_factor",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student includes the arrangement factor (5!) in their calculation for one part.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "final_answer",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student provides a final answer for one part, but it is not correct.",
+        "confidence": 0.5
+      }
+    ],
+    "total_recommended": 3,
+    "max_total": 9,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's calculations are incorrect and do not follow the expected combination formulas."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1258,
+  "outputTokens": 302,
+  "cachedAt": "2026-08-05T18:03:15.751Z"
+}

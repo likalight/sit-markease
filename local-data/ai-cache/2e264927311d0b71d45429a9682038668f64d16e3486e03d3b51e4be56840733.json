@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "elastic_potential_energy",
+        "name": "Elastic Potential Energy Calculation",
+        "weight": 28,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correctly identifies the extension but makes an error in calculating the elastic potential energy."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly calculates the extension and elastic potential energy as 0.64 J."
+          }
+        ]
+      },
+      {
+        "key": "gravitational_potential_energy",
+        "name": "Gravitational Potential Energy Calculation",
+        "weight": 28,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Uses the correct method but makes an error in calculating the gravitational potential energy."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly applies the formula to find the gravitational potential energy as 0.80 J."
+          }
+        ]
+      },
+      {
+        "key": "kinetic_energy",
+        "name": "Kinetic Energy Calculation",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to calculate the kinetic energy correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculates the kinetic energy as 0.16 J."
+          }
+        ]
+      },
+      {
+        "key": "speed_calculation",
+        "name": "Speed Calculation",
+        "weight": 30,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Correctly substitutes values but makes an error in calculating the speed."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly substitutes and calculates the speed as approximately 1.1 m s⁻¹."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 795,
+  "outputTokens": 475,
+  "cachedAt": "2026-08-05T02:24:51.766Z"
+}

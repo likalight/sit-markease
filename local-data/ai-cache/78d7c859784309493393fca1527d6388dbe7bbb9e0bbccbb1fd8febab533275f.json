@@ -1,0 +1,52 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "define_velocity",
+        "name": "Definition of Velocity",
+        "weight": 17,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The definition of velocity is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The definition of velocity is correctly stated as change in displacement over time taken."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_and_uncertainty",
+        "name": "Calculation of k and Uncertainty",
+        "weight": 83,
+        "max_score": 5,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The calculation of k is incorrect or missing, with no uncertainty determination."
+          },
+          {
+            "level": "proficient",
+            "score": 3,
+            "descriptor": "The calculation of k is partially correct, but the uncertainty is not accurately determined."
+          },
+          {
+            "level": "expert",
+            "score": 5,
+            "descriptor": "The calculation of k is correct, with accurate determination of both percentage and absolute uncertainty."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 852,
+  "outputTokens": 274,
+  "cachedAt": "2026-08-06T12:10:07.901Z"
+}

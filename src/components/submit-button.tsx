@@ -11,15 +11,17 @@ export function SubmitButton({
   pendingLabel,
   className = "rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary",
   disabled = false,
+  dataTourId,
 }: {
   children: React.ReactNode;
   pendingLabel: string;
   className?: string;
   disabled?: boolean;
+  dataTourId?: string;
 }) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending || disabled} className={`${className} disabled:opacity-60`}>
+    <button type="submit" disabled={pending || disabled} className={`${className} disabled:opacity-60`} data-tour-id={dataTourId}>
       {pending ? pendingLabel : children}
     </button>
   );

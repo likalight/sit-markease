@@ -1,0 +1,111 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "define_velocity",
+        "name": "Definition of Velocity",
+        "weight": 17,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The definition of velocity is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The definition of velocity is correctly stated as change in displacement over time taken."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_method",
+        "name": "Calculation Method for k",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The method for calculating k is incorrect or not shown."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The method for calculating k is partially correct but contains errors."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "The method for calculating k is correct and clearly shown."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_answer",
+        "name": "Final Answer for k",
+        "weight": 17,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The final answer for k is incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The final answer for k is correct."
+          }
+        ]
+      },
+      {
+        "key": "calculate_uncertainty_method",
+        "name": "Calculation Method for Uncertainty",
+        "weight": 17,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The method for calculating uncertainty is incorrect or not shown."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The method for calculating uncertainty is partially correct but contains errors."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "The method for calculating uncertainty is correct and clearly shown."
+          }
+        ]
+      },
+      {
+        "key": "final_uncertainty_answer",
+        "name": "Final Answer for Uncertainty",
+        "weight": 13,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The final answer for uncertainty is incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The final answer for uncertainty is correct."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 846,
+  "outputTokens": 605,
+  "cachedAt": "2026-08-06T07:31:32.875Z"
+}

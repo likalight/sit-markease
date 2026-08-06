@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "setup_correctness_issue",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Sets up the sum of the arithmetic progression (AP) from 19 to 90."
+      },
+      {
+        "misconception_key": "final_value_accuracy_issue",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          4
+        ],
+        "severity": "notational",
+        "observed_signature": "States the final result for the sum of the arithmetic progression."
+      },
+      {
+        "misconception_key": "Incorrect application of geometric series formula",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "procedural",
+        "observed_signature": "Applies the formula for the sum of an arithmetic progression."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 922,
+  "outputTokens": 214,
+  "cachedAt": "2026-08-05T15:08:36.256Z"
+}

@@ -1,0 +1,24 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_lack_of_calculations_for_part_a_and_b_",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          2,
+          4,
+          5,
+          6
+        ],
+        "severity": "procedural",
+        "observed_signature": "The calculation of k is not present, and there is no uncertainty determination."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1238,
+  "outputTokens": 105,
+  "cachedAt": "2026-08-06T13:48:45.486Z"
+}

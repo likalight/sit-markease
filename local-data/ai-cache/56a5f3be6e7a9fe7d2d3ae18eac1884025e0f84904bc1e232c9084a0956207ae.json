@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 2y, \\; y(0) = 3.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 2 dx. Integrate: \\ln|y| = 2x + C, \\; y = A e^{2x}. Apply \\; y(0) = 3: \\; 3 = A e^0 \\Rightarrow A = 3. \\; \\text{Final answer: } y = 3 e^{2x}.",
+        "hint_ladder": [
+          "Remember to separate the variables first.",
+          "What do you get when you integrate both sides?",
+          "Don't forget to apply the initial condition after integrating."
+        ],
+        "targets_because": "This item isolates the integration of a simple reciprocal function, helping to clarify the correct process before introducing more complexity.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 6 Q3"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 4xy, \\; y(1) = 2.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 4x dx. Integrate: \\ln|y| = 2x^2 + C, \\; y = A e^{2x^2}. Apply \\; y(1) = 2: \\; 2 = A e^2 \\Rightarrow A = 2 e^{-2}. \\; \\text{Final answer: } y = 2 e^{-2} e^{2x^2} = 2 e^{2(x^2 - 1)}.",
+        "hint_ladder": [
+          "Separate the variables before integrating.",
+          "What is the integral of \\frac{1}{y}?",
+          "Make sure to apply the initial condition after finding the general solution."
+        ],
+        "targets_because": "This item requires integrating a reciprocal function while applying the initial condition correctly, directly addressing the misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 6 Q5"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 3xy, \\; y(0) = 4.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 3x dx. Integrate: \\ln|y| = \\frac{3}{2}x^2 + C, \\; y = A e^{\\frac{3}{2}x^2}. Apply \\; y(0) = 4: \\; 4 = A e^0 \\Rightarrow A = 4. \\; \\text{Final answer: } y = 4 e^{\\frac{3}{2}x^2}.",
+        "hint_ladder": [
+          "Start by separating the variables.",
+          "What do you get after integrating both sides?",
+          "Don't forget to substitute the initial condition after integration."
+        ],
+        "targets_because": "This item reinforces the importance of correctly integrating a reciprocal function and applying the initial condition, which are key to overcoming the misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 5x^4 y, \\; y(1) = 3.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 5x^4 dx. Integrate: \\ln|y| = x^5 + C, \\; y = A e^{x^5}. Apply \\; y(1) = 3: \\; 3 = A e^1 \\Rightarrow A = 3 e^{-1}. \\; \\text{Final answer: } y = 3 e^{-1} e^{x^5} = 3 e^{x^5 - 1}.",
+        "hint_ladder": [
+          "Make sure to separate the variables first.",
+          "What do you get when you integrate both sides?",
+          "Remember to apply the initial condition after you have the general solution."
+        ],
+        "targets_because": "This extension item challenges the student with a more complex function while still focusing on the correct integration process and application of the initial condition.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 6 Q5"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1151,
+  "outputTokens": 1039,
+  "cachedAt": "2026-07-28T15:52:12.374Z"
+}

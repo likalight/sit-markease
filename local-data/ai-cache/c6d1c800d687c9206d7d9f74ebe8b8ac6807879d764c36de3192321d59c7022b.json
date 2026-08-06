@@ -1,0 +1,30 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_separation_invalid",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "The student sets up the differential equation but does not separate the variables."
+      },
+      {
+        "misconception_key": "mc_ic_applied_before_general",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "procedural",
+        "observed_signature": "The student applies the initial condition to find the constant C."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1200,
+  "outputTokens": 147,
+  "cachedAt": "2026-07-29T06:49:34.292Z"
+}

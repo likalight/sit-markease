@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "part_i",
+        "name": "Transformation of the differential equation",
+        "weight": 43,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Attempts to differentiate and substitute but makes significant errors."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly differentiates and substitutes but has minor simplification errors."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "Accurately differentiates, substitutes, and simplifies to du/dx = -6/x^3."
+          }
+        ]
+      },
+      {
+        "key": "part_ii",
+        "name": "Integration and application of initial condition",
+        "weight": 57,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Attempts integration but fails to apply the initial condition correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Integrates correctly but makes errors in applying the initial condition."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "Correctly integrates and applies the initial condition but has minor errors."
+          },
+          {
+            "level": "master",
+            "score": 4,
+            "descriptor": "Accurately integrates, applies the initial condition, and finds the correct final answer."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 808,
+  "outputTokens": 337,
+  "cachedAt": "2026-08-06T11:56:02.021Z"
+}

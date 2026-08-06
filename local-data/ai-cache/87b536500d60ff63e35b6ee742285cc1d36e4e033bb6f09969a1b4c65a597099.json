@@ -1,0 +1,22 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_constant_of_integration_dropped",
+        "confidence": 0.85,
+        "evidence_step_indices": [
+          2,
+          3
+        ],
+        "severity": "notational",
+        "observed_signature": "Integrated to ln|y| = x^2/2 with no +C, then patched the final answer with an ad-hoc factor of 2 at step 4 to match the initial condition."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:05.615Z"
+}

@@ -1,0 +1,58 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "\frac{dy}{y} = x \\, dx",
+        "plain_text": "The student sets up the differential equation.",
+        "role": "setup",
+        "confidence": 1
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "\text{ln}|y| = \frac{x^2}{2} + C",
+        "plain_text": "The student integrates both sides of the equation.",
+        "role": "rule_application",
+        "confidence": 1
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "y(0) = 2 \\Rightarrow C = \\text{ln}2",
+        "plain_text": "The student applies the initial condition to find the constant C.",
+        "role": "substitution",
+        "confidence": 1
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "y = 2e^{\\frac{x^2}{2}}",
+        "plain_text": "The student solves for y in terms of x.",
+        "role": "result",
+        "confidence": 1
+      }
+    ],
+    "final_answer": {
+      "latex": "y = 2e^{\\frac{x^2}{2}}",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 1
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 14659,
+  "outputTokens": 355,
+  "cachedAt": "2026-07-29T06:49:15.834Z"
+}

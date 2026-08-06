@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The stated solution correctly solves the equation for z.",
+    "method": "llm"
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 262,
+  "outputTokens": 28,
+  "cachedAt": "2026-08-05T18:21:55.130Z"
+}

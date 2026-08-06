@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "You did a great job setting up the equation in Step 1, correctly identifying the components involved. However, there seems to be a misunderstanding in how to approach the calculation in Step 2.",
+    "strengths": [
+      {
+        "text": "Correctly set up the equation based on the problem's parameters.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 2,
+        "what_happened": "You calculated the result of the expression from Step 1.",
+        "why_it_matters": "Getting the right result is crucial for the next steps in solving the problem.",
+        "misconception_key": null
+      }
+    ],
+    "next_action": "Can you double-check your calculation in Step 2 and see if you might have misapplied the order of operations?",
+    "tone": "socratic",
+    "word_count": 149
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 761,
+  "outputTokens": 195,
+  "cachedAt": "2026-08-05T17:17:49.718Z"
+}

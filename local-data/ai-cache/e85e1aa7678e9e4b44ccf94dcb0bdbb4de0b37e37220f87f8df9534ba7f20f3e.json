@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "elastic_potential_energy",
+        "name": "Elastic Potential Energy Calculation",
+        "weight": 30,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The calculation of elastic potential energy is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The elastic potential energy is correctly calculated as 0.64 J."
+          }
+        ]
+      },
+      {
+        "key": "gravitational_potential_energy",
+        "name": "Gravitational Potential Energy Calculation",
+        "weight": 30,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The calculation of gravitational potential energy is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The gravitational potential energy is correctly calculated as 0.80 J."
+          }
+        ]
+      },
+      {
+        "key": "kinetic_energy",
+        "name": "Kinetic Energy Calculation",
+        "weight": 20,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The kinetic energy calculation is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The kinetic energy is correctly calculated as 0.16 J."
+          }
+        ]
+      },
+      {
+        "key": "speed_calculation",
+        "name": "Speed Calculation",
+        "weight": 20,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The speed calculation is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The speed of the block is correctly calculated as 1.1 m/s."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1002,
+  "outputTokens": 453,
+  "cachedAt": "2026-08-06T07:31:40.009Z"
+}

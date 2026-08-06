@@ -9,7 +9,14 @@ __pycache__/
 .venv/
 sidecar/.venv/
 *.tsbuildinfo
-local-data/
+# Committed as an exception below: seeded AI cache entries for the guided
+# demo tour's real sample scripts (Physics/Math) — Vercel's filesystem is
+# read-only outside /tmp, so this cache never persists between production
+# requests unless it ships with the deploy. See src/lib/ai/cache.ts and
+# src/lib/ai/client.ts (callStructured checks this cache before any live
+# provider call, regardless of AIMS_FIXTURE_MODE).
+local-data/*
+!local-data/ai-cache
 supabase/.temp/
 
 .vercel

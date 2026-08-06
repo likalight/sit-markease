@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "x_coordinates",
+        "name": "Finding x-coordinates of A and B",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not attempt to find the x-coordinates."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly substituted and solved the quadratic equation for both x-coordinates."
+          }
+        ]
+      },
+      {
+        "key": "volume_integral",
+        "name": "Setting up the volume integral",
+        "weight": 17,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not set up the volume integral correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "The student correctly set up the volume integral using the washer method."
+          }
+        ]
+      },
+      {
+        "key": "integration_evaluation",
+        "name": "Integration and evaluation of the volume",
+        "weight": 50,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not integrate or evaluate the volume correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "The student correctly integrated and evaluated the volume to the exact answer of 125*pi/6."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 601,
+  "outputTokens": 354,
+  "cachedAt": "2026-08-05T08:03:11.236Z"
+}

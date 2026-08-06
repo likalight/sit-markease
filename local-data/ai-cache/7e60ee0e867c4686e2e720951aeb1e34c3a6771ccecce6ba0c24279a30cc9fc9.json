@@ -1,0 +1,49 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "formula_setup",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student sets up a sum of an arithmetic progression, which is not relevant to the compound interest formula needed for this problem.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "correct_substitution",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "No values related to the compound interest formula were substituted, as the student did not use the correct formula.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "final_value",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The final result provided is for an arithmetic progression, not the compound interest calculation, thus it cannot be considered correct.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 3,
+    "error_carry_forward_applied": false,
+    "needs_human_review": false,
+    "review_reasons": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 965,
+  "outputTokens": 307,
+  "cachedAt": "2026-08-05T15:08:31.902Z"
+}

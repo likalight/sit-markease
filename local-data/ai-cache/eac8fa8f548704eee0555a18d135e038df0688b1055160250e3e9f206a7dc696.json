@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_lack_of_context_in_solution_steps",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Sets up the equation for the sum of an arithmetic series using the given values."
+      },
+      {
+        "misconception_key": "mc_candidate_lack_of_specific_calculations_for_a_and_",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "procedural",
+        "observed_signature": "Substitutes and simplifies to find the common difference d."
+      },
+      {
+        "misconception_key": "mc_candidate_missing_function_derivation",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Substitutes d back into the equation to solve for a_1."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 935,
+  "outputTokens": 229,
+  "cachedAt": "2026-08-05T15:11:37.415Z"
+}

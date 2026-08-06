@@ -1,0 +1,20 @@
+{
+  "data": {
+    "detected": [],
+    "novel_candidates": [
+      {
+        "proposed_name": "Lack of calculations for part (a) and (b)",
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "confidence": 0.9
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1186,
+  "outputTokens": 63,
+  "cachedAt": "2026-08-05T18:11:50.168Z"
+}

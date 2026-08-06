@@ -1,0 +1,63 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "c_setup",
+        "level": "expert",
+        "score": 4,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "Correctly separates variables into dy/y = x dx.",
+        "confidence": 0.92
+      },
+      {
+        "criterion_key": "c_method",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 6,
+        "evidence_step_indices": [
+          2,
+          3
+        ],
+        "justification": "Integrated correctly but never wrote the constant of integration — the general solution loses a degree of freedom.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "c_ic",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The initial condition is patched onto an already-particular solution via an ad-hoc factor of 2, rather than solved for a genuine constant C.",
+        "confidence": 0.75
+      },
+      {
+        "criterion_key": "c_answer",
+        "level": "expert",
+        "score": 5,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "Final answer matches the expected result (verified symbolically).",
+        "confidence": 0.9
+      }
+    ],
+    "total_recommended": 16,
+    "max_total": 20,
+    "error_carry_forward_applied": true,
+    "needs_human_review": true,
+    "review_reasons": [
+      "method_omits_constant_of_integration_but_reaches_correct_answer"
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:20:03.242Z"
+}

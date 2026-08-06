@@ -1,0 +1,31 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "setup_correctness_issue",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Sets up the equation with a value of 1311 and states to use a formula with n equal to 23."
+      },
+      {
+        "misconception_key": "Lack of context in solution steps",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          2,
+          3
+        ],
+        "severity": "notational",
+        "observed_signature": "Contains unreadable text that does not contribute to a clear mathematical step."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 922,
+  "outputTokens": 163,
+  "cachedAt": "2026-08-05T15:09:02.262Z"
+}

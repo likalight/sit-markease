@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "arranging_men",
+        "name": "Arranging the Men",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not correctly arrange the men."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly arranged the men using 8!."
+          }
+        ]
+      },
+      {
+        "key": "identifying_gaps",
+        "name": "Identifying Gaps for Women",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student failed to identify the correct number of gaps."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly identified 9 gaps and chose 5 of them."
+          }
+        ]
+      },
+      {
+        "key": "arranging_women",
+        "name": "Arranging the Women",
+        "weight": 34,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not correctly arrange the women or calculate the final product."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly arranged the women using 5! and calculated the final product."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 539,
+  "outputTokens": 347,
+  "cachedAt": "2026-08-05T14:33:59.117Z"
+}

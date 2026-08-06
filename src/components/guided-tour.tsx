@@ -47,6 +47,11 @@ export function GuidedTour() {
   const [busy, setBusy] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipSize, setTooltipSize] = useState({ width: 320, height: 200 });
+  // See the catch-up effect below for why this exists: flips true right
+  // before any self-triggered step change (advance()/handleNext()), so that
+  // effect can tell "we just moved the step ourselves, pathname hasn't
+  // caught up yet" apart from "the product genuinely skipped a page."
+  const advanceRef = useRef(false);
 
   useEffect(() => {
     const bootstrapMode = searchParams.get("tour");
@@ -74,6 +79,27 @@ export function GuidedTour() {
   // waiting on a target that was never going to appear on this run.
   useEffect(() => {
     if (!tourState) return;
+    // advance()/handleNext() commit the new step SYNCHRONOUSLY, well before
+    // the real navigation they triggered actually lands — so this effect's
+    // very first run after a self-triggered step change reads a STALE
+    // pathname against the already-advanced step. A fixed debounce here
+    // previously tried to paper over that by waiting out the race, but a
+    // real server-action round trip (e.g. creating an attempt row) can take
+    // longer than any debounce window picked in advance, so the premature
+    // check still fired — and since several steps in this tour intentionally
+    // reuse the same pathname ("/submit" 4x, "/feedback" 3x, "/work/" 2x),
+    // catching up against a stale pathname can land on a step several hops
+    // further ahead than the real next one (reproduced live: jumped from
+    // step 3 straight to step 8). advanceRef, set by every self-triggered
+    // step change below, makes this exact-once instead of timing-based:
+    // skip the very next run of this effect unconditionally (that's the
+    // stale one, always caused by our own state update, never a real
+    // navigation), then let it evaluate for real once pathname itself
+    // actually changes — by which point it reflects reality.
+    if (advanceRef.current) {
+      advanceRef.current = false;
+      return;
+    }
     const steps = TOUR_STEPS[tourState.mode];
     const current = steps[tourState.step];
     if (!current || current.matches(pathname)) return;
@@ -102,6 +128,7 @@ export function GuidedTour() {
     if (step.switchTo && step.redirectAfterSwitch) {
       const nextIndex = tourState.step + 1;
       const isEnd = step.end || nextIndex >= TOUR_STEPS[tourState.mode].length;
+      advanceRef.current = true;
       writeStoredState(isEnd ? null : { mode: tourState.mode, step: nextIndex });
       void switchRoleAction(step.switchTo, step.redirectAfterSwitch);
       return;
@@ -113,6 +140,7 @@ export function GuidedTour() {
       return;
     }
     const next = { mode: tourState.mode, step: nextIndex };
+    advanceRef.current = true;
     writeStoredState(next);
     setTourState(next);
   }
@@ -219,6 +247,7 @@ export function GuidedTour() {
     if (step!.switchTo && step!.redirectAfterSwitch) {
       const nextIndex = tourState!.step + 1;
       const isEnd = step!.end || nextIndex >= TOUR_STEPS[tourState!.mode].length;
+      advanceRef.current = true;
       writeStoredState(isEnd ? null : { mode: tourState!.mode, step: nextIndex });
       await switchRoleAction(step!.switchTo, step!.redirectAfterSwitch);
       return;

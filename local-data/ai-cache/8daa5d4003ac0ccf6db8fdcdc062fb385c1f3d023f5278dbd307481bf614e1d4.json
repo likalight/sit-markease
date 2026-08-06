@@ -1,0 +1,50 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          2,
+          3
+        ],
+        "latex": "x = 0.72 - 0.40 = 0.32",
+        "plain_text": "Calculates the change in length of the spring by subtracting the initial length from the final length.",
+        "role": "substitution",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          4,
+          5
+        ],
+        "latex": "E = \\text{area under graph} = \\frac{1}{2} k x^2",
+        "plain_text": "States that the elastic potential energy is equal to the area under the graph, indicating a formula for potential energy.",
+        "role": "rule_application",
+        "confidence": 0.78
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          6
+        ],
+        "latex": "= 0.32 \\times A",
+        "plain_text": "Multiplies the change in length by the area to find the elastic potential energy.",
+        "role": "simplification",
+        "confidence": 0.78
+      }
+    ],
+    "final_answer": {
+      "latex": "0.64",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.85
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 20766,
+  "outputTokens": 307,
+  "cachedAt": "2026-08-06T12:12:33.378Z"
+}

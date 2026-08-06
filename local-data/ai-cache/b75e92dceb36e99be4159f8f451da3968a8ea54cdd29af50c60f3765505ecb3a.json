@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 2y, \\text{ given } y(0) = 3.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 2dx. Integrate: \\ln|y| = 2x + C, \\text{ so } y = Ae^{2x}. Apply y(0) = 3: 3 = A e^{0} \\Rightarrow A = 3. \\text{ Final answer: } y = 3e^{2x}.",
+        "hint_ladder": [
+          "Separate the variables first.",
+          "Remember to integrate both sides before applying the initial condition.",
+          "After finding the general solution, substitute the initial condition to find the constant."
+        ],
+        "targets_because": "This item requires the student to separate and integrate before applying the initial condition, isolating the misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 6 Q3"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 3x^2 y, \\text{ given } y(1) = 4.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 3x^2 dx. Integrate: \\ln|y| = x^3 + C, \\text{ so } y = Ae^{x^3}. Apply y(1) = 4: 4 = Ae^{1} \\Rightarrow A = 4e^{-1}. \\text{ Final answer: } y = 4e^{-1} e^{x^3} = 4e^{x^3 - 1}.",
+        "hint_ladder": [
+          "Start by separating the variables.",
+          "Integrate both sides before substituting the initial condition.",
+          "Use the initial condition to solve for the constant after finding the general solution."
+        ],
+        "targets_because": "This item emphasizes the importance of integrating before applying the initial condition, addressing the misconception directly.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 5y, \\text{ given } y(0) = 10.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 5dx. Integrate: \\ln|y| = 5x + C, \\text{ so } y = Ae^{5x}. Apply y(0) = 10: 10 = Ae^{0} \\Rightarrow A = 10. \\text{ Final answer: } y = 10e^{5x}.",
+        "hint_ladder": [
+          "Separate the variables correctly.",
+          "Integrate both sides before applying the initial condition.",
+          "Once you have the general solution, substitute the initial condition to find the constant."
+        ],
+        "targets_because": "This problem reinforces the correct order of operations in solving ODEs, preventing the application of initial conditions prematurely.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 6 Q5"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 6xy, \\text{ given } y(2) = 5.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 6x dx. Integrate: \\ln|y| = 3x^2 + C, \\text{ so } y = Ae^{3x^2}. Apply y(2) = 5: 5 = Ae^{12} \\Rightarrow A = 5e^{-12}. \\text{ Final answer: } y = 5e^{-12} e^{3x^2} = 5e^{3x^2 - 12}.",
+        "hint_ladder": [
+          "Begin by separating the variables.",
+          "Make sure to integrate both sides before using the initial condition.",
+          "After determining the general solution, substitute the initial condition to find the constant."
+        ],
+        "targets_because": "This extension problem challenges the student to apply the correct methodology in a more complex scenario, reinforcing the misconception's correction.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Lecture 5: Separation of Variables"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1157,
+  "outputTokens": 1009,
+  "cachedAt": "2026-07-29T07:00:16.853Z"
+}

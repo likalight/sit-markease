@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "recognition_split",
+        "name": "Recognition of Required Split",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not recognize the required split of 3 men and 3 women."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly recognized the required split of 3 men and 3 women."
+          }
+        ]
+      },
+      {
+        "key": "correct_c10_3",
+        "name": "Correct Calculation of C(10,3)",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not calculate C(10,3) correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculated C(10,3) as 120."
+          }
+        ]
+      },
+      {
+        "key": "correct_c15_3",
+        "name": "Correct Calculation of C(15,3)",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not calculate C(15,3) correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculated C(15,3) as 455."
+          }
+        ]
+      },
+      {
+        "key": "final_product",
+        "name": "Correct Final Product Calculation",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not arrive at the correct final product."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculated the final product as 54,600."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 472,
+  "outputTokens": 463,
+  "cachedAt": "2026-08-05T14:34:20.813Z"
+}

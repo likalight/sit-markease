@@ -86,16 +86,26 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
                   )}
                 </div>
 
-                <div className="flex flex-col gap-xs md:min-w-44" data-tour-id={assessment.id === DEMO_FORMATIVE_ASSESSMENT_ID ? "submit-start-attempt" : undefined}>
+                <div className="flex flex-col gap-xs md:min-w-44">
                   {isFormative && (
                     active ? (
-                      <Link href={`/work/${assessment.id}?attempt=${active.id}`} className="rounded-sm bg-ink px-md py-xs text-center text-body-sm font-medium text-on-dark">
+                      <Link
+                        href={`/work/${assessment.id}?attempt=${active.id}`}
+                        data-tour-id={assessment.id === DEMO_FORMATIVE_ASSESSMENT_ID ? "submit-start-attempt" : undefined}
+                        className="rounded-sm bg-ink px-md py-xs text-center text-body-sm font-medium text-on-dark"
+                      >
                         Continue attempt
                       </Link>
                     ) : (
                       <form action={startAssessmentAttemptAction}>
                         <input type="hidden" name="assessmentId" value={assessment.id} />
-                        <SubmitButton disabled={unavailable || remaining === 0} pendingLabel="Starting...">Start attempt</SubmitButton>
+                        <SubmitButton
+                          disabled={unavailable || remaining === 0}
+                          pendingLabel="Starting..."
+                          dataTourId={assessment.id === DEMO_FORMATIVE_ASSESSMENT_ID ? "submit-start-attempt" : undefined}
+                        >
+                          Start attempt
+                        </SubmitButton>
                       </form>
                     )
                   )}

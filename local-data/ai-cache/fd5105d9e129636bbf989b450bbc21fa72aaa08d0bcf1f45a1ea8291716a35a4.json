@@ -1,0 +1,49 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "term_identification",
+        "level": "proficient",
+        "score": 1,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly identifies the terms a=3, d=4, n=10.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "formula_usage",
+        "level": "proficient",
+        "score": 2,
+        "max_score": 2,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student correctly states and uses the formula a_n = a + (n-1)d.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "final_arithmetic",
+        "level": "novice",
+        "score": 0,
+        "max_score": 2,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student does not arrive at the correct final answer of 39 due to incorrect arithmetic.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 3,
+    "max_total": 5,
+    "error_carry_forward_applied": false,
+    "needs_human_review": false,
+    "review_reasons": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1002,
+  "outputTokens": 296,
+  "cachedAt": "2026-08-04T14:49:39.767Z"
+}

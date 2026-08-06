@@ -1,0 +1,121 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "define_linear_momentum",
+        "name": "Definition of Linear Momentum",
+        "weight": 11,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The definition of linear momentum is missing or incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly defines linear momentum as mass times velocity."
+          }
+        ]
+      },
+      {
+        "key": "contact_time_interval",
+        "name": "Time Interval of Contact",
+        "weight": 11,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The time interval of contact is not identified or incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly identifies the time interval of contact as 40 ms."
+          }
+        ]
+      },
+      {
+        "key": "acceleration_description",
+        "name": "Description of Acceleration",
+        "weight": 22,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The descriptions of acceleration are missing or incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly describes the acceleration as constant from 80 to 100 ms."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "The student correctly describes the acceleration as constant from 80 to 100 ms and zero from 100 to 120 ms."
+          }
+        ]
+      },
+      {
+        "key": "force_calculation",
+        "name": "Calculation of Force",
+        "weight": 22,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The method for calculating force is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student uses the correct method for calculating force but provides an incorrect answer."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "The student correctly applies the method and calculates the force as 13 N."
+          }
+        ]
+      },
+      {
+        "key": "momentum_sketch",
+        "name": "Sketch of Momentum Variation",
+        "weight": 35,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The sketch of momentum variation is missing or incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student includes one correct line segment in the momentum sketch."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student includes two correct line segments in the momentum sketch."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "The student accurately sketches all three required line segments in the momentum variation."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1002,
+  "outputTokens": 702,
+  "cachedAt": "2026-08-04T19:37:28.006Z"
+}

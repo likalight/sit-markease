@@ -1,0 +1,103 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "part_a_model",
+        "name": "Part A Model",
+        "weight": 25,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No correct model identified."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly identifies the model for free bits."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Correctly identifies the model and explains it."
+          }
+        ]
+      },
+      {
+        "key": "part_a_calculation",
+        "name": "Part A Calculation",
+        "weight": 25,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No calculation attempted."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly performs the calculation but not the final value."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Correctly performs the calculation and arrives at the final value."
+          }
+        ]
+      },
+      {
+        "key": "part_b_model",
+        "name": "Part B Model",
+        "weight": 25,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No correct model identified."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly identifies the binomial coefficient model."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Correctly identifies the model and explains it."
+          }
+        ]
+      },
+      {
+        "key": "part_b_calculation",
+        "name": "Part B Calculation",
+        "weight": 25,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "No calculation attempted."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly performs the calculation but not the final value."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Correctly performs the calculation and arrives at the final value."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 590,
+  "outputTokens": 527,
+  "cachedAt": "2026-08-05T14:33:38.023Z"
+}

@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The stated solution correctly calculates the sum of 5 and 3.",
+    "method": "llm"
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 240,
+  "outputTokens": 32,
+  "cachedAt": "2026-08-05T18:21:52.314Z"
+}

@@ -1,0 +1,30 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "novice_on_part_i",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "procedural",
+        "observed_signature": "the student correctly finds A=5 but does not calculate u3."
+      },
+      {
+        "misconception_key": "novice_on_part_iii",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          8
+        ],
+        "severity": "procedural",
+        "observed_signature": "the student sets up the summation but does not apply the geometric series formula correctly."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 764,
+  "outputTokens": 153,
+  "cachedAt": "2026-08-04T08:09:39.239Z"
+}

@@ -1,0 +1,80 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "gp_ap_identification",
+        "name": "Geometric/Arithmetic Progression Identification",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Identifies the type of series incorrectly or not at all."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly identifies the type of series and applies the appropriate formula."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "Accurately identifies the series type and provides a clear explanation of the formula used."
+          }
+        ]
+      },
+      {
+        "key": "correct_substitution",
+        "name": "Correct Substitution",
+        "weight": 30,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Makes significant errors in substitution leading to incorrect calculations."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Substitutes values correctly but may have minor errors in calculations."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "Substitutes all values correctly and performs calculations accurately."
+          }
+        ]
+      },
+      {
+        "key": "final_value",
+        "name": "Correct Final Value",
+        "weight": 40,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "Provides an incorrect final value for one or more parts."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Calculates the final value correctly for most parts but makes an error in one."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "Calculates the final value correctly for all parts."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 576,
+  "outputTokens": 438,
+  "cachedAt": "2026-08-05T14:33:03.085Z"
+}

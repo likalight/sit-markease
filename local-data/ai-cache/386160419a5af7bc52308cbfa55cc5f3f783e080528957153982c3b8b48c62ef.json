@@ -1,0 +1,88 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "nth_term_equation",
+        "name": "Correct nth-term equation",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The nth-term equation is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The nth-term equation is correct."
+          }
+        ]
+      },
+      {
+        "key": "sum_of_terms_equation",
+        "name": "Correct sum of 10 terms equation",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The sum of terms equation is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The sum of terms equation is correct."
+          }
+        ]
+      },
+      {
+        "key": "solving_simultaneous_equations",
+        "name": "Correctly solving simultaneous equations",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The solution to the simultaneous equations is incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The solution to the simultaneous equations is correct."
+          }
+        ]
+      },
+      {
+        "key": "final_values",
+        "name": "Correct final values for a and d",
+        "weight": 25,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The final values for a and d are incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "One of the final values for a or d is correct."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Both final values for a and d are correct."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 572,
+  "outputTokens": 469,
+  "cachedAt": "2026-08-05T14:32:42.439Z"
+}

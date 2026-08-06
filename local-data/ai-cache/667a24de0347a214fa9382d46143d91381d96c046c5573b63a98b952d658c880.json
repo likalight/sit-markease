@@ -1,0 +1,80 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "define_velocity",
+        "name": "Definition of Velocity",
+        "weight": 17,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The definition of velocity is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The definition of velocity is correctly stated as change in displacement over time."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_part1",
+        "name": "Calculation of k (Part b)(i)",
+        "weight": 33,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The calculation is incorrect or no attempt is made."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The substitution is correct but the final value of k is not reached."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "The calculation is correct, yielding k = 1.4."
+          }
+        ]
+      },
+      {
+        "key": "calculate_k_part2",
+        "name": "Calculation of k with Uncertainty (Part b)(ii)",
+        "weight": 50,
+        "max_score": 3,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The calculation of uncertainty is incorrect or missing."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The percentage uncertainty is calculated correctly but the absolute uncertainty is incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Both percentage and absolute uncertainties are calculated correctly but the final answer is not stated correctly."
+          },
+          {
+            "level": "expert",
+            "score": 3,
+            "descriptor": "All calculations are correct, with the final answer stated as k = 1.4 +/- 0.2."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 843,
+  "outputTokens": 459,
+  "cachedAt": "2026-08-06T11:56:07.614Z"
+}

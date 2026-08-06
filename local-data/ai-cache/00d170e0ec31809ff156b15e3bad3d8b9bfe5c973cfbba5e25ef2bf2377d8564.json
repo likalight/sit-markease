@@ -1,0 +1,58 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "\frac{dy}{y} = x \\, dx",
+        "plain_text": "Separates variables by dividing both sides by y and multiplying by dx.",
+        "role": "setup",
+        "confidence": 1
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "\text{ln}|y| = \frac{x^2}{2}",
+        "plain_text": "Integrates both sides, retaining the constant of integration.",
+        "role": "rule_application",
+        "confidence": 1
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "y = e^{\frac{x^2}{2}}",
+        "plain_text": "Solves for y by exponentiating both sides.",
+        "role": "result",
+        "confidence": 1
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "y(0) = 2 \\Rightarrow y = 2e^{\frac{x^2}{2}}",
+        "plain_text": "Applies the initial condition to find the specific solution.",
+        "role": "substitution",
+        "confidence": 1
+      }
+    ],
+    "final_answer": {
+      "latex": "y = 2e^{\frac{x^2}{2}}",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 1
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 14771,
+  "outputTokens": 363,
+  "cachedAt": "2026-07-29T06:58:22.641Z"
+}

@@ -1,0 +1,40 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "setup_correctness",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly sets up the first sum but does not correctly set up the second sum, as the terms listed do not match the expected series.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "final_value_accuracy",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The final numeric values for the sums are incorrect based on the calculations provided in the steps.",
+        "confidence": 0.7
+      }
+    ],
+    "total_recommended": 2,
+    "max_total": 4,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach to the sums is unclear and contains errors in setup and final values."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1146,
+  "outputTokens": 242,
+  "cachedAt": "2026-08-05T15:07:37.269Z"
+}

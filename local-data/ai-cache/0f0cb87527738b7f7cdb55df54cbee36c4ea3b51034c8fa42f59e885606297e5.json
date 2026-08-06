@@ -1,0 +1,51 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "latex": "1.67 \\left( \\frac{(1.04)^{9}}{1.04-1} \\right)",
+        "plain_text": "Sets up the equation for calculating a value using a formula.",
+        "role": "setup",
+        "confidence": 0.77
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          5
+        ],
+        "latex": "= 17.67326817",
+        "plain_text": "Calculates the result of the previous expression.",
+        "role": "result",
+        "confidence": 0.31
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          6
+        ],
+        "latex": "= 17.67 \\text{ cm} (4s.f.)",
+        "plain_text": "Rounds the result to four significant figures.",
+        "role": "result",
+        "confidence": 0.31
+      }
+    ],
+    "final_answer": {
+      "latex": "17.67 \\text{ cm} (4s.f.)",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.5
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 20717,
+  "outputTokens": 289,
+  "cachedAt": "2026-08-05T15:09:43.727Z"
+}

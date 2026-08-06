@@ -1,0 +1,45 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_lack_of_calculations_for_part_a_and_b_",
+        "confidence": 1,
+        "evidence_step_indices": [
+          1,
+          2,
+          3
+        ],
+        "severity": "conceptual",
+        "observed_signature": "No terms for sequence a_n = a_{n-1}^2 were computed."
+      },
+      {
+        "misconception_key": "mc_candidate_lack_of_calculations_for_part_a_and_b_",
+        "confidence": 1,
+        "evidence_step_indices": [
+          1,
+          2,
+          3
+        ],
+        "severity": "conceptual",
+        "observed_signature": "No terms for sequence a_n = n*a_{n-1} + n^2*a_{n-2} were computed."
+      },
+      {
+        "misconception_key": "mc_candidate_lack_of_calculations_for_part_a_and_b_",
+        "confidence": 1,
+        "evidence_step_indices": [
+          1,
+          2,
+          3
+        ],
+        "severity": "conceptual",
+        "observed_signature": "No terms for sequence a_n = a_{n-1} + a_{n-3} were computed."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1213,
+  "outputTokens": 295,
+  "cachedAt": "2026-08-06T00:48:19.591Z"
+}

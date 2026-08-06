@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "correct_formula",
+        "name": "Correct Arithmetic Series Sum Formula",
+        "weight": 33,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The formula used for the sum of the series is incorrect."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The correct formula for the sum of the series is provided."
+          }
+        ]
+      },
+      {
+        "key": "correct_substitution",
+        "name": "Correct Substitution of Values",
+        "weight": 33,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Values for a and d are not substituted correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Values for a and d are substituted correctly into the formula."
+          }
+        ]
+      },
+      {
+        "key": "correct_simplification",
+        "name": "Correct Simplification of Expression",
+        "weight": 34,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The final expression is not simplified correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The final expression is simplified correctly."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 460,
+  "outputTokens": 331,
+  "cachedAt": "2026-08-05T14:32:31.988Z"
+}

@@ -1,0 +1,47 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "setup_correctness",
+        "name": "Correct Setup/Expansion",
+        "weight": 50,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The setup for each sum is correctly expanded."
+          },
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "At least one sum setup is incorrect or incomplete."
+          }
+        ]
+      },
+      {
+        "key": "final_value_accuracy",
+        "name": "Correct Final Numeric Value",
+        "weight": 50,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "All final numeric values for the sums are correct."
+          },
+          {
+            "level": "novice",
+            "score": 1,
+            "descriptor": "At least one final numeric value is incorrect."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 586,
+  "outputTokens": 219,
+  "cachedAt": "2026-08-05T14:31:53.330Z"
+}

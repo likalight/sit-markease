@@ -1,0 +1,63 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "c_setup",
+        "level": "expert",
+        "score": 4,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "Correctly separates variables into dy/y = x dx.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "c_method",
+        "level": "novice",
+        "score": 1,
+        "max_score": 6,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "Integration is performed but is disconnected from the flawed step 2 — the overall method is incoherent.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "c_ic",
+        "level": "novice",
+        "score": 1,
+        "max_score": 5,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "Initial condition substituted into the unintegrated separated equation, producing the nonsensical statement 2/y = 0.",
+        "confidence": 0.72
+      },
+      {
+        "criterion_key": "c_answer",
+        "level": "novice",
+        "score": 1,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "Final answer omits the constant entirely and does not match the expected result (verified symbolically).",
+        "confidence": 0.85
+      }
+    ],
+    "total_recommended": 7,
+    "max_total": 20,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "unusual_and_inconsistent_method",
+      "initial_condition_misapplied"
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:03.914Z"
+}

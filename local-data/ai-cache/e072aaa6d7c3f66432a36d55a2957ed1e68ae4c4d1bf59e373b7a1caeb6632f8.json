@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "final_value_accuracy_issue",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "provides a result that is unrelated to the sums requested in the question"
+      },
+      {
+        "misconception_key": "incorrect_formula_usage",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "procedural",
+        "observed_signature": "dividing 1.67 times (1.00 times 10 to the power of -9) by 1.00 minus 1"
+      },
+      {
+        "misconception_key": "lack_of_context_in_solution_steps",
+        "confidence": 0.85,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "notational",
+        "observed_signature": "sets up the equation by dividing 1.67 times (1.00 times 10 to the power of -9) by 1.00 minus 1"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1077,
+  "outputTokens": 250,
+  "cachedAt": "2026-08-05T17:17:44.021Z"
+}

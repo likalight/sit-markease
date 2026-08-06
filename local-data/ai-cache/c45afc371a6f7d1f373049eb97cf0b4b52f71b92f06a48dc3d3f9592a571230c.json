@@ -1,0 +1,73 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "sum_pairs_identification",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student lists pairs of numbers that sum to 9, but does not correctly identify all four pairs.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "pigeons_pigeonholes",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          5
+        ],
+        "justification": "The student applies the pigeonhole principle but does not explicitly identify the pigeons and pigeonholes.",
+        "confidence": 0.6
+      },
+      {
+        "criterion_key": "pigeonhole_conclusion",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          5
+        ],
+        "justification": "The student applies the pigeonhole principle but does not provide a correct conclusion based on it.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "final_conclusion",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          6
+        ],
+        "justification": "The student states that selecting 4 numbers can avoid pairs that sum to 9, but does not clearly conclude the final statement.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "counterexample_part_b",
+        "level": "novice",
+        "score": 0,
+        "max_score": 2,
+        "evidence_step_indices": [
+          6
+        ],
+        "justification": "The student provides a selection of 4 numbers but does not conclude correctly about the statement being false.",
+        "confidence": 0.5
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach lacks clarity and completeness in identifying key concepts."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1336,
+  "outputTokens": 487,
+  "cachedAt": "2026-08-05T18:06:55.951Z"
+}

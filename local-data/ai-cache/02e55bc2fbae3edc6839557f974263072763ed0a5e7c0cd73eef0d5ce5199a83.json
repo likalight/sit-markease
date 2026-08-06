@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_i",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student correctly finds A=5 but fails to find u3.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "part_ii",
+        "level": "novice",
+        "score": 2,
+        "max_score": 4,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The student forms equations but incorrectly calculates a=7.5 instead of a=15/2.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "part_iii",
+        "level": "novice",
+        "score": 2,
+        "max_score": 4,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student sets up the summation but does not apply the geometric series formula correctly.",
+        "confidence": 0.7
+      }
+    ],
+    "total_recommended": 5,
+    "max_total": 10,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student made significant errors in calculations that affect multiple parts."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1563,
+  "outputTokens": 302,
+  "cachedAt": "2026-08-05T02:42:51.866Z"
+}

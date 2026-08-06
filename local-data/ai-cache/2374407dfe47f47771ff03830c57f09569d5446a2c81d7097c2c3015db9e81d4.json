@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "part_a_i",
+        "name": "Elastic Potential Energy Calculation",
+        "weight": 28,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to use the correct method or reaches an incorrect value."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly uses the area under the graph to find the elastic potential energy as 0.64 J."
+          }
+        ]
+      },
+      {
+        "key": "part_a_ii",
+        "name": "Gravitational Potential Energy Calculation",
+        "weight": 28,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to apply the formula correctly or reaches an incorrect value."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly applies E = mgh to find the gravitational potential energy as 0.80 J."
+          }
+        ]
+      },
+      {
+        "key": "part_b_i",
+        "name": "Kinetic Energy Calculation",
+        "weight": 14,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to calculate the kinetic energy correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly calculates the kinetic energy as 0.16 J."
+          }
+        ]
+      },
+      {
+        "key": "part_b_ii",
+        "name": "Speed Calculation",
+        "weight": 30,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to substitute correctly or reaches an incorrect speed."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Correctly substitutes into the equation to find the speed as 1.1 m/s."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 970,
+  "outputTokens": 469,
+  "cachedAt": "2026-08-06T11:56:13.678Z"
+}

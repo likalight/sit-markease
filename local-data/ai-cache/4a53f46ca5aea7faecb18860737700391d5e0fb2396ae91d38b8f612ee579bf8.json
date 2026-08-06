@@ -1,0 +1,48 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_incorrect_application_of_geometric_serie",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          3,
+          4
+        ],
+        "severity": "procedural",
+        "observed_signature": "Applies the formula for the sum of a geometric series"
+      },
+      {
+        "misconception_key": "mc_candidate_incorrect_calculation_of_coefficients",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "severity": "procedural",
+        "observed_signature": "Calculates the sum of another series with terms (-2), (-1), 0, 1, and 2"
+      }
+    ],
+    "novel_candidates": [
+      {
+        "proposed_name": "setup_correctness_issue",
+        "evidence_step_indices": [
+          2
+        ],
+        "confidence": 0.9
+      },
+      {
+        "proposed_name": "final_value_accuracy_issue",
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "confidence": 0.9
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 926,
+  "outputTokens": 248,
+  "cachedAt": "2026-08-05T15:07:42.503Z"
+}

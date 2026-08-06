@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "nth_term_equation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student defined the formula for the nth term of a geometric sequence, which is incorrect as the problem involves an arithmetic progression.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "sum_of_terms_equation",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student attempted to substitute values into a formula, but it is for a geometric sequence instead of the required arithmetic progression.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "solving_simultaneous_equations",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The student calculated a term but did not solve any simultaneous equations relevant to the problem.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "final_values",
+        "level": "novice",
+        "score": 0,
+        "max_score": 2,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student did not provide any final values for the first term and common difference of the arithmetic progression.",
+        "confidence": 0.8
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 5,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student used the wrong sequence type (geometric instead of arithmetic)."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1173,
+  "outputTokens": 409,
+  "cachedAt": "2026-08-06T00:48:23.334Z"
+}

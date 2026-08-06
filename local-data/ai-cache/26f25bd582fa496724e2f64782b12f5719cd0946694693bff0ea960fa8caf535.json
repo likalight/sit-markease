@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "count_terms_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "does not provide a clear count of the number of terms in the series"
+      },
+      {
+        "misconception_key": "final_value_accuracy_issue",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "notational",
+        "observed_signature": "references a formula but is unreadable"
+      },
+      {
+        "misconception_key": "identify_pigeons_error",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "conceptual",
+        "observed_signature": "does not explicitly state that it is a geometric progression"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1187,
+  "outputTokens": 204,
+  "cachedAt": "2026-08-05T18:23:30.853Z"
+}

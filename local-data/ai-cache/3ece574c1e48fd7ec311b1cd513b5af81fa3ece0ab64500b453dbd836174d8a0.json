@@ -1,0 +1,200 @@
+{
+  "data": {
+    "mappings": [
+      {
+        "question_id": "497e6263-9c2f-4f4e-b233-bdf2ccf454cf",
+        "detected_label": "1(a)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.2
+          },
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.2,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for sum of first 5 terms."
+      },
+      {
+        "question_id": "497e6263-9c2f-4f4e-b233-bdf2ccf454cf",
+        "detected_label": "1(b)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.4,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for geometric series sum."
+      },
+      {
+        "question_id": "497e6263-9c2f-4f4e-b233-bdf2ccf454cf",
+        "detected_label": "1(c)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.6,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for constant sum."
+      },
+      {
+        "question_id": "497e6263-9c2f-4f4e-b233-bdf2ccf454cf",
+        "detected_label": "1(d)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.8,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for telescoping series."
+      },
+      {
+        "question_id": "6d08e252-e568-4601-ad15-0ff9575992ee",
+        "detected_label": "2(a)",
+        "regions": [
+          {
+            "page_index": 1,
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for recurrence relation."
+      },
+      {
+        "question_id": "6d08e252-e568-4601-ad15-0ff9575992ee",
+        "detected_label": "2(b)",
+        "regions": [
+          {
+            "page_index": 1,
+            "x": 0,
+            "y": 0.2,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for second recurrence relation."
+      },
+      {
+        "question_id": "6d08e252-e568-4601-ad15-0ff9575992ee",
+        "detected_label": "2(c)",
+        "regions": [
+          {
+            "page_index": 1,
+            "x": 0,
+            "y": 0.4,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for third recurrence relation."
+      },
+      {
+        "question_id": "44d4fdd4-ac1b-4681-af4e-c75d50160059",
+        "detected_label": "3",
+        "regions": [
+          {
+            "page_index": 2,
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for compound interest."
+      },
+      {
+        "question_id": "9f8eb0fa-33a9-4129-891d-0e4e57588895",
+        "detected_label": "4",
+        "regions": [
+          {
+            "page_index": 2,
+            "x": 0,
+            "y": 0.2,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for arithmetic series."
+      },
+      {
+        "question_id": "cf2153ee-aed2-41a5-aee7-f6c21fb14806",
+        "detected_label": "5",
+        "regions": [
+          {
+            "page_index": 2,
+            "x": 0,
+            "y": 0.4,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for arithmetic progression."
+      },
+      {
+        "question_id": "9a00ced5-9886-411a-b721-ca63c5460259",
+        "detected_label": "6",
+        "regions": [
+          {
+            "page_index": 2,
+            "x": 0,
+            "y": 0.6,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for geometric series."
+      },
+      {
+        "question_id": "a13466d0-b553-4a0b-9959-49f1d55b7981",
+        "detected_label": "8",
+        "regions": [
+          {
+            "page_index": 2,
+            "x": 0,
+            "y": 0.8,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "Visible calculations for limit of series."
+      }
+    ],
+    "unassigned_regions": [],
+    "flags": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 186684,
+  "outputTokens": 1393,
+  "cachedAt": "2026-08-05T15:01:33.767Z"
+}

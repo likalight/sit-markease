@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_lack_of_context_in_solution_steps",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "severity": "conceptual",
+        "observed_signature": "The student correctly finds A=5 but fails to find u3."
+      }
+    ],
+    "novel_candidates": [
+      {
+        "proposed_name": "Incorrect calculation of coefficients",
+        "evidence_step_indices": [
+          3
+        ],
+        "confidence": 0.9
+      },
+      {
+        "proposed_name": "Incorrect application of geometric series formula",
+        "evidence_step_indices": [
+          4
+        ],
+        "confidence": 0.85
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 769,
+  "outputTokens": 170,
+  "cachedAt": "2026-08-05T02:42:56.004Z"
+}

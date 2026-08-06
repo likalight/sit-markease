@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The solution is mathematically correct and properly solves the differential equation with the given initial condition.",
+    "method": "llm"
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 286,
+  "outputTokens": 33,
+  "cachedAt": "2026-07-28T15:52:15.577Z"
+}

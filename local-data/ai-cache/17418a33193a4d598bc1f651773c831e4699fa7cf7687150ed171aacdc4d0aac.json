@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "gp_ap_identification",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not identify the type of series or apply any relevant formulas.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "correct_substitution",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student performs calculations that do not relate to the sums in the question.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "final_value",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student provides a result that is unrelated to the sums requested in the question.",
+        "confidence": 0.9
+      }
+    ],
+    "total_recommended": 3,
+    "max_total": 9,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's solution does not address the question at all."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1157,
+  "outputTokens": 297,
+  "cachedAt": "2026-08-05T17:17:38.583Z"
+}

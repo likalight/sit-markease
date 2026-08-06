@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "You did a great job setting up the recurrence relation and identifying the initial conditions. However, there was an issue in solving the system of equations in Step 7.",
+    "strengths": [
+      {
+        "text": "You accurately set up the recurrence relation and provided initial conditions.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 7,
+        "what_happened": "You attempted to solve the system of equations for a, b, and c.",
+        "why_it_matters": "Solving the system correctly is crucial for determining the specific values needed for the general term of the sequence.",
+        "misconception_key": "system of equations"
+      }
+    ],
+    "next_action": "Review your calculations in Step 7 to ensure you're correctly applying methods for solving systems of equations.",
+    "tone": "supportive",
+    "word_count": 150
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 696,
+  "outputTokens": 197,
+  "cachedAt": "2026-08-04T08:09:43.938Z"
+}

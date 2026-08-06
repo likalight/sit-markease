@@ -1,0 +1,98 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "(10) = \\frac{10 \\times 9 \\times 8 \\times 7}{4 \\times 3 \\times 2 \\times 1} = 210/",
+        "plain_text": "Calculates the value of (10) using the formula for combinations.",
+        "role": "result",
+        "confidence": 0.83
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          4,
+          6
+        ],
+        "latex": "(10) = 1, (10) = 10, (10) = 45, (10) = 120, (10) = 210 \\quad 1 + 10 + 45 + 120 + 210 = 386/",
+        "plain_text": "Lists the values of various combinations and sums them up.",
+        "role": "setup",
+        "confidence": 0.89
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          8,
+          9,
+          10
+        ],
+        "latex": "2^{10} - \\left( (10) + (10) + (10) + (10) \\right) = 1024 - (1 + 10 + 45 + 120) = 1024 - 176 = 848/",
+        "plain_text": "Calculates 2 raised to the power of 10 and subtracts the sum of previous results.",
+        "role": "simplification",
+        "confidence": 0.6
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          15,
+          16
+        ],
+        "latex": "5! = 120 \\quad 5! = 120",
+        "plain_text": "Calculates the factorial of 5.",
+        "role": "result",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          21,
+          22,
+          23
+        ],
+        "latex": "4! = 24 \\quad 4! = 24 \\quad 3! = 6",
+        "plain_text": "Calculates the factorials of 4 and 3.",
+        "role": "result",
+        "confidence": 0.99
+      },
+      {
+        "step_index": 6,
+        "line_indices": [
+          12,
+          13,
+          14
+        ],
+        "latex": "(BCD, A, F, F, G) \\quad (BA, G, E, C, D, E) \\quad C \\text{ is part of both",
+        "plain_text": "Lists combinations and states that C is part of both.",
+        "role": "setup",
+        "confidence": 0.82
+      },
+      {
+        "step_index": 7,
+        "line_indices": [
+          18,
+          19,
+          20
+        ],
+        "latex": "(CEFA, B, D, G) \\quad (ABC, D, E, F, G) \\quad (CBA, BED, F, G)",
+        "plain_text": "Lists additional combinations.",
+        "role": "setup",
+        "confidence": 0.88
+      }
+    ],
+    "final_answer": {
+      "latex": "848",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.83
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 38040,
+  "outputTokens": 740,
+  "cachedAt": "2026-08-05T15:32:04.808Z"
+}

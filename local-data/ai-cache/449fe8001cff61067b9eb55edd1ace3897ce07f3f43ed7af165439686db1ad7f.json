@@ -1,0 +1,21 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "final_arithmetic",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          4
+        ],
+        "severity": "procedural",
+        "observed_signature": "does not arrive at the correct final answer of 39 due to incorrect arithmetic"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 668,
+  "outputTokens": 83,
+  "cachedAt": "2026-08-04T14:49:44.400Z"
+}

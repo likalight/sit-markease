@@ -1,0 +1,83 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          4
+        ],
+        "latex": "\frac{dy}{dx} = 2y - 6. \\ y = ux^2 \\Rightarrow \\frac{du}{dx} = f(x)",
+        "plain_text": "Sets up the differential equation and substitution.",
+        "role": "setup",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          7,
+          8
+        ],
+        "latex": "x^2(2u \\frac{du}{dx}) = 2ux^2 - 6",
+        "plain_text": "Applies the substitution to the differential equation.",
+        "role": "substitution",
+        "confidence": 0.94
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          10,
+          11
+        ],
+        "latex": "x^3 \\frac{dy}{dx} = -6",
+        "plain_text": "Rearranges the equation to isolate dy/dx.",
+        "role": "simplification",
+        "confidence": 0.85
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          14,
+          16
+        ],
+        "latex": "\\frac{du}{dx} = -6x^{-3}",
+        "plain_text": "Differentiates both sides with respect to x.",
+        "role": "rule_application",
+        "confidence": 0.97
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          20,
+          21
+        ],
+        "latex": "u = -6x^{-2} + C",
+        "plain_text": "Integrates the equation to find u.",
+        "role": "rule_application",
+        "confidence": 0.7
+      },
+      {
+        "step_index": 6,
+        "line_indices": [
+          26,
+          30
+        ],
+        "latex": "y = 3 - x^2",
+        "plain_text": "Substitutes the constant back to find y.",
+        "role": "result",
+        "confidence": 0.87
+      }
+    ],
+    "final_answer": {
+      "latex": "y = 3 - x^2",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.75
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 38156,
+  "outputTokens": 517,
+  "cachedAt": "2026-08-06T12:19:08.806Z"
+}

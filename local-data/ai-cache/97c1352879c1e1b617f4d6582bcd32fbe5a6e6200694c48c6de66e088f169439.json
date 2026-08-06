@@ -1,0 +1,30 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_incorrect_calculation_of_coefficients",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "procedural",
+        "observed_signature": "finding a=7.5, b=-5, c=-5"
+      },
+      {
+        "misconception_key": "mc_candidate_incorrect_application_of_geometric_serie",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          4
+        ],
+        "severity": "procedural",
+        "observed_signature": "does not apply the geometric series formula correctly"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 822,
+  "outputTokens": 154,
+  "cachedAt": "2026-08-05T02:45:51.535Z"
+}

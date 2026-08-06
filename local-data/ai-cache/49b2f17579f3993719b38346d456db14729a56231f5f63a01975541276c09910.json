@@ -1,0 +1,41 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_incorrect_application_of_geometric_serie",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Defines the formula for the nth term of a geometric sequence."
+      },
+      {
+        "misconception_key": "mc_candidate_misunderstanding_of_progression_type",
+        "confidence": 0.9,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Substitutes the initial value and common ratio into the formula to find the 9th term."
+      },
+      {
+        "misconception_key": "mc_candidate_missing_final_values",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          4
+        ],
+        "severity": "notational",
+        "observed_signature": "did not provide any final values for the first term and common difference of the arithmetic progression."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1266,
+  "outputTokens": 239,
+  "cachedAt": "2026-08-06T00:48:27.658Z"
+}

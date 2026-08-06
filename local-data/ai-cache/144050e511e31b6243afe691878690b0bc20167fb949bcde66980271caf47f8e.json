@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "identify_pigeons_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "at least two houses must have consecutive addresses"
+      },
+      {
+        "misconception_key": "incorrect_pigeonhole_conclusion",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "applying the pigeonhole principle to conclude that at least two houses must have consecutive addresses"
+      },
+      {
+        "misconception_key": "conclusion_statement_error",
+        "confidence": 0.6,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "notational",
+        "observed_signature": "the conclusion does not hold for four integers"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1126,
+  "outputTokens": 209,
+  "cachedAt": "2026-08-05T18:11:50.659Z"
+}

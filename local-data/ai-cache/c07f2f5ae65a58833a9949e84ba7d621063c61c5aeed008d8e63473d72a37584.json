@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "rewrite_an",
+        "name": "Correctly rewrite a_n",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student fails to rewrite a_n correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly rewrites a_n as (1/4)^n."
+          }
+        ]
+      },
+      {
+        "key": "identify_terms",
+        "name": "Identify first term and ratio",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student does not identify the first term or ratio correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly identifies the first term as 1 and the ratio as 1/4."
+          }
+        ]
+      },
+      {
+        "key": "sum_to_n_formula",
+        "name": "Correct sum-to-n formula",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student does not provide the correct sum-to-n formula."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly applies the sum-to-n formula for the geometric series."
+          }
+        ]
+      },
+      {
+        "key": "correct_limit",
+        "name": "Correct limit evaluation",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student fails to evaluate the limit correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly evaluates the limit as 4/3."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 530,
+  "outputTokens": 455,
+  "cachedAt": "2026-08-05T14:33:14.671Z"
+}

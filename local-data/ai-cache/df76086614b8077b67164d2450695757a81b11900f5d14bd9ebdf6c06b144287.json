@@ -1,0 +1,61 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "latex": "1311 = B U H \\text{! use formula: } n = 23",
+        "plain_text": "Sets up the equation with a value of 1311 and states to use a formula with n equal to 23.",
+        "role": "setup",
+        "confidence": 0.85
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "latex": "[ILLEGIBLE]",
+        "plain_text": "Contains unreadable text that does not contribute to a clear mathematical step.",
+        "role": "result",
+        "confidence": 0.2
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "latex": "[ILLEGIBLE]",
+        "plain_text": "Contains unreadable text that does not contribute to a clear mathematical step.",
+        "role": "result",
+        "confidence": 0.22
+      }
+    ],
+    "final_answer": {
+      "latex": "",
+      "present": false
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.54
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 20849,
+  "outputTokens": 306,
+  "cachedAt": "2026-08-05T15:08:49.481Z"
+}

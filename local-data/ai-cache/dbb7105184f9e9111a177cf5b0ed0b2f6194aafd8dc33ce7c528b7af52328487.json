@@ -1,0 +1,11 @@
+{
+  "data": {
+    "detected": [],
+    "novel_candidates": []
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:04.741Z"
+}

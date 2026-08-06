@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "formula_setup",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student sets up a series of numbers to be summed, which does not correspond to the correct compound interest formula.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "correct_substitution",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student calculates the number of terms in a series, which is unrelated to substituting values into the compound interest formula.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "final_value",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The final result stated by the student does not correspond to the correct calculation of the compound interest.",
+        "confidence": 0.9
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 3,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach does not align with the compound interest calculation, indicating a misunderstanding of the problem."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 952,
+  "outputTokens": 323,
+  "cachedAt": "2026-08-05T17:17:39.843Z"
+}

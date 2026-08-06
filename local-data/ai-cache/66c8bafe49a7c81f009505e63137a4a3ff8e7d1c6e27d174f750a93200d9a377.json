@@ -1,0 +1,52 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_i",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student correctly finds A=5 but does not calculate u3.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "part_ii",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 4,
+        "evidence_step_indices": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "justification": "The student forms all three correct equations and solves them to find a=15/2, b=-5, c=-5.",
+        "confidence": 0.95
+      },
+      {
+        "criterion_key": "part_iii",
+        "level": "novice",
+        "score": 2,
+        "max_score": 4,
+        "evidence_step_indices": [
+          8
+        ],
+        "justification": "The student sets up the summation but does not apply the geometric series formula correctly.",
+        "confidence": 0.8
+      }
+    ],
+    "total_recommended": 7,
+    "max_total": 10,
+    "error_carry_forward_applied": false,
+    "needs_human_review": false,
+    "review_reasons": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1590,
+  "outputTokens": 306,
+  "cachedAt": "2026-08-04T08:09:33.548Z"
+}

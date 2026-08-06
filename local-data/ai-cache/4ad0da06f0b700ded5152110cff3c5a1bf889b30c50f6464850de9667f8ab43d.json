@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "identify_gp",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student identifies values for a but does not explicitly state that it is a geometric progression.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "count_terms",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not provide a clear count of the number of terms in the series.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "final_expression",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student's reference to a formula is unreadable, preventing a valid final expression from being derived.",
+        "confidence": 0.5
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 3,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "Transcription is partly illegible and lacks clarity in identifying the geometric progression and counting terms."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1008,
+  "outputTokens": 309,
+  "cachedAt": "2026-08-05T18:23:26.140Z"
+}

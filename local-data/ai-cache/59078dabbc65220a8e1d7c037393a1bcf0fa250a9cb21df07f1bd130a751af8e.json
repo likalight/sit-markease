@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 3y + 2, \\; y(0) = 1.",
+        "solution_latex": "This equation is not separable. To solve it, we can use an integrating factor or another method. The general solution involves finding an integrating factor and solving accordingly.",
+        "hint_ladder": [
+          "Check if the equation can be separated into a product of functions of y and functions of x.",
+          "Consider the form of the equation and whether it fits the criteria for separation of variables.",
+          "If it cannot be separated, think about using an integrating factor."
+        ],
+        "targets_because": "This item directly challenges the student to recognize that not all differential equations can be separated, which is crucial for addressing their misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 2x y, \\; y(0) = 1.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 2x dx. Integrate: ln|y| = x^2 + C, so y = A e^{x^2}. Apply y(0) = 1: A = 1. Final answer: y = e^{x^2}.",
+        "hint_ladder": [
+          "Identify the terms that can be separated.",
+          "Rewrite the equation to isolate dy and dx.",
+          "After integration, remember to apply the initial condition only to the general solution."
+        ],
+        "targets_because": "This item reinforces the correct application of separation of variables to a separable ODE, addressing the student's misconception about recognizing separability.",
+        "provenance": {
+          "type": "retrieved",
+          "source_label": "Tutorial 6 Q3"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 4x^3 y, \\; y(0) = 2.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 4x^3 dx. Integrate: ln|y| = x^4 + C, so y = A e^{x^4}. Apply y(0) = 2: A = 2. Final answer: y = 2 e^{x^4}.",
+        "hint_ladder": [
+          "Start by isolating dy and dx.",
+          "Make sure to integrate both sides correctly.",
+          "Don't forget to apply the initial condition after finding the general solution."
+        ],
+        "targets_because": "This item allows the student to practice correctly separating and solving a separable ODE, reinforcing their understanding of the procedure.",
+        "provenance": {
+          "type": "retrieved",
+          "source_label": "Tutorial 6 Q5"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Solve \\frac{dy}{dx} = \\frac{y^2}{x}, \\; y(1) = 3.",
+        "solution_latex": "Separate: \\frac{dy}{y^2} = \\frac{1}{x} dx. Integrate: -\\frac{1}{y} = \\ln|x| + C. Thus, y = -\\frac{1}{\\ln|x| + C}. Apply y(1) = 3 to find C, leading to the final solution.",
+        "hint_ladder": [
+          "Identify the variables that can be separated in the equation.",
+          "Remember to integrate both sides carefully.",
+          "After integrating, apply the initial condition to determine the constant."
+        ],
+        "targets_because": "This extension item challenges the student with a more complex separable ODE, further solidifying their understanding of when to apply separation of variables.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Lecture 5: Separation of Variables"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1158,
+  "outputTokens": 903,
+  "cachedAt": "2026-07-29T06:51:00.439Z"
+}

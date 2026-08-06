@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "ml_per_hr_calculation",
+        "name": "Correct mL/hr Calculation",
+        "weight": 40,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not calculate the mL/hr rate correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "Correctly calculated the mL/hr rate as 125 mL/hr."
+          }
+        ]
+      },
+      {
+        "key": "gtt_per_min_conversion",
+        "name": "Correct gtt/min Conversion",
+        "weight": 40,
+        "max_score": 4,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not convert the mL/hr rate to gtt/min correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 4,
+            "descriptor": "Correctly converted the rate to 31 gtt/min."
+          }
+        ]
+      },
+      {
+        "key": "final_answer_rounding",
+        "name": "Appropriate Final Answer Rounding",
+        "weight": 20,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not round the final answer appropriately."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "Rounded the final answer to 31 gtt/min correctly."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 473,
+  "outputTokens": 347,
+  "cachedAt": "2026-07-28T18:31:18.386Z"
+}

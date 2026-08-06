@@ -1,0 +1,83 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "address_pairing",
+        "name": "Correct Address Pairing",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not correctly pair the addresses."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly paired the 100 addresses into 50 consecutive pairs."
+          }
+        ]
+      },
+      {
+        "key": "identify_pigeons",
+        "name": "Identification of Pigeons",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Failed to identify the 51 houses as the pigeons."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly identified the 51 houses as the pigeons."
+          }
+        ]
+      },
+      {
+        "key": "pigeonhole_application",
+        "name": "Application of Pigeonhole Principle",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not correctly apply the pigeonhole principle."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly applied the pigeonhole principle to conclude."
+          }
+        ]
+      },
+      {
+        "key": "conclusion_statement",
+        "name": "Concluding Statement",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not provide a concluding statement about consecutive addresses."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Provided a clear concluding statement about consecutive addresses."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 556,
+  "outputTokens": 439,
+  "cachedAt": "2026-08-05T14:34:56.110Z"
+}

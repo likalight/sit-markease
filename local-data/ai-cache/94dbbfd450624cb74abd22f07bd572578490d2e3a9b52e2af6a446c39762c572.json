@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_a",
+        "level": "novice",
+        "score": 0,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "No terms for sequence a_n = a_{n-1}^2 were computed.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "part_b",
+        "level": "novice",
+        "score": 0,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "No terms for sequence a_n = n*a_{n-1} + n^2*a_{n-2} were computed.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "part_c",
+        "level": "novice",
+        "score": 0,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "No terms for sequence a_n = a_{n-1} + a_{n-3} were computed.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 12,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "Student's solution does not address the sequences as required."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1210,
+  "outputTokens": 316,
+  "cachedAt": "2026-08-05T17:17:42.539Z"
+}

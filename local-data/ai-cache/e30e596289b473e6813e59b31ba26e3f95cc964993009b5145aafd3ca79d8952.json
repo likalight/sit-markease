@@ -1,0 +1,65 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "identify_gp",
+        "name": "Identifying the Geometric Progression",
+        "weight": 33,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student fails to identify the geometric progression."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly identifies the geometric progression with a=2 and r=3."
+          }
+        ]
+      },
+      {
+        "key": "count_terms",
+        "name": "Counting the Number of Terms",
+        "weight": 33,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student incorrectly counts the number of terms."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly counts the number of terms as n+1."
+          }
+        ]
+      },
+      {
+        "key": "final_expression",
+        "name": "Deriving the Final Expression",
+        "weight": 34,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student provides an incorrect or incomplete final expression."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "The student correctly simplifies the final expression to 3^(n+1) - 1."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 490,
+  "outputTokens": 345,
+  "cachedAt": "2026-08-05T14:32:53.030Z"
+}

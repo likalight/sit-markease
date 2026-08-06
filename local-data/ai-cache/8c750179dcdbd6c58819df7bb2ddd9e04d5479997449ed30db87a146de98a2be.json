@@ -1,0 +1,78 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "81 \\times \\left( \\frac{9}{5} \\right) \\times 5! = 40,320 \\times 126 \\times 120 = 609,813,120",
+        "plain_text": "Calculates the product of 81, 9/5, and 5! to find a large number.",
+        "role": "rule_application",
+        "confidence": 0.9
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "51 \\times \\left( \\frac{-10}{3} \\right) \\times \\left( \\frac{15}{3} \\right) = 120 \\times 455 = 54,600",
+        "plain_text": "Calculates the product of 51, -10/3, and 15/3 to find another large number.",
+        "role": "rule_application",
+        "confidence": 0.9
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "101 \\times 4 + 1 = 405",
+        "plain_text": "Calculates the expression 101 times 4 plus 1.",
+        "role": "simplification",
+        "confidence": 0.9
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "(1,8), (2,7), (3,6), (4,5)",
+        "plain_text": "Lists pairs of numbers that sum to 9.",
+        "role": "result",
+        "confidence": 0.8
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          5
+        ],
+        "latex": "there are 4 pairs that sum to 9. by the pigeonhole principle, if we choose 5 numbers from these 8, at least one pair will be selected.",
+        "plain_text": "Applies the pigeonhole principle to explain that selecting 5 numbers guarantees a pair that sums to 9.",
+        "role": "result",
+        "confidence": 0.7
+      },
+      {
+        "step_index": 6,
+        "line_indices": [
+          6
+        ],
+        "latex": "if we choose 4 numbers, it is possible not to select any pairs that sum to 9.",
+        "plain_text": "States that selecting 4 numbers can avoid selecting pairs that sum to 9.",
+        "role": "result",
+        "confidence": 0.7
+      }
+    ],
+    "final_answer": {
+      "latex": "",
+      "present": false
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.8
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 37598,
+  "outputTokens": 614,
+  "cachedAt": "2026-08-05T18:06:47.236Z"
+}

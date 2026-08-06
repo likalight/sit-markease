@@ -1,0 +1,106 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "sum_pairs_identification",
+        "name": "Identification of Sum-to-9 Pairs",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not identify the correct pairs."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly formed the four pairs that sum to 9."
+          }
+        ]
+      },
+      {
+        "key": "pigeons_pigeonholes",
+        "name": "Identification of Pigeons and Pigeonholes",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Failed to identify pigeons and pigeonholes."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly identified the pairs as pigeonholes and selected integers as pigeons."
+          }
+        ]
+      },
+      {
+        "key": "pigeonhole_conclusion",
+        "name": "Pigeonhole Principle Conclusion",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not provide a correct conclusion based on the pigeonhole principle."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Correctly concluded that at least one pair must be fully selected."
+          }
+        ]
+      },
+      {
+        "key": "final_conclusion",
+        "name": "Final Conclusion Statement",
+        "weight": 25,
+        "max_score": 1,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not clearly state the final conclusion."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Clearly stated the final conclusion regarding the sum of selected integers."
+          }
+        ]
+      },
+      {
+        "key": "counterexample_part_b",
+        "name": "Counterexample for Part (b)",
+        "weight": 15,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Did not provide a valid counterexample."
+          },
+          {
+            "level": "proficient",
+            "score": 1,
+            "descriptor": "Provided a valid counterexample but did not conclude correctly."
+          },
+          {
+            "level": "expert",
+            "score": 2,
+            "descriptor": "Provided a valid counterexample and correctly concluded the statement is false."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 666,
+  "outputTokens": 597,
+  "cachedAt": "2026-08-05T14:34:47.327Z"
+}

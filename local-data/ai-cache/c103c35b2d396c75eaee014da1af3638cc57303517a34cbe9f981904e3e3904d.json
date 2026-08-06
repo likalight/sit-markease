@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "address_pairing",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not correctly pair the addresses into consecutive pairs.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "identify_pigeons",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student failed to identify the 51 houses as the pigeons.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "pigeonhole_application",
+        "level": "proficient",
+        "score": 1,
+        "max_score": 1,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student correctly applied the pigeonhole principle to conclude that at least two houses must have consecutive addresses.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "conclusion_statement",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student did not provide a clear concluding statement about consecutive addresses.",
+        "confidence": 0.9
+      }
+    ],
+    "total_recommended": 1,
+    "max_total": 4,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's reasoning is unclear and does not follow the expected structure for the problem."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1096,
+  "outputTokens": 380,
+  "cachedAt": "2026-08-05T17:56:48.824Z"
+}

@@ -1,0 +1,39 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "address_pairing_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "at least two houses must have consecutive addresses"
+      },
+      {
+        "misconception_key": "identify_pigeons_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "51 houses and 100 addresses"
+      },
+      {
+        "misconception_key": "conclusion_statement_error",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          1
+        ],
+        "severity": "notational",
+        "observed_signature": "the conclusion is not true for 4 integers"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1105,
+  "outputTokens": 197,
+  "cachedAt": "2026-08-05T17:56:53.139Z"
+}

@@ -1,0 +1,47 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "differentiation",
+        "name": "Correct Differentiation",
+        "weight": 50,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not differentiate correctly."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly differentiated to get dy/dx = 6x + 5."
+          }
+        ]
+      },
+      {
+        "key": "evaluation",
+        "name": "Correct Evaluation",
+        "weight": 50,
+        "max_score": 2,
+        "levels": [
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "The student did not evaluate dy/dx correctly at x=2."
+          },
+          {
+            "level": "proficient",
+            "score": 2,
+            "descriptor": "The student correctly substituted x=2 and evaluated to get 17."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 448,
+  "outputTokens": 230,
+  "cachedAt": "2026-08-04T15:03:24.142Z"
+}

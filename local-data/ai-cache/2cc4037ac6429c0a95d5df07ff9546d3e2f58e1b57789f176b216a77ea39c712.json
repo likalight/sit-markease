@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 3y, \\text{ given } y(0) = 4.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 3dx. Integrate: \\ln|y| = 3x + C. Exponentiate: y = A e^{3x}. Apply y(0) = 4: A = 4. Final answer: y = 4 e^{3x}.",
+        "hint_ladder": [
+          "Separate the variables.",
+          "Don't forget to include the constant of integration after integration.",
+          "Apply the initial condition only after finding the general solution."
+        ],
+        "targets_because": "This item emphasizes the importance of including the constant of integration during the integration step.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 6 Q3"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 5xy, \\text{ given } y(1) = 3.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 5x dx. Integrate: \\ln|y| = \\frac{5}{2}x^2 + C. Exponentiate: y = A e^{\\frac{5}{2}x^2}. Apply y(1) = 3: 3 = A e^{\\frac{5}{2}} \\Rightarrow A = 3 e^{-\\frac{5}{2}}. Final answer: y = 3 e^{-\\frac{5}{2}} e^{\\frac{5}{2}x^2}.",
+        "hint_ladder": [
+          "Separate the variables correctly.",
+          "Remember to include the constant of integration after integrating both sides.",
+          "Use the initial condition after obtaining the general solution."
+        ],
+        "targets_because": "This item requires the student to integrate correctly while emphasizing the necessity of the constant of integration.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 4 Q2"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 6y, \\text{ given } y(2) = 10.",
+        "solution_latex": "Separate: \\frac{dy}{y} = 6dx. Integrate: \\ln|y| = 6x + C. Exponentiate: y = A e^{6x}. Apply y(2) = 10: 10 = A e^{12} \\Rightarrow A = 10 e^{-12}. Final answer: y = 10 e^{-12} e^{6x}.",
+        "hint_ladder": [
+          "Start by separating the variables.",
+          "Don't forget the constant of integration after integration.",
+          "Substitute the initial condition only after finding the general solution."
+        ],
+        "targets_because": "This item reinforces the importance of the constant of integration in finding the general solution before applying the initial condition.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 6 Q5"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Solve \\frac{dy}{dx} = 4y^2, \\text{ given } y(1) = 1.",
+        "solution_latex": "Separate: \\frac{dy}{y^2} = 4dx. Integrate: -\\frac{1}{y} = 4x + C. Rearrange: y = -\\frac{1}{4x + C}. Apply y(1) = 1: 1 = -\\frac{1}{4 + C} \\Rightarrow C = -5. Final answer: y = -\\frac{1}{4x - 5}.",
+        "hint_ladder": [
+          "Separate the variables correctly.",
+          "Remember to integrate both sides before applying the initial condition.",
+          "Ensure you include the constant of integration during the integration process."
+        ],
+        "targets_because": "This extension item challenges the student to apply the concept of integration constants in a different context, reinforcing the necessity of +C.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "variant of Tutorial 6 Q3"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1174,
+  "outputTokens": 990,
+  "cachedAt": "2026-08-03T12:31:43.003Z"
+}

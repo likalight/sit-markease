@@ -1,0 +1,75 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "4! \\times \\left( \\frac{9}{5} \\right) \\times 5! = 40,320 \\times 126 \\times 120 = 609,813,120",
+        "plain_text": "Calculates the product of factorials and a fraction to find a total.",
+        "role": "result",
+        "confidence": 0.91
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          3,
+          4
+        ],
+        "latex": "\\left( \\frac{10}{3} \\right) \\times \\left( \\frac{15}{3} \\right) = 120 \\times 455 = 54,600",
+        "plain_text": "Calculates the product of two fractions and finds a total.",
+        "role": "result",
+        "confidence": 0.89
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          6
+        ],
+        "latex": "101 \\times 4 + 1 = 405",
+        "plain_text": "Performs a multiplication and addition to find a total.",
+        "role": "result",
+        "confidence": 0.8
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "latex": "(1,8), (2,7), (3,6), (4,5) \\text{ there are 4 pairs that sum to 9. by the pigeonhole principle, if we choose 5 numbers from these 8, at least one pair will be selected. the pigeons are the 5 selected numbers, the pigeonholes are the four pairs. }",
+        "plain_text": "Identifies pairs of numbers that sum to 9 and applies the pigeonhole principle.",
+        "role": "rule_application",
+        "confidence": 0.91
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          12,
+          13,
+          14
+        ],
+        "latex": "if we choose 4 numbers, it is possible not to select any pairs that sum to 9. \\text{ for example, selecting } \\{1,2,3,4\\} \\text{ avoids all the pairs. }",
+        "plain_text": "Explains a scenario where selecting 4 numbers avoids selecting pairs that sum to 9.",
+        "role": "result",
+        "confidence": 0.86
+      }
+    ],
+    "final_answer": {
+      "latex": "",
+      "present": false
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.84
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 37939,
+  "outputTokens": 600,
+  "cachedAt": "2026-08-05T15:32:35.665Z"
+}

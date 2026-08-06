@@ -1,0 +1,51 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "identify_gp",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not identify the geometric progression correctly, as the setup does not reflect the series given in the question.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "count_terms",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not provide a correct count of the number of terms in the series, as the setup is unclear.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "final_expression",
+        "level": "novice",
+        "score": 0,
+        "max_score": 1,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student does not derive a final expression for the series, as the steps are unreadable and do not lead to a valid conclusion.",
+        "confidence": 0.5
+      }
+    ],
+    "total_recommended": 0,
+    "max_total": 3,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's solution is largely unreadable and does not clearly address the problem."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1028,
+  "outputTokens": 326,
+  "cachedAt": "2026-08-05T15:08:57.326Z"
+}

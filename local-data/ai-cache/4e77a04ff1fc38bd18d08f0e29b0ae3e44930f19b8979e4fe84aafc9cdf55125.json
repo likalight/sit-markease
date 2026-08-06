@@ -1,0 +1,65 @@
+{
+  "data": {
+    "mappings": [
+      {
+        "question_id": "421b8467-8cd2-4087-baf1-7535b0291133",
+        "detected_label": "1(a)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.1
+          },
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.1,
+            "w": 1,
+            "h": 0.4
+          }
+        ],
+        "confidence": 0.9,
+        "notes": "The answer for part (a) is clearly defined and matches the question prompt."
+      },
+      {
+        "question_id": "421b8467-8cd2-4087-baf1-7535b0291133",
+        "detected_label": "1(b)(i)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.5,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.8,
+        "notes": "The calculation for part (b)(i) is visible and corresponds to the question."
+      },
+      {
+        "question_id": "421b8467-8cd2-4087-baf1-7535b0291133",
+        "detected_label": "1(b)(ii)",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.7,
+            "w": 1,
+            "h": 0.2
+          }
+        ],
+        "confidence": 0.8,
+        "notes": "The final answer for part (b)(ii) is present and matches the question."
+      }
+    ],
+    "unassigned_regions": [],
+    "flags": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 38004,
+  "outputTokens": 429,
+  "cachedAt": "2026-08-06T11:47:34.035Z"
+}

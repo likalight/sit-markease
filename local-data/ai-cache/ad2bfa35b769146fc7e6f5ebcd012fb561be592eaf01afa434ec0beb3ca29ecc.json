@@ -1,0 +1,21 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_ic_applied_before_general",
+        "confidence": 0.82,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "conceptual",
+        "observed_signature": "Substituted y(0)=2 into the separated but unintegrated equation, producing the nonsensical statement 2/y = 0."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:06.447Z"
+}

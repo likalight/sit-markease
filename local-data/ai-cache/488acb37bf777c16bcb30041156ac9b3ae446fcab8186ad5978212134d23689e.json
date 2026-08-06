@@ -1,0 +1,62 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "c_setup",
+        "level": "novice",
+        "score": 1,
+        "max_score": 4,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student sets up the differential equation but does not separate the variables.",
+        "confidence": 0.8
+      },
+      {
+        "criterion_key": "c_method",
+        "level": "novice",
+        "score": 2,
+        "max_score": 6,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student attempts integration but does not show correct separation of variables.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "c_ic",
+        "level": "proficient",
+        "score": 3,
+        "max_score": 5,
+        "evidence_step_indices": [
+          3
+        ],
+        "justification": "The student applies the initial condition correctly to find the constant C.",
+        "confidence": 0.9
+      },
+      {
+        "criterion_key": "c_answer",
+        "level": "proficient",
+        "score": 4,
+        "max_score": 5,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student provides the final answer, which is correct.",
+        "confidence": 0.9
+      }
+    ],
+    "total_recommended": 10,
+    "max_total": 20,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The approach to solving the ODE is unclear and lacks proper variable separation."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 944,
+  "outputTokens": 366,
+  "cachedAt": "2026-07-29T06:49:27.824Z"
+}

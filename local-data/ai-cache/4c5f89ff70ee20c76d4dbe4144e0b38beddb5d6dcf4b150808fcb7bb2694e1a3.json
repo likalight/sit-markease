@@ -1,0 +1,42 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_i",
+        "level": "novice",
+        "score": 1,
+        "max_score": 3,
+        "evidence_step_indices": [
+          1,
+          2
+        ],
+        "justification": "The student attempts to set up the differential equation and applies the substitution, but does not correctly differentiate or simplify to find du/dx.",
+        "confidence": 0.5
+      },
+      {
+        "criterion_key": "part_ii",
+        "level": "novice",
+        "score": 1,
+        "max_score": 4,
+        "evidence_step_indices": [
+          5,
+          6
+        ],
+        "justification": "The student attempts to integrate and substitute back to find y, but fails to correctly apply the initial condition.",
+        "confidence": 0.5
+      }
+    ],
+    "total_recommended": 2,
+    "max_total": 7,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "The student's approach contains significant errors in both parts, and the integration and application of the initial condition are not clearly correct."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1122,
+  "outputTokens": 255,
+  "cachedAt": "2026-08-06T12:19:14.069Z"
+}

@@ -1,0 +1,58 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "19 + 27 + 30 + \\ldots + 90 \\Rightarrow 3.9 + 3.9 + 3.10 + \\ldots + 3.50",
+        "plain_text": "Sets up the series of numbers to be summed.",
+        "role": "setup",
+        "confidence": 0.9
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "n = 30 - 3 + 4 - 23",
+        "plain_text": "Calculates the number of terms in the series.",
+        "role": "simplification",
+        "confidence": 0.8
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "S_n = \\frac{n(a_1 + a_n)}{2} = \\frac{25(19 + 90)}{2}",
+        "plain_text": "Applies the formula for the sum of an arithmetic progression.",
+        "role": "rule_application",
+        "confidence": 0.85
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "S_n = 1311",
+        "plain_text": "States the final result of the sum.",
+        "role": "result",
+        "confidence": 0.9
+      }
+    ],
+    "final_answer": {
+      "latex": "1311",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.85
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 20597,
+  "outputTokens": 373,
+  "cachedAt": "2026-08-05T17:17:33.505Z"
+}

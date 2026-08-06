@@ -1,0 +1,35 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "role": "substitution",
+        "plain_text": "substitutes 5 for A in the equation 15 = 2(5) + A, solving for A."
+      },
+      {
+        "step_index": 2,
+        "role": "rule_application",
+        "plain_text": "applies the formula u3 = 2(15) + 5(2) to calculate u3, resulting in 40."
+      },
+      {
+        "step_index": 3,
+        "role": "result",
+        "plain_text": "determines the coefficients a, b, and c in the expression a(2^n) + bn + c using the values u1=5, u2=15, and u3=40, finding a=7.5, b=-5, c=-5."
+      },
+      {
+        "step_index": 4,
+        "role": "result",
+        "plain_text": "writes the summation formula for u_r from r=1 to n, resulting in the expression for the sum."
+      }
+    ],
+    "final_answer": {
+      "latex": "Sum r=1 to n of u_r = 7.5(2^(n+1)-2) - 5n(n+1)/2 - 5n",
+      "present": true
+    }
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 508,
+  "outputTokens": 280,
+  "cachedAt": "2026-08-05T02:42:46.041Z"
+}

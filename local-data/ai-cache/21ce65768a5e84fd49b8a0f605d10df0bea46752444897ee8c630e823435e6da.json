@@ -1,0 +1,38 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "Correct Differentiation",
+        "level": "proficient",
+        "score": 2,
+        "max_score": 2,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student correctly differentiated the function to obtain dy/dx = 6x + 5.",
+        "confidence": 1
+      },
+      {
+        "criterion_key": "Correct Evaluation",
+        "level": "proficient",
+        "score": 2,
+        "max_score": 2,
+        "evidence_step_indices": [
+          4
+        ],
+        "justification": "The student correctly substituted x=2 into the derivative and evaluated it to get 17.",
+        "confidence": 1
+      }
+    ],
+    "total_recommended": 4,
+    "max_total": 4,
+    "error_carry_forward_applied": false,
+    "needs_human_review": false,
+    "review_reasons": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 963,
+  "outputTokens": 217,
+  "cachedAt": "2026-08-04T15:09:51.318Z"
+}

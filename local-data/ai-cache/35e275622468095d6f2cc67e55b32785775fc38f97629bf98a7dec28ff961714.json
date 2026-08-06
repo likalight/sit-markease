@@ -1,0 +1,58 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1
+        ],
+        "latex": "dy/y = x\\,dx",
+        "plain_text": "Separate variables: dy/y = x dx",
+        "role": "setup",
+        "confidence": 0.94
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          2
+        ],
+        "latex": "\\ln|y| = x^2/2",
+        "plain_text": "Integrate both sides — no constant of integration written",
+        "role": "rule_application",
+        "confidence": 0.9
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          3
+        ],
+        "latex": "y = e^{x^2/2}",
+        "plain_text": "Exponentiate to solve for y, still no +C",
+        "role": "simplification",
+        "confidence": 0.89
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          4
+        ],
+        "latex": "y = 2e^{x^2/2}",
+        "plain_text": "Applies y(0)=2 directly by inserting a factor of 2, inconsistent with the missing +C",
+        "role": "result",
+        "confidence": 0.87
+      }
+    ],
+    "final_answer": {
+      "latex": "y = 2e^{x^2/2}",
+      "present": true
+    },
+    "flags": [
+      "constant_of_integration_missing_then_patched"
+    ]
+  },
+  "model": "gemini-flash-latest",
+  "provider": "gemini",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:01.972Z"
+}

@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "Clean, correct solution from start to finish.",
+    "strengths": [
+      {
+        "text": "Separated variables correctly and integrated with the constant of integration retained.",
+        "step_indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "text": "Applied the initial condition to the general solution to solve for C.",
+        "step_indices": [
+          3
+        ]
+      }
+    ],
+    "breakdown_points": [],
+    "next_action": "Try a separable ODE with a different initial condition to confirm the method generalizes for you.",
+    "tone": "supportive",
+    "word_count": 60
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedAt": "2026-07-27T17:24:07.232Z"
+}

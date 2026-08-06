@@ -1,0 +1,29 @@
+{
+  "data": {
+    "summary": "You did a great job applying the quotient rule in Step 1 to find the derivative. However, there were some inaccuracies in your integration and evaluation steps that need attention.",
+    "strengths": [
+      {
+        "text": "Successfully applied the quotient rule to find the derivative.",
+        "step_indices": [
+          1
+        ]
+      }
+    ],
+    "breakdown_points": [
+      {
+        "step_index": 4,
+        "what_happened": "You integrated the expression but did not find the antiderivative correctly.",
+        "why_it_matters": "Finding the correct antiderivative is crucial for accurately evaluating the integral.",
+        "misconception_key": "final_value_accuracy_issue"
+      }
+    ],
+    "next_action": "Review the integration process and double-check your antiderivative before applying the limits.",
+    "tone": "supportive",
+    "word_count": 144
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 884,
+  "outputTokens": 185,
+  "cachedAt": "2026-08-06T12:19:23.415Z"
+}

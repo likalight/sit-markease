@@ -1,0 +1,31 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_derivative_simplification_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          3
+        ],
+        "severity": "procedural",
+        "observed_signature": "Rearranges the equation to isolate dy/dx."
+      },
+      {
+        "misconception_key": "mc_candidate_final_value_accuracy_issue",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          5,
+          6
+        ],
+        "severity": "conceptual",
+        "observed_signature": "fails to correctly apply the initial condition."
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1235,
+  "outputTokens": 147,
+  "cachedAt": "2026-08-06T12:28:01.691Z"
+}

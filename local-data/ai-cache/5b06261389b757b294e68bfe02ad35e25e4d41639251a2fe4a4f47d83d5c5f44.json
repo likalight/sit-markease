@@ -1,0 +1,57 @@
+{
+  "data": {
+    "mappings": [
+      {
+        "question_id": "091bd0ef-ed36-4389-98d9-ec9485de22f2",
+        "detected_label": "1",
+        "regions": [
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.5
+          },
+          {
+            "page_index": 0,
+            "x": 0,
+            "y": 0.5,
+            "w": 1,
+            "h": 0.5
+          }
+        ],
+        "confidence": 1,
+        "notes": "The answers correspond to the two parts of question 1."
+      },
+      {
+        "question_id": "7dc7c234-6b87-4b0c-91ef-22020c0e0803",
+        "detected_label": "3",
+        "regions": [
+          {
+            "page_index": 1,
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.5
+          },
+          {
+            "page_index": 1,
+            "x": 0,
+            "y": 0.5,
+            "w": 1,
+            "h": 0.5
+          }
+        ],
+        "confidence": 1,
+        "notes": "The answers correspond to the two parts of question 3."
+      }
+    ],
+    "unassigned_regions": [],
+    "flags": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 74557,
+  "outputTokens": 338,
+  "cachedAt": "2026-08-06T12:18:43.913Z"
+}

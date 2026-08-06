@@ -1,0 +1,84 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          4,
+          8
+        ],
+        "latex": "y = \\frac{\\ln x}{x} \\quad \\frac{dy}{dx} = \\frac{x(1) - (\\ln x)(1)}{x^2}",
+        "plain_text": "Defines y as ln(x) divided by x and finds the derivative dy/dx using the quotient rule.",
+        "role": "setup",
+        "confidence": 0.84
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          9,
+          10
+        ],
+        "latex": "= \\frac{1 - \\ln x}{x^2} = \\frac{1}{x^2} - \\frac{\\ln x}{x^2}",
+        "plain_text": "Applies the quotient rule to simplify the derivative to a single fraction.",
+        "role": "simplification",
+        "confidence": 0.67
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          6,
+          11
+        ],
+        "latex": "\\int_1^e \\frac{\\ln x}{x^2} dx = -\\int_1^e \\frac{\\ln x}{x^2} dx - \\int_1^e \\frac{1}{x^2} dx",
+        "plain_text": "Sets up the integral of ln(x)/x² from 1 to e, expressing it in terms of two integrals.",
+        "role": "setup",
+        "confidence": 0.83
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          12,
+          13
+        ],
+        "latex": "= -\\left[\\frac{\\ln x}{x} - \\frac{1}{x}\\right]_1^e",
+        "plain_text": "Integrates the expression and applies the limits of integration.",
+        "role": "rule_application",
+        "confidence": 0.76
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          14,
+          15
+        ],
+        "latex": "= -\\left[\\left(\\ln e + 1\\right) - \\left(\\ln 1 + 1\\right)\\right]",
+        "plain_text": "Substitutes the limits into the integrated expression.",
+        "role": "substitution",
+        "confidence": 0.8
+      },
+      {
+        "step_index": 6,
+        "line_indices": [
+          16,
+          17
+        ],
+        "latex": "= 1 - \\frac{1}{2}",
+        "plain_text": "Simplifies the expression to find the final value of the integral.",
+        "role": "simplification",
+        "confidence": 0.7
+      }
+    ],
+    "final_answer": {
+      "latex": "1 - \\frac{1}{2}",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.75
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 38036,
+  "outputTokens": 654,
+  "cachedAt": "2026-08-06T12:19:07.987Z"
+}
