@@ -232,3 +232,24 @@ Reworked the guided tour (`src/lib/demo-tour/`) to open with instructor authorin
 ## Student feedback page mirrors the instructor review console's layout
 
 Direct request: the student-facing feedback page (`src/app/(student)/feedback/page.tsx`) now renders through a new read-only `StudentFeedbackConsole` component (`src/components/student-feedback-console.tsx`) using the same three-column shape as the instructor's `review-console.tsx` — original script, transcribed/reconciled steps, verdict — instead of a single-column stacked summary. This supersedes the earlier documented decision that summative students never see the raw transcription (only formative did, as the safeguard against a misread with no instructor gate): by the time a summative result reaches this page it has already been instructor-approved and released, so there is no remaining "unverified transcription" risk to hide, and showing the same reconciled steps the instructor graded from builds trust rather than undermining it. The per-step "This wasn't read correctly" flag stays formative-only (its purpose — a pre-approval safeguard — doesn't apply to already-released work).
+
+## Demo content swapped from Tutorial 1/3 to real Math/Physics past papers
+
+The guided demo tour's Combinatorics content repeatedly triggered low-confidence script mapping
+and slow AI grading during live testing, making the public demo feel unreliable. Swapped to two
+other pre-existing assessments, "Physics" (formative) and "Math" (summative), trimmed to 2
+questions each (from real A-level Physics 9702/21 and H2 Maths 9758/01 past papers already on
+hand) rather than authoring a third tutorial from scratch. Physics's rubric was authored from the
+real, official Cambridge mark scheme via `structureRubric()` — a genuine improvement over the
+Tutorial 1/3 rubrics, which had no official scheme to draw from and were derived from worked
+answers instead (Math's rubric still had to be derived the same way, since no official mark
+scheme exists for that paper, only a third-party worked-solutions document).
+
+The guided tour storyline was also deepened, not just re-pointed at new content, per direct
+request: formative now demonstrates a real revise-and-resubmit loop (a genuinely incomplete first
+attempt — one question left entirely unanswered, not a fabricated wrong answer — followed by a
+corrected resubmission), and summative now shows an instructor explicitly catching and overriding
+something the AI flagged low-confidence before approving, rather than approving a clean result
+straight away. Both tours now end by actually attempting the generated practice item (typing a
+real answer, revealing the verified solution, self-reporting the outcome) instead of stopping at
+"here's your fresh practice question."

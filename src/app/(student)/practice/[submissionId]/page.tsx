@@ -35,8 +35,12 @@ export default async function PracticeSetPage({
       </div>
 
       <div className="flex flex-col gap-lg">
-        {items.map((item: any) => {
+        {items.map((item: any, i: number) => {
           const attempt = attemptByItemId.get(item.id);
+          // The guided tour attempts the first item in the freshly-generated
+          // set (the scaffold question) — real answer, real solution reveal,
+          // real self-report, not just a generated-and-abandoned question.
+          const isTourTarget = i === 0;
           return (
             <PracticeItemCard
               key={item.id}
@@ -50,6 +54,9 @@ export default async function PracticeSetPage({
               provenance={item.provenance}
               verifiedBy={item.verified_by}
               initialAttempt={attempt ? { response: attempt.response, hintsUsed: attempt.hints_used, outcome: attempt.outcome } : undefined}
+              textareaTourId={isTourTarget ? "practice-attempt-textarea" : undefined}
+              solutionButtonTourId={isTourTarget ? "practice-show-solution" : undefined}
+              outcomeTourId={isTourTarget ? "practice-outcome" : undefined}
             />
           );
         })}

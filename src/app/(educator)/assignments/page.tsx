@@ -166,7 +166,7 @@ export default async function AssignmentsPage() {
                           <span className="text-verified">{r.released} reviewed &amp; released</span>
                           <Link
                             href={`/assignments/${r.assessmentId}/upload`}
-                            data-tour-id={r.assessmentId === DEMO_SUMMATIVE_ASSESSMENT_ID ? "assignments-upload-combinatorics" : undefined}
+                            data-tour-id={r.assessmentId === DEMO_SUMMATIVE_ASSESSMENT_ID ? "assignments-upload-summative-question" : undefined}
                             className="underline"
                           >
                             Upload a script →

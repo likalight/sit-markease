@@ -3,7 +3,11 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { AttemptTimer } from "@/components/attempt-timer";
 import { AssessmentScriptUpload } from "@/components/assessment-script-upload";
-import { DEMO_FORMATIVE_ASSESSMENT_ID, DEMO_FORMATIVE_SAMPLE_SCRIPT } from "@/lib/demo-tour/demo-content";
+import {
+  DEMO_FORMATIVE_ASSESSMENT_ID,
+  DEMO_FORMATIVE_SAMPLE_SCRIPT_ATTEMPT_1,
+  DEMO_FORMATIVE_SAMPLE_SCRIPT_ATTEMPT_2,
+} from "@/lib/demo-tour/demo-content";
 
 export default async function AssessmentWorkPage({ params, searchParams }: { params: Promise<{ assessmentId: string }>; searchParams: Promise<{ attempt?: string }> }) {
   const user = await getCurrentUser();
@@ -44,7 +48,16 @@ export default async function AssessmentWorkPage({ params, searchParams }: { par
             assessmentId={assessmentId}
             kind="formative"
             attemptId={(attempt as any).id}
-            sampleScriptUrl={assessmentId === DEMO_FORMATIVE_ASSESSMENT_ID ? DEMO_FORMATIVE_SAMPLE_SCRIPT : undefined}
+            sampleScriptUrl={
+              assessmentId === DEMO_FORMATIVE_ASSESSMENT_ID
+                ? // Tour narrative: attempt #1 is deliberately incomplete (revise-and-
+                  // resubmit demo beat), attempt #2 is the corrected version. Any
+                  // attempt beyond #2 just reuses the corrected script.
+                  (attempt as any).attempt_number === 1
+                  ? DEMO_FORMATIVE_SAMPLE_SCRIPT_ATTEMPT_1
+                  : DEMO_FORMATIVE_SAMPLE_SCRIPT_ATTEMPT_2
+                : undefined
+            }
           />
         </section>
       )}

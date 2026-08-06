@@ -14,6 +14,9 @@ interface Props {
   provenance: { type: "retrieved" | "variant_of"; source_label: string };
   verifiedBy: "sympy" | "llm" | "unverified";
   initialAttempt?: { response: string | null; hintsUsed: number; outcome: "correct" | "partial" | "incorrect" | null };
+  textareaTourId?: string;
+  solutionButtonTourId?: string;
+  outcomeTourId?: string;
 }
 
 const DIFFICULTY_ORDER = ["scaffold", "target", "extension"] as const;
@@ -83,6 +86,7 @@ export function PracticeItemCard(props: Props) {
       <p className="text-caption text-muted-soft">{props.targetsBecause}</p>
 
       <textarea
+        data-tour-id={props.textareaTourId}
         value={attempt}
         onChange={(e) => onAttemptChange(e.target.value)}
         placeholder="Try it here before revealing hints or the solution..."
@@ -98,6 +102,7 @@ export function PracticeItemCard(props: Props) {
           Reveal a hint ({hintsRevealed}/{props.hintLadder.length})
         </button>
         <button
+          data-tour-id={props.solutionButtonTourId}
           onClick={() => setShowSolution(true)}
           disabled={!hasAttempted}
           title={hasAttempted ? undefined : "Try the problem first"}
@@ -126,7 +131,7 @@ export function PracticeItemCard(props: Props) {
             ✓ Checked {props.verifiedBy === "sympy" ? "symbolically" : props.verifiedBy === "llm" ? "by model" : ""}
           </span>
 
-          <div className="flex items-center gap-xs pt-xs">
+          <div data-tour-id={props.outcomeTourId} className="flex items-center gap-xs pt-xs">
             <span className="text-caption text-muted-soft">How did you do?</span>
             {(["correct", "partial", "incorrect"] as const).map((o) => (
               <button

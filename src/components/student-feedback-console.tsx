@@ -281,7 +281,7 @@ export function StudentFeedbackConsole(props: {
             </p>
             <div className="flex flex-wrap items-center gap-md pt-xs">
               {props.isFormative && (
-                <Link href="/submit" className="text-body-sm text-body underline">
+                <Link href="/submit" data-tour-id="feedback-revise-resubmit" className="text-body-sm text-body underline">
                   Revise and resubmit →
                 </Link>
               )}

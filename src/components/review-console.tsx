@@ -908,7 +908,7 @@ export function ReviewConsole(props: {
             >
               Approve &amp; next <span className="opacity-70">(A)</span>
             </button>
-            <button onClick={startEditFocusedStep} className="rounded-sm border border-hairline px-sm py-xs text-body-sm">
+            <button data-tour-id="edit-step" onClick={startEditFocusedStep} className="rounded-sm border border-hairline px-sm py-xs text-body-sm">
               Edit step <span className="opacity-60">(E)</span>
             </button>
             <button onClick={skip} className="rounded-sm border border-hairline px-sm py-xs text-body-sm">
