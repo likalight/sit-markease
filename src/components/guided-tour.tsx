@@ -94,9 +94,15 @@ export function GuidedTour() {
     // A click-target step that also switches persona (e.g. "Release all
     // results", a real form submit that doesn't navigate away on its own)
     // is safe to switch immediately — unlike the approve button, there's no
-    // competing client-side navigation to race against here.
+    // competing client-side navigation to race against here. Must advance
+    // to the NEXT step here, not clear the state — writing null silently
+    // ended the tour on every persona switch (no tooltip on the page it
+    // redirects to), since the page it lands on reads a wiped localStorage
+    // on mount. Mirrors handleNext's button-driven switch path below.
     if (step.switchTo && step.redirectAfterSwitch) {
-      writeStoredState(null);
+      const nextIndex = tourState.step + 1;
+      const isEnd = step.end || nextIndex >= TOUR_STEPS[tourState.mode].length;
+      writeStoredState(isEnd ? null : { mode: tourState.mode, step: nextIndex });
       void switchRoleAction(step.switchTo, step.redirectAfterSwitch);
       return;
     }
