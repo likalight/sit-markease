@@ -1,0 +1,29 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "full_solution",
+        "level": "developing",
+        "score": 2,
+        "max_score": 6,
+        "evidence_step_indices": [
+          1
+        ],
+        "justification": "The student defines velocity as the rate of change of displacement, but does not complete the calculations for k or its uncertainty.",
+        "confidence": 0.8
+      }
+    ],
+    "total_recommended": 2,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "Incomplete calculations for k and its uncertainty."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1219,
+  "outputTokens": 147,
+  "cachedAt": "2026-08-06T17:22:58.478Z"
+}

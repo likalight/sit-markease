@@ -37,4 +37,18 @@ export async function saveAssessmentSetupAction(assessmentId: string, formData: 
 
   revalidatePath("/assignments");
   revalidatePath(`/assignments/${assessmentId}/setup`);
+
+  // Formative deliberately stays put here — the guided demo tour's own
+  // switchRoleAction (a separate sign-in + redirect) owns navigation for
+  // this exact click, and a second competing redirect from this action
+  // would race it (the same class of race that caused the original
+  // /login-gate bug: a server round trip racing the button's own
+  // click-triggered navigation, and reliably losing). Summative never
+  // switches persona here, so there's nothing to race — redirecting back
+  // to /assignments (where "Upload a script" lives next) is safe and, on
+  // its own merits, better than leaving the educator stranded on a form
+  // that just silently revalidated in place.
+  if ((assessment as any).assessment_mode !== "formative") {
+    redirect("/assignments");
+  }
 }

@@ -155,48 +155,62 @@ export function GuidedTour() {
     let cancelled = false;
     let cleanupClick: (() => void) | undefined;
 
+    // Click handling is delegated on `document`, not attached directly to
+    // the located element — found live: between locate() capturing an
+    // element reference and the user actually clicking it, a page
+    // revalidation (e.g. the "Save & issue" / "Start attempt" server
+    // actions both revalidate their page) can swap in a freshly-rendered
+    // DOM node. A listener attached to the OLD node reference is now
+    // orphaned and never fires, even though the real click lands on the
+    // new node and the underlying action completes normally — the tour
+    // silently stops advancing while the real work keeps happening (seen
+    // live: both formative attempts completed and were submitted, but the
+    // tour stayed stuck asking for the second "Start attempt" click).
+    // event.target.closest(...) re-resolves against whatever's actually in
+    // the DOM at the moment of the click, so a swapped node is never stale.
+    if (step!.advanceOn === "click-target") {
+      const targetId = step!.targetTourId;
+      const handler = (event: MouseEvent) => {
+        const el = (event.target as HTMLElement | null)?.closest(`[data-tour-id="${targetId}"]`);
+        if (!el) return;
+        if (step!.switchTo && step!.redirectAfterSwitch && step!.waitForFormRemoval) {
+          // This target is a real form submit (e.g. "Release all results")
+          // — its own server action needs time to actually complete before
+          // we sign out and redirect. Firing switchRoleAction immediately
+          // on click raced that in-flight submission and aborted it before
+          // it ever wrote the release, leaving status stuck at "open."
+          // Wait for the element to actually leave the DOM (the real
+          // completion signal — the form stops rendering once released)
+          // before switching roles. Only steps that set this flag need it
+          // — a form that stays put and just revalidates in place (e.g.
+          // "Save & issue") never satisfies this and previously just burned
+          // the full 15s fallback for nothing, badly stalling the tour.
+          const observer = new MutationObserver(() => {
+            if (!document.body.contains(el)) {
+              observer.disconnect();
+              clearTimeout(fallback);
+              advance();
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+          const fallback = setTimeout(() => {
+            observer.disconnect();
+            advance();
+          }, 15000);
+        } else {
+          advance();
+        }
+      };
+      document.addEventListener("click", handler, { capture: true });
+      cleanupClick = () => document.removeEventListener("click", handler, { capture: true } as any);
+    }
+
     function locate() {
       if (cancelled) return;
       const el = document.querySelector(`[data-tour-id="${step!.targetTourId}"]`) as HTMLElement | null;
       if (el) {
         const box = el.getBoundingClientRect();
         setRect({ top: box.top, left: box.left, width: box.width, height: box.height });
-        if (step!.advanceOn === "click-target") {
-          if (step!.switchTo && step!.redirectAfterSwitch && step!.waitForFormRemoval) {
-            // This target is a real form submit (e.g. "Release all results")
-            // — its own server action needs time to actually complete before
-            // we sign out and redirect. Firing switchRoleAction immediately
-            // on click raced that in-flight submission and aborted it before
-            // it ever wrote the release, leaving status stuck at "open."
-            // Wait for the element to actually leave the DOM (the real
-            // completion signal — the form stops rendering once released)
-            // before switching roles. Only steps that set this flag need it
-            // — a form that stays put and just revalidates in place (e.g.
-            // "Save & issue") never satisfies this and previously just burned
-            // the full 15s fallback for nothing, badly stalling the tour.
-            const target = el;
-            const handler = () => {
-              const observer = new MutationObserver(() => {
-                if (!document.body.contains(target)) {
-                  observer.disconnect();
-                  clearTimeout(fallback);
-                  advance();
-                }
-              });
-              observer.observe(document.body, { childList: true, subtree: true });
-              const fallback = setTimeout(() => {
-                observer.disconnect();
-                advance();
-              }, 15000);
-            };
-            el.addEventListener("click", handler, { capture: true, once: true });
-            cleanupClick = () => el.removeEventListener("click", handler, { capture: true } as any);
-          } else {
-            const handler = () => advance();
-            el.addEventListener("click", handler, { capture: true, once: true });
-            cleanupClick = () => el.removeEventListener("click", handler, { capture: true } as any);
-          }
-        }
         return;
       }
       attempts += 1;
