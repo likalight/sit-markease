@@ -2,11 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
-import { FeedbackFlagButton } from "@/components/feedback-flag-button";
-import { RequestRevisionButton } from "@/components/request-revision-button";
-import { ScriptViewer } from "@/components/script-viewer";
-import { MathText } from "@/components/math";
-import { OcrStepFlagButton } from "@/components/ocr-step-flag-button";
+import { StudentFeedbackConsole } from "@/components/student-feedback-console";
 import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-grouping";
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
@@ -129,9 +125,18 @@ export default async function StudentFeedbackPage({
       const taxonomy = module_ ? await db.listMisconceptions(module_.id) : [];
       const taxonomyById = new Map(taxonomy.map((t: any) => [t.id, t]));
 
-      // Formative mode has no instructor gate, so — unlike summative,
-      // where a student never sees the raw transcription at all — the
-      // student here is the one safeguard against a misread OCR result.
+      const misconceptionStepIndices = new Set<number>(
+        tags.flatMap((t: any) => t.evidence_step_indices ?? [])
+      );
+
+      // Previously summative students never saw the raw transcription at
+      // all (formative had no instructor gate, so the student was the only
+      // safeguard against a misread — see docs/DECISIONS.md). Superseded by
+      // direct request: the student-feedback layout now mirrors the
+      // instructor's review console (script / transcribed steps / verdict)
+      // for both modes — by the time a summative result is visible here it
+      // was already instructor-approved and released, so there's no
+      // remaining "unverified transcription" risk to hide.
       return {
         submissionId: submission.id,
         pending: false as const,
@@ -144,6 +149,7 @@ export default async function StudentFeedbackPage({
           name: nameByKey[c.criterion_key] ?? c.criterion_key,
           score: c.score,
           maxScore: c.max_score,
+          evidenceStepIndices: c.evidence_step_indices,
         })),
         originalUrl,
         partBoxes,
@@ -160,9 +166,14 @@ export default async function StudentFeedbackPage({
         })),
         hasPracticeSet: false,
         isFormative,
-        steps: isFormative
-          ? steps.map((s: any) => ({ stepIndex: s.step_index, latex: s.latex, plainText: s.plain_text }))
-          : [],
+        steps: steps.map((s: any) => ({
+          stepIndex: s.step_index,
+          latex: s.latex,
+          plainText: s.plain_text,
+          confidence: s.confidence,
+          agreement: s.agreement,
+          hasMisconception: misconceptionStepIndices.has(s.step_index),
+        })),
       };
     })
   );
@@ -170,7 +181,7 @@ export default async function StudentFeedbackPage({
   const visible = cards.filter((c): c is NonNullable<typeof c> => c !== null);
 
   return (
-    <main data-tour-id="feedback-container" className="mx-auto flex max-w-2xl flex-col gap-xxl px-6 py-section">
+    <main data-tour-id="feedback-container" className="mx-auto flex max-w-6xl flex-col gap-xxl px-6 py-section">
       <div className="flex items-baseline justify-between">
         <h1 className="font-serif text-display-lg text-ink">Review work</h1>
         {(sub || attempt || assessmentParam) && (
@@ -196,143 +207,25 @@ export default async function StudentFeedbackPage({
             </p>
           </div>
         ) : (
-        <div key={c.submissionId} className="flex flex-col gap-xl border-t border-hairline pt-xl">
-          <div className="flex items-baseline justify-between">
-            <div>
-              {c.questionPosition && <p className="font-mono text-caption-caps text-muted-soft">Question {c.questionPosition}</p>}
-              <p className="line-clamp-2 text-body-sm text-muted">{c.questionPrompt}</p>
-            </div>
-            <span className="font-serif text-display-md tabular-nums text-ink">{c.total}/{c.maxTotal}</span>
-          </div>
-
-          {/* Criterion bars */}
-          <div className="flex flex-col gap-xs">
-            {c.criteria.map((cr, i) => (
-              <div key={i} className="flex items-center gap-sm text-body-sm">
-                <span className="w-40 shrink-0 text-muted">{cr.name}</span>
-                <div className="h-2 flex-1 rounded-pill bg-surface-soft">
-                  <div
-                    className="h-2 rounded-pill bg-ink"
-                    style={{ width: `${(cr.score / cr.maxScore) * 100}%` }}
-                  />
-                </div>
-                <span className="w-12 shrink-0 text-right tabular-nums text-muted">
-                  {cr.score}/{cr.maxScore}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Annotated script — the emotional core (docs/DESIGN.md §3) */}
-          {c.originalUrl && (
-            <div>
-              <h2 className="mb-xs font-mono text-caption-caps text-muted-soft">Your script</h2>
-              <ScriptViewer imageUrl={c.originalUrl} boxes={c.partBoxes} activeKeys={c.activePartKeys} />
-            </div>
-          )}
-
-          {c.isFormative && c.steps.length > 0 && (
-            <div>
-              <h2 className="mb-xs font-mono text-caption-caps text-muted-soft">
-                Check your work was read correctly
-              </h2>
-              <ul className="flex flex-col gap-xs">
-                {c.steps.map((s) => (
-                  <li
-                    key={s.stepIndex}
-                    className="flex items-center justify-between gap-sm rounded-sm border border-hairline px-sm py-xs"
-                  >
-                    <span className="text-body-sm text-body">
-                      <MathText latex={s.latex} />
-                    </span>
-                    <OcrStepFlagButton feedbackId={c.feedbackId} stepIndex={s.stepIndex} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="flex items-start gap-xs rounded-sm bg-primary-soft px-sm py-xs">
-            <span className="mt-[1px] shrink-0 rounded-sm bg-primary px-xs py-[1px] font-mono text-caption-caps text-on-primary">
-              AI Summary
-            </span>
-            <p className="text-body-md text-body">{c.summary}</p>
-          </div>
-
-          {c.strengths.length > 0 && (
-            <div>
-              <h2 className="font-mono text-caption-caps text-muted-soft">What went well</h2>
-              <ul className="mt-xs list-disc pl-5 text-body-md text-body">
-                {c.strengths.map((s, i) => (
-                  <li key={i}>
-                    {s.text} <span className="text-muted-soft">(step {s.step_indices.join(", ")})</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {c.breakdownPoints.length > 0 && (
-            <div>
-              <h2 className="font-mono text-caption-caps text-muted-soft">Where it broke down</h2>
-              <ul className="mt-xs flex flex-col gap-sm">
-                {c.breakdownPoints.map((b, i) => (
-                  <li key={i} className="rounded-lg border-l-[3px] border-l-attention bg-attention-soft px-md py-sm">
-                    <p className="text-title-sm text-body-strong">Step {b.step_index}</p>
-                    <p className="text-body-md text-body">{b.what_happened}</p>
-                    <p className="text-body-sm text-muted">{b.why_it_matters}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {c.misconceptions.length > 0 && (
-            <div>
-              <h2 className="font-mono text-caption-caps text-muted-soft">Misconception cards</h2>
-              <ul className="mt-xs flex flex-col gap-sm">
-                {c.misconceptions.map((m, i) => (
-                  <li key={i} className="rounded-lg border-l-[3px] border-l-attention bg-surface-soft px-md py-sm">
-                    <p className="text-title-md text-body-strong">
-                      {m.name} <span className="text-caption-caps text-muted-soft">({m.severity})</span>
-                    </p>
-                    <p className="text-body-md text-muted">{m.observedSignature}</p>
-                    {m.remediationNote && (
-                      <details className="mt-xs">
-                        <summary className="cursor-pointer text-caption text-muted-soft">Why this matters</summary>
-                        <p className="mt-xs text-body-sm text-muted">{m.remediationNote}</p>
-                      </details>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="rounded-lg bg-surface-soft px-md py-sm text-body-md text-body">
-            <span className="font-medium text-body-strong">Next: </span>
-            {c.nextAction}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-md">
-            {c.isFormative && (
-              <Link href="/submit" className="text-body-md text-body underline">
-                Revise and resubmit →
-              </Link>
-            )}
-            <Link href="/exam-prep" data-tour-id="exam-prep-link" className="text-body-md text-body underline">
-              Generate practice in Exam prep -&gt;
-            </Link>
-            {false && (c.hasPracticeSet ? (
-              <Link href={`/practice/${c.submissionId}`} className="text-body-md text-body underline">
-                Go to your practice set →
-              </Link>
-            ) : (
-              <RequestRevisionButton submissionId={c.submissionId} />
-            ))}
-          </div>
-
-          <FeedbackFlagButton feedbackId={c.feedbackId} />
+        <div key={c.submissionId} className="border-t border-hairline pt-xl">
+          <StudentFeedbackConsole
+            questionPosition={c.questionPosition}
+            questionPrompt={c.questionPrompt}
+            total={c.total}
+            maxTotal={c.maxTotal}
+            originalUrl={c.originalUrl}
+            partBoxes={c.partBoxes}
+            steps={c.steps}
+            criteria={c.criteria}
+            summary={c.summary}
+            strengths={c.strengths}
+            breakdownPoints={c.breakdownPoints}
+            misconceptions={c.misconceptions}
+            nextAction={c.nextAction}
+            feedbackId={c.feedbackId}
+            isFormative={c.isFormative}
+            submissionId={c.submissionId}
+          />
         </div>
         )
       )}
