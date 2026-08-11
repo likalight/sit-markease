@@ -45,7 +45,6 @@ export default async function AssessmentRubricPage({
           <div className="flex items-center gap-sm">
             <Link
               href={`/assignments/${assessmentId}/setup`}
-              data-tour-id="issue-settings-link"
               className="rounded-sm border border-hairline px-md py-xs text-body-sm text-body"
             >
               Issue settings

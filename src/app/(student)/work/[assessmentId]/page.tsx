@@ -50,9 +50,9 @@ export default async function AssessmentWorkPage({ params, searchParams }: { par
             attemptId={(attempt as any).id}
             sampleScriptUrl={
               assessmentId === DEMO_FORMATIVE_ASSESSMENT_ID
-                ? // Tour narrative: attempt #1 is deliberately incomplete (revise-and-
-                  // resubmit demo beat), attempt #2 is the corrected version. Any
-                  // attempt beyond #2 just reuses the corrected script.
+                ? // Live-demo beat: attempt #1 is deliberately incomplete (shows the
+                  // revise-and-resubmit flow), attempt #2 is the corrected version.
+                  // Any attempt beyond #2 just reuses the corrected script.
                   (attempt as any).attempt_number === 1
                   ? DEMO_FORMATIVE_SAMPLE_SCRIPT_ATTEMPT_1
                   : DEMO_FORMATIVE_SAMPLE_SCRIPT_ATTEMPT_2

@@ -14,8 +14,8 @@ export function AssessmentScriptUpload({
   kind: "formative" | "summative";
   attemptId?: string;
   studentIds?: string[];
-  // Guided-demo-tour only: a real, pre-stored script (public/demo/...) a
-  // reviewer can submit with one click instead of taking their own photo or
+  // Live-demo convenience: a real, pre-stored script (public/demo/...) a
+  // presenter can submit with one click instead of taking their own photo or
   // picking a file — still runs the real signed-upload -> boundary-
   // detection -> grading pipeline, not a mock (CLAUDE.md #5/#8).
   sampleScriptUrl?: string;
@@ -210,7 +210,6 @@ export function AssessmentScriptUpload({
         {sampleScriptUrl && (
           <button
             type="button"
-            data-tour-id="use-sample-script"
             disabled={loading || (kind === "summative" && !studentId)}
             onClick={useSampleScript}
             className="rounded-sm bg-primary px-md py-sm text-body-sm font-medium text-on-primary disabled:opacity-50"

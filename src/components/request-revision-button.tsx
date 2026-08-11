@@ -5,11 +5,9 @@ import { useState } from "react";
 export function RequestRevisionButton({
   submissionId,
   label = "Generate practice set",
-  dataTourId,
 }: {
   submissionId: string;
   label?: string;
-  dataTourId?: string;
 }) {
   const [state, setState] = useState<"idle" | "generating" | "error">("idle");
 
@@ -40,7 +38,6 @@ export function RequestRevisionButton({
     <button
       onClick={submit}
       disabled={state === "generating"}
-      data-tour-id={dataTourId}
       className="rounded-sm bg-primary px-md py-xs text-body-sm font-medium text-on-primary disabled:opacity-60"
     >
       {state === "generating" ? "Building your practice set..." : label}
