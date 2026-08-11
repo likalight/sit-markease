@@ -90,8 +90,10 @@ Click **"Switch to student view →"** to hand off.
 
 1. `/submit` → Physics card → "Start attempt" → `/work/[id]`.
 2. "Use sample script" (real photographed script, real pipeline — not a
-   mock) → submit. Narrate while it runs: OpenCV line detection → two
-   independent model reads cross-checked → SymPy check where checkable.
+   mock) → submit. Narrate while it runs: OpenCV line detection → pix2text
+   + AWS Textract feed independent OCR hints into one multimodal model
+   read, which reports its own per-step confidence → SymPy check where
+   checkable.
 3. Back on `/submit`, "Review assessment" → `/feedback` — **no instructor
    touched this.** Point at the source-image-beside-transcription pairing
    first (the trust mechanism), then the mark, per-part evidence boxes,
@@ -133,12 +135,13 @@ step 5 is the point that matters, the second exam-prep visit is just an
 echo of a beat you already made once.
 
 ### 6:15–6:45 — Zoom out: architecture and safeguards
-No new screen needed. One breath: zero-cost build, two independent models
-on two different vendor families for transcription cross-checking (not two
-models from the same family), local embeddings, symbolic verification, and
-— the one concrete proof point — a criterion result without
-`evidence_step_indices` fails schema validation; that's enforced in code
-and a DB constraint, not a prompt asking nicely.
+No new screen needed. One breath: zero-cost-friendly build on OpenAI,
+independent OCR hints (pix2text + Textract) grounding the model's read
+without replacing it, self-reported per-step confidence gating low-
+certainty reads to a human, symbolic verification via SymPy where
+checkable, and — the one concrete proof point — a criterion result
+without `evidence_step_indices` fails schema validation; that's enforced
+in code and a DB constraint, not a prompt asking nicely.
 
 ### 6:45–7:00 — Close
 One sentence back to the problem statement. Stop talking. Take questions.

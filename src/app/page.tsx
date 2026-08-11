@@ -103,8 +103,8 @@ export default async function LandingPage({
         <Slide eyebrow="Our solution">
           <div className="flex flex-col gap-lg text-left">
             <h2 className="font-serif text-display-sm font-bold text-ink">
-              AIMS is a human-in-the-loop pipeline: two independent AI reads cross-check each other, a human
-              approves every mark, and every mistake becomes a fresh practice question.
+              AIMS is a human-in-the-loop pipeline: a multimodal model reads the handwriting with its own
+              confidence attached, a human approves every mark, and every mistake becomes a fresh practice question.
             </h2>
             <ul className="flex flex-col gap-md md:flex-row md:gap-xl">
               {SOLUTION_BULLETS.map((b, i) => {

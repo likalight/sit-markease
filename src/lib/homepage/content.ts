@@ -90,7 +90,7 @@ export const FEASIBILITY = {
   now: {
     title: "Working today, not a mockup",
     points: [
-      "Every screenshot on this page is the live app — free-tier OpenAI + Gemini calls, a real Supabase backend, deployed and reachable right now.",
+      "Every screenshot on this page is the live app — real OpenAI calls, a real Supabase backend, deployed and reachable right now.",
       "A Python/FastAPI sidecar handles OCR line-detection and symbolic answer-checking, deployed independently of the Next.js app.",
       "Confidence gating means low-certainty reads route to a human by default — it's safe to hand real submissions to today, not just a demo.",
       "Honest gap: measured against synthetic test scripts so far, not yet real handwriting at classroom scale — that's the next milestone, not a hidden one.",
