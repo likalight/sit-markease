@@ -1,0 +1,40 @@
+"use client";
+
+import type { ReactNode } from "react";
+
+// A single full-viewport slide inside <Deck>. `index`/`total`/`registerRef`
+// are injected by Deck via cloneElement — never pass them by hand.
+export function Slide({
+  children,
+  className = "",
+  index,
+  total,
+  registerRef,
+  eyebrow,
+  dark = false,
+}: {
+  children: ReactNode;
+  className?: string;
+  index?: number;
+  total?: number;
+  registerRef?: (el: HTMLElement | null) => void;
+  eyebrow?: string;
+  dark?: boolean;
+}) {
+  return (
+    <section
+      ref={registerRef as any}
+      data-slide-index={index}
+      className={`relative flex h-dvh w-full snap-start snap-always flex-col items-center justify-center overflow-hidden px-6 py-section ${dark ? "bg-surface-dark" : ""} ${className}`}
+    >
+      <div className="mx-auto flex w-full max-w-[1160px] flex-col gap-lg">
+        {eyebrow && typeof index === "number" && typeof total === "number" && (
+          <p className={`font-mono text-caption-caps ${dark ? "text-on-dark-soft" : "text-muted-soft"}`}>
+            {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")} · {eyebrow}
+          </p>
+        )}
+        {children}
+      </div>
+    </section>
+  );
+}

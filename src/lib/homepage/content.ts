@@ -98,7 +98,7 @@ export const FEASIBILITY = {
   next: {
     title: "Where it goes from here",
     points: [
-      "Any discipline with a checkable answer works today — expanding to more SIT modules is a rubric, not a rebuild.",
+      "Many disciplines with a checkable answer work today — expanding to more SIT modules is a rubric, not a rebuild.",
       "The same pipeline generalises to other institutions running open-ended, rubric-graded assessment at scale.",
       "Deeper LMS integration (single sign-on, gradebook sync) is the natural next step once a module adopts it for real.",
     ],
