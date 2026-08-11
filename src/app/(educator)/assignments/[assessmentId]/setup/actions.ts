@@ -24,6 +24,8 @@ export async function saveAssessmentSetupAction(assessmentId: string, formData: 
   const durationRaw = Number(formData.get("durationMinutes") ?? 0);
   const attemptsRaw = Number(formData.get("attemptsAllowed") ?? 1);
   const selectedIds = VALID_STUDENT_IDS.filter((id) => formData.getAll("studentIds").includes(id));
+  const feedbackModeRaw = String(formData.get("feedbackMode") ?? "guided");
+  const feedbackMode = ["socratic", "guided", "reveal"].includes(feedbackModeRaw) ? feedbackModeRaw : "guided";
 
   const students = (await Promise.all(selectedIds.map(resolveStudentAccount))).filter(Boolean) as any[];
   await db.updateAssessment(assessmentId, {
@@ -32,6 +34,7 @@ export async function saveAssessmentSetupAction(assessmentId: string, formData: 
     due_at: singaporeIso(formData.get("dueAt")),
     duration_minutes: durationRaw > 0 ? Math.round(durationRaw) : null,
     attempts_allowed: Math.max(1, Math.round(attemptsRaw || 1)),
+    feedback_mode: feedbackMode,
   });
   await db.replaceAssessmentStudents(assessmentId, students.map((student) => student.id));
 

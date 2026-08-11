@@ -28,7 +28,7 @@ export const PROMPT_VERSIONS = {
   s2ReadTyped: "s2_read_typed.v1",
   s4Assess: "s4_assess.v2",
   s5Diagnose: "s5_diagnose.v1",
-  s6Feedback: "s6_feedback.v2",
+  s6Feedback: "s6_feedback.v3",
   s7Practice: "s7_practice.v1",
   s7Verify: "s7_verify.v1",
   rubricStructure: "rubric_structure.v1",
@@ -337,7 +337,7 @@ export function s5DiagnoseUserPrompt(args: {
 }
 
 export function s6FeedbackSystemPrompt(): string {
-  return loadPrompt("s6_feedback.v2.md");
+  return loadPrompt("s6_feedback.v3.md");
 }
 
 const S6_FEEDBACK_SHAPE = `Respond with ONLY this JSON shape, no markdown fences, no commentary:
@@ -348,7 +348,7 @@ const S6_FEEDBACK_SHAPE = `Respond with ONLY this JSON shape, no markdown fences
     { "step_index": 1, "what_happened": "<plain language>", "why_it_matters": "<plain language>", "misconception_key": "<key or null>" }
   ],
   "next_action": "<one concrete next step for the student>",
-  "tone": "supportive" | "concise" | "socratic",
+  "tone": "socratic" | "guided" | "reveal",
   "word_count": <integer, total words across summary+strengths+breakdown_points+next_action>
 }
 Use the "tone" value given in the prompt above — don't pick your own.`;
@@ -358,11 +358,11 @@ export function s6FeedbackUserPrompt(args: {
   totalScore: number;
   maxScore: number;
   misconceptions: { name: string; evidence_step_indices: number[]; observed_signature: string }[];
-  tone: "supportive" | "concise" | "socratic";
+  feedbackMode: "socratic" | "guided" | "reveal";
 }): string {
   return [
     `SCORE: ${args.totalScore}/${args.maxScore}`,
-    `TONE: ${args.tone}`,
+    `FEEDBACK MODE (instructor-chosen, per assessment): ${args.feedbackMode}`,
     ``,
     `STUDENT'S SOLUTION STEPS:`,
     ...args.steps.map((s) => `Step ${s.step_index}: ${s.plain_text}`),
@@ -370,7 +370,7 @@ export function s6FeedbackUserPrompt(args: {
     `DETECTED MISCONCEPTIONS:`,
     ...args.misconceptions.map((m) => `- ${m.name} at step(s) ${m.evidence_step_indices.join(", ")}: ${m.observed_signature}`),
     ``,
-    `Write feedback per the system prompt's principles. Never reveal the full model solution.`,
+    `Write feedback per the system prompt's principles for the "${args.feedbackMode}" mode.`,
     ``,
     S6_FEEDBACK_SHAPE,
   ].join("\n");

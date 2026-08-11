@@ -19,7 +19,7 @@ export const FeedbackSchema = z.object({
   strengths: z.array(StrengthSchema),
   breakdown_points: z.array(BreakdownPointSchema),
   next_action: z.string(),
-  tone: z.enum(["supportive", "concise", "socratic"]),
+  tone: z.enum(["socratic", "guided", "reveal"]),
   word_count: z.number().int(),
 });
 export type Feedback = z.infer<typeof FeedbackSchema>;

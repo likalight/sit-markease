@@ -70,22 +70,30 @@ left. Roughly:
 
 ## 2:00–7:00 — The live demo
 
-Full journey, live, for both modes — not a highlight reel. The only thing
-skipped is the OCR/mapping wait on the Math upload (pre-seeded above,
-nothing to watch); every click a judge would actually want to see stays
-live.
+Full journey, live, for both modes — not a highlight reel, and no padding
+at the end either: every minute goes to a feature, nothing is reserved for
+a wrap-up speech. The only thing skipped is the OCR/mapping wait on the
+Math upload (pre-seeded above, nothing to watch); every click a judge
+would actually want to see stays live.
 
-### 2:00–2:45 — Shared: rubric authoring (as instructor)
+### 2:00–3:00 — Shared: rubric authoring + feedback style (as instructor)
 1. `/assignments` → open either assessment → "Review rubric."
 2. On `/assignments/[id]/rubric`: point at one criterion, its weight, its
    levels — editable right here, not baked in at question-creation time.
-3. "Issue settings" → confirm the roster → save. State once, for both
-   modes: *nothing is visible to a student until this step.*
+3. "Issue settings" → confirm the roster. Then the new bit: **"Feedback
+   style."** *"This is the instructor's call, per assessment, not the
+   student's — how much of the answer the AI is allowed to give away."*
+   Point at the three options: Socratic (guiding questions only, never
+   states the answer), Guided (names the mistake and explains it, still
+   withholds the correct working), Reveal (shows the correct working and
+   final answer outright). Leave Physics on **Guided** for now → save.
+   State once, for both modes: *nothing is visible to a student until this
+   step.*
 
-Do this once, narrate that it's identical machinery for both modes, then
-diverge.
+Do this once, narrate that the roster/rubric machinery is identical for
+both modes, then diverge.
 
-### 2:45–4:15 — Formative route (Physics): student self-serve, no gate
+### 3:00–4:15 — Formative route (Physics): student self-serve, no gate
 Click **"Switch to student view →"** to hand off.
 
 1. `/submit` → Physics card → "Start attempt" → `/work/[id]`.
@@ -97,7 +105,8 @@ Click **"Switch to student view →"** to hand off.
 3. Back on `/submit`, "Review assessment" → `/feedback` — **no instructor
    touched this.** Point at the source-image-beside-transcription pairing
    first (the trust mechanism), then the mark, per-part evidence boxes,
-   misconception card.
+   misconception card. Notice the feedback explains the mistake but
+   doesn't hand over the fix — that's the Guided mode you just set.
 4. This first attempt is deliberately incomplete (a real ran-out-of-time
    script, one question untouched) — "Revise and resubmit" → `/work/[id]`
    again → this time upload the complete/correct sample script → submit →
@@ -108,9 +117,15 @@ Click **"Switch to student view →"** to hand off.
    it, type a real answer, reveal the solution, self-report the outcome.
    This is your Innovation (20%) beat — say so.
 
-### 4:15–6:15 — Summative route (Math): instructor-gated
-Click **"Switch to instructor view →"** to hand back.
+### 4:15–4:45 — Instructor beat: choosing Reveal for Math
+Click **"Switch to instructor view →"**.
 
+`/assignments` → Math → "Issue settings" → **Feedback style** → **Reveal**
+→ save. *"This is a final exam — the class won't revisit it, so I want
+students shown the correct working directly, not left to re-derive it.
+That's a teaching decision, and now it's one click, per assessment."*
+
+### 4:45–6:45 — Summative route (Math): instructor-gated
 1. `/review` → open the pre-seeded Math submission → `/review/[id]`. Same
    source-image/transcription pairing the student saw, now with rubric
    criteria, evidence indices, and the AI's recommended per-criterion
@@ -126,25 +141,14 @@ Click **"Switch to instructor view →"** to hand back.
 5. Click **"Switch to student view →"** — the payoff shot. `/submit` now
    shows "Review assessment" for Math → click it → `/feedback`. No resubmit
    button this time (contrast this explicitly against the formative loop):
-   *this is the mark, reviewed and released by a human.*
+   *this is the mark, reviewed and released by a human* — **and point at
+   the feedback text itself showing the correct working**, right next to
+   Physics' guided feedback from five minutes ago that didn't. Same
+   pipeline, two different teaching decisions, both made by the instructor.
+   That contrast is your close — no separate wrap-up slide needed.
 
-If time allows, one more beat: `/exam-prep` → generate + attempt one more
-practice item off this result, same as the formative close. Cut this first
-if you're running long — the "no resubmit, human released it" contrast in
-step 5 is the point that matters, the second exam-prep visit is just an
-echo of a beat you already made once.
-
-### 6:15–6:45 — Zoom out: architecture and safeguards
-No new screen needed. One breath: zero-cost-friendly build on OpenAI,
-independent OCR hints (pix2text + Textract) grounding the model's read
-without replacing it, self-reported per-step confidence gating low-
-certainty reads to a human, symbolic verification via SymPy where
-checkable, and — the one concrete proof point — a criterion result
-without `evidence_step_indices` fails schema validation; that's enforced
-in code and a DB constraint, not a prompt asking nicely.
-
-### 6:45–7:00 — Close
-One sentence back to the problem statement. Stop talking. Take questions.
+If you land here with time to spare: `/exam-prep` → generate + attempt one
+more practice item off this result. Cut this first if you're running long.
 
 ## If something breaks live
 

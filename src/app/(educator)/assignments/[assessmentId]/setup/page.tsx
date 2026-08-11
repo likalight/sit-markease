@@ -32,6 +32,7 @@ export default async function AssessmentSetupPage({ params }: { params: Promise<
   const assignedEmails = new Set((assigned as any[]).map((row) => row.student?.email));
   const save = saveAssessmentSetupAction.bind(null, assessmentId);
   const formative = (assessment as any).assessment_mode === "formative";
+  const feedbackMode = (assessment as any).feedback_mode ?? "guided";
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-lg px-6 py-xl">
@@ -73,6 +74,29 @@ export default async function AssessmentSetupPage({ params }: { params: Promise<
             )}
           </div>
         </section>
+
+        <fieldset className="border-t border-hairline pt-md">
+          <legend className="text-title-md text-body-strong">Feedback style</legend>
+          <p className="mt-xxs text-body-sm text-muted">
+            How much of the answer the AI feedback may reveal — your call, not the student's. Applies once you
+            release results.
+          </p>
+          <div className="mt-sm flex flex-col gap-sm">
+            {[
+              { value: "socratic", label: "Socratic", body: "Guiding questions only — never states the mistake or the correct answer. The student has to work it out." },
+              { value: "guided", label: "Guided", body: "Names the mistake and explains why it matters, but still doesn't hand over the correct working." },
+              { value: "reveal", label: "Reveal", body: "Explains what went wrong AND shows the correct working and final answer directly." },
+            ].map((opt) => (
+              <label key={opt.value} className="flex items-start gap-sm rounded-sm border border-hairline px-md py-sm text-body-sm">
+                <input type="radio" name="feedbackMode" value={opt.value} defaultChecked={feedbackMode === opt.value} className="mt-[3px] h-4 w-4" />
+                <span>
+                  <span className="font-medium text-body-strong">{opt.label}</span>
+                  <span className="block text-caption text-muted-soft">{opt.body}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         <fieldset className="border-t border-hairline pt-md">
           <legend className="text-title-md text-body-strong">Assigned students</legend>

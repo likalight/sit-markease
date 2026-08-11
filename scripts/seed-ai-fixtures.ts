@@ -182,7 +182,7 @@ const FEEDBACKS: Record<string, Feedback> = {
     ],
     breakdown_points: [],
     next_action: "Try a separable ODE with a different initial condition to confirm the method generalizes for you.",
-    tone: "supportive",
+    tone: "guided",
     word_count: 60,
   },
   dropped_c: {
@@ -197,7 +197,7 @@ const FEEDBACKS: Record<string, Feedback> = {
       },
     ],
     next_action: "Redo step 2 writing +C explicitly, then solve for C using y(0)=2 — you'll land on the same answer, but through a method that works for any initial condition.",
-    tone: "supportive",
+    tone: "guided",
     word_count: 95,
   },
   ic_too_early: {
@@ -212,7 +212,7 @@ const FEEDBACKS: Record<string, Feedback> = {
       },
     ],
     next_action: "Integrate first to get the general solution with +C, and only then substitute y(0)=2 to solve for C.",
-    tone: "supportive",
+    tone: "guided",
     word_count: 90,
   },
 };
@@ -450,7 +450,7 @@ async function main() {
       totalScore: grade.total_recommended,
       maxScore: grade.max_total,
       misconceptions,
-      tone: "supportive",
+      feedbackMode: "guided",
     });
 
     const key = cacheKey({ promptVersion: PROMPT_VERSIONS.s6Feedback, provider: PRIMARY_PROVIDER, model: PRIMARY_MODEL, system, prompt });

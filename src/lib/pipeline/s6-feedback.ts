@@ -15,7 +15,7 @@ export interface FeedbackResult {
  * Degrades rather than throws (CLAUDE.md rule 8). */
 export async function generateFeedback(
   submissionId: string,
-  tone: "supportive" | "concise" | "socratic" = "supportive"
+  feedbackMode: "socratic" | "guided" | "reveal" = "guided"
 ): Promise<FeedbackResult> {
   // Idempotency guard — see s2-transcribe.ts's identical guard.
   const existingFeedback = await db.getFeedback(submissionId);
@@ -60,7 +60,7 @@ export async function generateFeedback(
         totalScore: grade.total_recommended,
         maxScore: grade.max_total,
         misconceptions: misconceptionsForPrompt,
-        tone,
+        feedbackMode,
       }),
       schema: FeedbackSchema,
       nativeSchema: feedbackNativeSchema,

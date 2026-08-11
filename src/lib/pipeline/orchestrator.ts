@@ -65,22 +65,23 @@ async function continuePipelineAfterTranscription(submissionId: string, transcri
   const assessResult = await assessSubmission(submissionId);
   const diagnoseResult = assessResult.status === "assessed" ? await diagnoseSubmission(submissionId) : { status: "failed" as const, detectedCount: 0 };
 
-  let preferredTone: "supportive" | "concise" | "socratic" = "supportive";
+  // How much of the answer S6 may reveal is an instructor decision, per
+  // assessment, made before release — not a student personal preference
+  // (users.feedback_tone, migration 0004, is now superseded by this for
+  // the reveal-depth axis; see migration 0009). Applies uniformly to
+  // formative and summative: formative used to be hardcoded to always
+  // "socratic" here, which took the choice away from the instructor even
+  // though formative is exactly where an instructor might reasonably want
+  // guided or reveal instead (e.g. a low-stakes weekly quiz the class
+  // won't revisit).
+  let feedbackMode: "socratic" | "guided" | "reveal" = "guided";
   if (assessResult.status === "assessed") {
     const submission = await db.getSubmission(submissionId);
     const question = submission ? await db.getQuestionWithRubric(submission.question_id) : null;
     const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
-    if ((assessment as any)?.assessment_mode === "formative") {
-      // Progressive hints, not a preference — the defining trait of
-      // formative mode (Nicholas's review), so it overrides whatever tone
-      // the student has set for themselves.
-      preferredTone = "socratic";
-    } else {
-      const student = submission?.student_id ? await db.getUser(submission.student_id) : null;
-      preferredTone = (student as any)?.feedback_tone ?? "supportive";
-    }
+    feedbackMode = (assessment as any)?.feedback_mode ?? "guided";
   }
-  const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId, preferredTone) : { status: "failed" as const };
+  const feedbackResult = assessResult.status === "assessed" ? await generateFeedback(submissionId, feedbackMode) : { status: "failed" as const };
 
   // Threaded through to the API response so the client actually knows
   // release happened — this was silently dropped before (the function ran
