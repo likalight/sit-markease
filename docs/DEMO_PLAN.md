@@ -55,9 +55,9 @@ left. Roughly:
 - **Background + Problem** (25s): institutional context, then the 4
   problem bullets plus the 94.92% stat — this is Problem-Solution Fit, 30%
   of the rubric, land it early.
-- **Solution** (20s): the one-sentence mechanism (two independent AI reads
-  cross-check each other, a human approves every mark) plus the 3 solution
-  cards.
+- **Solution** (20s): the one-sentence mechanism (a multimodal model reads
+  the handwriting with its own confidence attached, a human approves every
+  mark) plus the 3 solution cards.
 - **Anticipated Impact** (25s): the student/instructor before-after, close
   on the "compounds every week" line.
 - **Scalability** (15s): many disciplines, one pipeline — let the
