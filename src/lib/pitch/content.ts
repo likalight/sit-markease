@@ -70,7 +70,7 @@ export const COMPARISON_ROWS = [
     aims: "Connects mistakes to targeted practice",
   },
   {
-    existing: "Rubrics are adjusted as the instructor is marking submissions",
+    existing: "Rubric issues are only caught mid-marking, after work has already started",
     aims: "Suggests rubric refinements to the instructor before detailed submission review",
   },
 ];
@@ -109,7 +109,7 @@ export const SUMMATIVE = {
 
 export const REQUEST_REVISION = {
   title: "Request a practice revision set",
-  body: "RAG finds material for exactly what was missed; OpenAI turns it into a fresh, verified question that lands straight in the student's practice queue — no instructor gate, since nothing here is graded.",
+  body: "A search over the module's own notes finds material for exactly what was missed; OpenAI turns it into a fresh, verified question that lands straight in the student's practice queue — no instructor gate, since nothing here is graded.",
 };
 
 // Explicit "anticipated impact" framing — the hackathon rubric scores this

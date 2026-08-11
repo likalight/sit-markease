@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { env } from "@/lib/db/env";
-import { signInAction, signInAsEducatorAction, signUpAction } from "./actions";
+import { signInAction, signUpAction } from "./actions";
+import { enterAsEducatorAction } from "../enter/actions";
 import { Logo } from "@/components/logo";
 
 // Full email/password account creation — for onboarding real students beyond
@@ -19,13 +20,12 @@ export default async function LoginPage({
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
       <div>
         <Logo className="mb-sm h-12 w-auto" />
-        <h1 className="font-serif text-display-sm text-ink">Create your account</h1>
+        <h1 className="font-serif text-display-sm text-ink">Continue as an instructor</h1>
         <p className="text-body-sm text-muted">
-          Full account sign-up — for a real class, not the 3-ID test gate.
+          Straight into the review queue — no account needed for a live demo.
         </p>
         <p className="mt-xs text-body-sm text-muted">
-          Just testing? <Link href="/enter/student" className="underline">Use the quick student ID entry</Link> or{" "}
-          <Link href="/" className="underline">go to the homepage</Link> for one-click educator access.
+          Testing as a student instead? <Link href="/enter/student" className="underline">Use the quick student entry</Link>.
         </p>
       </div>
 
@@ -35,75 +35,85 @@ export default async function LoginPage({
         </p>
       )}
 
-      {fixtureMode ? (
-        <div className="flex flex-col gap-lg">
-          <form action={signInAction} className="flex flex-col gap-2">
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="rounded-sm bg-ink px-3 py-2 text-body-sm font-medium text-on-dark">
-              Sign in
-            </button>
-          </form>
+      {/* Same one-click pattern as /enter/student — not gated behind
+          fixture mode, since a live-mode presenter needs this exactly as
+          much as a fixture-mode one. Previously only rendered when
+          AIMS_FIXTURE_MODE=true, which silently broke the demo's
+          instructor entry point whenever run against real providers. */}
+      <form action={enterAsEducatorAction}>
+        <button type="submit" className="w-full rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
+          Continue as Dr. Tan (demo) →
+        </button>
+      </form>
 
-          <form action={signUpAction} className="flex flex-col gap-2 border-t border-hairline pt-md">
-            <p className="text-caption-caps text-muted-soft">New student</p>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Name
-              <input name="name" type="text" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
-              Sign up
-            </button>
-          </form>
+      <details className="text-body-sm text-muted">
+        <summary className="cursor-pointer text-caption-caps text-muted-soft">Full account sign-in instead</summary>
+        <div className="mt-sm flex flex-col gap-lg">
+          {fixtureMode ? (
+            <>
+              <form action={signInAction} className="flex flex-col gap-2">
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Email
+                  <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <button type="submit" className="rounded-sm bg-ink px-3 py-2 text-body-sm font-medium text-on-dark">
+                  Sign in
+                </button>
+              </form>
 
-          <form action={signInAsEducatorAction} className="border-t border-hairline pt-md">
-            <button type="submit" className="text-caption text-muted-soft underline">
-              Educator? Continue as Dr. Tan (demo)
-            </button>
-          </form>
+              <form action={signUpAction} className="flex flex-col gap-2 border-t border-hairline pt-md">
+                <p className="text-caption-caps text-muted-soft">New student</p>
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Name
+                  <input name="name" type="text" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Email
+                  <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <button type="submit" className="rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
+                  Sign up
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <form action={signInAction} className="flex flex-col gap-3">
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Email
+                  <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Password
+                  <input name="password" type="password" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <button type="submit" className="mt-2 rounded-sm bg-ink px-3 py-2 text-body-sm font-medium text-on-dark">
+                  Sign in
+                </button>
+              </form>
+
+              <form action={signUpAction} className="flex flex-col gap-3 border-t border-hairline pt-lg">
+                <p className="text-caption-caps text-muted-soft">New student</p>
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Name
+                  <input name="name" type="text" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Email
+                  <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <label className="flex flex-col gap-1 text-body-sm text-body">
+                  Password
+                  <input name="password" type="password" required minLength={8} className="rounded-sm border border-hairline px-3 py-2" />
+                </label>
+                <button type="submit" className="rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
+                  Sign up
+                </button>
+              </form>
+            </>
+          )}
         </div>
-      ) : (
-        <div className="flex flex-col gap-lg">
-          <form action={signInAction} className="flex flex-col gap-3">
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Password
-              <input name="password" type="password" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="mt-2 rounded-sm bg-ink px-3 py-2 text-body-sm font-medium text-on-dark">
-              Sign in
-            </button>
-          </form>
-
-          <form action={signUpAction} className="flex flex-col gap-3 border-t border-hairline pt-lg">
-            <p className="text-caption-caps text-muted-soft">New student</p>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Name
-              <input name="name" type="text" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Email
-              <input name="email" type="email" required className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1 text-body-sm text-body">
-              Password
-              <input name="password" type="password" required minLength={8} className="rounded-sm border border-hairline px-3 py-2" />
-            </label>
-            <button type="submit" className="rounded-sm bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">
-              Sign up
-            </button>
-          </form>
-        </div>
-      )}
+      </details>
     </main>
   );
 }

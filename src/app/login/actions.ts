@@ -4,22 +4,7 @@ import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/db/supabase-server";
 import { env } from "@/lib/db/env";
 import { setLocalSession, clearLocalSession } from "@/lib/auth/local-session";
-import { localStore } from "@/lib/db/local-store";
 import { db } from "@/lib/db/facade";
-
-// Fixture-mode quick entry for the educator role (§10 M2) — students sign
-// up/in for real below; the educator role is intentionally lighter-touch
-// than a full account system since it only ever reviews the small uncertain
-// queue, not every submission.
-export async function signInAsEducatorAction() {
-  if (!env.isFixtureMode()) redirect("/login");
-  const user = localStore.findOne("users", (u: any) => u.role === "educator");
-  if (!user) {
-    redirect(`/login?error=${encodeURIComponent("no seeded educator — run npm run seed")}`);
-  }
-  await setLocalSession({ userId: user.id, email: user.email, name: user.name, role: user.role });
-  redirect("/dashboard");
-}
 
 // Fixture-mode student sign-in by email — no password, matching the rest of
 // this build's local-auth stand-in (docs/DECISIONS.md "M2 — free-tier

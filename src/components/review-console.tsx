@@ -6,7 +6,7 @@ import { ScriptViewer } from "./script-viewer";
 import { ConfidenceBar } from "./confidence-bar";
 import { MathText } from "./math";
 import { stepState } from "@/lib/design/step-state";
-import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-grouping";
+import { groupCriteriaByPart, extractPartLabel, stripPartLabel } from "@/lib/design/part-grouping";
 
 interface Step {
   stepIndex: number;
@@ -125,7 +125,7 @@ export function ReviewConsole(props: {
   // annotation, requested alongside the clean-math-by-default view.
   const criterionNameByStep = new Map<number, string>();
   for (const c of criteriaList) {
-    const name = nameByKey[c.criterionKey] ?? c.criterionKey;
+    const name = stripPartLabel(nameByKey[c.criterionKey] ?? c.criterionKey);
     for (const idx of c.evidenceStepIndices) {
       criterionNameByStep.set(idx, criterionNameByStep.has(idx) ? `${criterionNameByStep.get(idx)}, ${name}` : name);
     }
@@ -141,7 +141,7 @@ export function ReviewConsole(props: {
   // entirely rather than ever rendering the literal word "null"/"undefined".
   function labelName(criterionKey: string | null | undefined): string | null {
     if (!criterionKey) return null;
-    return nameByKey[criterionKey] ?? criterionKey;
+    return stripPartLabel(nameByKey[criterionKey] ?? criterionKey);
   }
   const ranked = [...criteriaList].sort((a, b) => b.score / b.maxScore - a.score / a.maxScore);
   const strongestName = ranked.length > 0 ? labelName(ranked[0]?.criterionKey) : null;
@@ -350,7 +350,7 @@ export function ReviewConsole(props: {
       const bottom = Math.max(...lineBoxes.map((b) => b.y + b.h));
       const states = groupCriteria.map(criterionState);
       const state = states.includes("disputed") ? "disputed" : states.includes("attention") ? "attention" : "verified";
-      const soleName = groupCriteria.length === 1 ? (nameByKey[groupCriteria[0].criterionKey] ?? groupCriteria[0].criterionKey) : null;
+      const soleName = groupCriteria.length === 1 ? stripPartLabel(nameByKey[groupCriteria[0].criterionKey] ?? groupCriteria[0].criterionKey) : null;
       const isPositionalKey = groupKey !== "all" && groupKey !== "unlabeled";
       const label =
         groupCriteria.length > 1
@@ -451,7 +451,10 @@ export function ReviewConsole(props: {
 
       {/* Centre: step-row list */}
       <div className="overflow-auto border-r border-hairline p-lg">
-        <h2 className="mb-sm font-mono text-caption-caps text-muted-soft">Reconciled steps</h2>
+        <h2 className="mb-xxs font-mono text-caption-caps text-muted-soft">Reconciled steps</h2>
+        <p className="mb-sm text-caption text-muted-soft">
+          "conf" = how sure the AI is this line was read correctly. Low confidence flags a human, it doesn't guess.
+        </p>
         <p className="mb-md text-caption text-muted-soft">{props.questionPromptText}</p>
         <div className="flex flex-col gap-xs">
           {props.steps.map((s) => {
@@ -677,7 +680,7 @@ export function ReviewConsole(props: {
           </div>
         )}
 
-        <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — RAG-matched</p>
+        <p className="mb-xs font-mono text-caption-caps text-muted-soft">Rubric — matched against course notes</p>
         <div className="flex flex-col border-t border-hairline">
           {criteriaList.map((c, i) => {
             const cardState = criterionState(c);
@@ -711,10 +714,13 @@ export function ReviewConsole(props: {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-xs">
                     <span className="text-title-sm font-semibold text-body-strong">
-                      {nameByKey[c.criterionKey] ?? c.criterionKey}
+                      {stripPartLabel(nameByKey[c.criterionKey] ?? c.criterionKey)}
                     </span>
-                    <span className="rounded-sm border border-[color-mix(in_srgb,var(--color-muted-soft)_40%,transparent)] px-xs py-[1px] font-mono text-caption text-muted-soft">
-                      RAG
+                    <span
+                      title="This criterion's score is grounded in a search over the module's own course notes, not just the model's general knowledge."
+                      className="rounded-sm border border-[color-mix(in_srgb,var(--color-muted-soft)_40%,transparent)] px-xs py-[1px] font-mono text-caption text-muted-soft"
+                    >
+                      from course notes
                     </span>
                   </div>
                   <p className="text-body-sm text-muted">{c.justification}</p>

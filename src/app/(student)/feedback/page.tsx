@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { StudentFeedbackConsole } from "@/components/student-feedback-console";
-import { groupCriteriaByPart, extractPartLabel } from "@/lib/design/part-grouping";
+import { groupCriteriaByPart, extractPartLabel, stripPartLabel } from "@/lib/design/part-grouping";
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
 // a student reads this once, carefully. Mark + criterion bars, the
@@ -91,7 +91,7 @@ export default async function StudentFeedbackPage({
           const ratios = groupCriteria.map((c: any) => c.score / c.max_score);
           const state = ratios.some((r: number) => r <= 0) ? "disputed" : ratios.every((r: number) => r >= 1) ? "verified" : "attention";
           const soleName =
-            groupCriteria.length === 1 ? nameByKey[groupCriteria[0].criterion_key] ?? groupCriteria[0].criterion_key : null;
+            groupCriteria.length === 1 ? stripPartLabel(nameByKey[groupCriteria[0].criterion_key] ?? groupCriteria[0].criterion_key) : null;
           const isPositionalKey = groupKey !== "all" && groupKey !== "unlabeled";
           const label =
             groupCriteria.length > 1
@@ -146,7 +146,7 @@ export default async function StudentFeedbackPage({
         questionPosition: (question as any)?.position ?? null,
         questionPrompt: (question as any)?.prompt_text ?? "",
         criteria: criteria.map((c: any) => ({
-          name: nameByKey[c.criterion_key] ?? c.criterion_key,
+          name: stripPartLabel(nameByKey[c.criterion_key] ?? c.criterion_key),
           score: c.score,
           maxScore: c.max_score,
           evidenceStepIndices: c.evidence_step_indices,

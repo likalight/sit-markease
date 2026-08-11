@@ -17,6 +17,14 @@ interface Props {
 }
 
 const DIFFICULTY_ORDER = ["scaffold", "target", "extension"] as const;
+// Plain-language labels for a non-technical viewer — "scaffold" reads as
+// internal instructional-design jargon; the dots already carry the ramp,
+// this text just needs to name where on it you are.
+const DIFFICULTY_LABELS: Record<(typeof DIFFICULTY_ORDER)[number], string> = {
+  scaffold: "Guided",
+  target: "Standard",
+  extension: "Challenge",
+};
 
 // docs/DESIGN.md §3 `practice-item` — difficulty ramp, hint ladder,
 // solution gated behind an attempt, verification badge. Attempts persist
@@ -66,11 +74,11 @@ export function PracticeItemCard(props: Props) {
   return (
     <div className="glass-card flex flex-col gap-sm p-lg">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-xxs" title={props.difficulty}>
+        <div className="flex items-center gap-xxs" title={DIFFICULTY_LABELS[props.difficulty]}>
           {DIFFICULTY_ORDER.map((_, i) => (
             <div key={i} className={`h-1.5 w-6 rounded-pill ${i < filledSegments ? "bg-verified" : "bg-hairline"}`} />
           ))}
-          <span className="ml-xs text-caption-caps text-muted-soft">{props.difficulty}</span>
+          <span className="ml-xs text-caption-caps text-muted-soft">{DIFFICULTY_LABELS[props.difficulty]}</span>
         </div>
         <span className="text-caption text-muted-soft">
           {props.provenance.type === "retrieved" ? "From" : "Variant of"} {props.provenance.source_label}

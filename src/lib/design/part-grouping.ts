@@ -16,11 +16,25 @@
 // single-part answer, and they're merged into one group — never fall
 // through to "one box per criterion" as a default, since that's exactly
 // the wrong behaviour for a single-part question with multiple criteria.
-const PART_LABEL_RE = /^\s*(?:part\s*)?\(?([ivxlcdm]{1,5}|[a-h]|\d{1,2})\)?[\s.):-]/i;
+// Two label shapes seen live from the rubric-structuring AI: "Part (i) - ..."
+// (parenthesised, handled by the first alternative) and "part_i ..." (an
+// underscored key-like token the model sometimes emits instead — matched by
+// the second alternative so it still groups correctly, and can still be
+// stripped for display by stripPartLabel below).
+const PART_LABEL_RE = /^\s*(?:part\s*\(?([ivxlcdm]{1,5}|[a-h]|\d{1,2})\)?[\s.):-]|part_([ivxlcdm]{1,5}|[a-h]|\d{1,2})\s+)/i;
 
 export function extractPartLabel(name: string): string | null {
   const m = name.match(PART_LABEL_RE);
-  return m ? m[1].toLowerCase() : null;
+  if (!m) return null;
+  return (m[1] ?? m[2]).toLowerCase();
+}
+
+// Display-only cleanup: a criterion name like "part_i Finding dy/dx" reads
+// as a raw internal key to anyone outside the codebase — strip the matched
+// label token so the UI shows "Finding dy/dx" (the part itself is already
+// shown separately as its own "Part (i)" heading via groupCriteriaByPart).
+export function stripPartLabel(name: string): string {
+  return name.replace(PART_LABEL_RE, "").trim() || name;
 }
 
 // Ordered, de-duplicated list of part markers the question itself declares,

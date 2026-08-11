@@ -16,7 +16,7 @@ export async function AppSidebar() {
   return (
     <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-hairline bg-surface-dark">
       <Link href={homeHref} className="flex items-center gap-xs px-md py-md">
-        <Logo className="h-7 w-auto" />
+        <Logo variant="on-dark" className="h-7 w-auto" />
       </Link>
 
       <SidebarNavLinks role={user.role} />

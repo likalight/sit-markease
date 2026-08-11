@@ -1,59 +1,91 @@
-# 7-Minute Live Demo Plan — SIT MarkEase
+# 7-Minute Slot Plan — SIT MarkEase (2 min pitch + 5 min demo)
 
-The self-serve guided-tour overlay is gone, but the **route** it walked is exactly
-right for a live pitch — it just needs a presenter driving it instead of a spotlight
-UI narrating itself. One screen, one presenter: you toggle between the instructor
+Two minutes of deck, five minutes of live product — not seven minutes of
+slides with a demo squeezed onto the end. The deck (`src/app/page.tsx`) is
+7 slides, ~15–20s each: Title → Background+Problem → Solution → Anticipated
+Impact → Scalability → Feasibility (+ one line on LMS integration) → Close.
+Everything the old, longer deck spent 8 slides showing as static
+screenshots (the Read/Score/Teach journey, the Attempt→Feedback→Practice
+loop) got cut as *slides* — not deleted, still real content in
+`src/lib/pitch/content.ts` and `src/lib/homepage/content.ts` — because the
+next five minutes show that exact story live and interactively. Walking
+through screenshots of it first just spends the clock twice on the same
+beat.
+
+The demo itself: one screen, one presenter, toggling between the instructor
 and student view with a single click (a small "Switch to student view →" /
-"Switch to instructor view →" pill fixed in the bottom-right corner, on every
-educator/student page — `src/components/demo-role-switcher.tsx`, wired to the
-existing `switchRoleAction`), full-screen each time so the room can actually read
-the rubric criteria and transcription text. No split screen — with one projector,
-halving the screen makes the review console (already dense) unreadable from the
-back of the room.
+"Switch to instructor view →" pill fixed in the bottom-right corner, on
+every educator/student page — `src/components/demo-role-switcher.tsx`,
+wired to the existing `switchRoleAction`), full-screen each time so the
+room can actually read the rubric criteria and transcription text. No split
+screen — with one projector, halving the screen makes the review console
+(already dense) unreadable from the back of the room.
 
-## Setup (before the 7 minutes start)
+## Setup (before you start)
 
-- One browser window, full screen. You'll toggle roles with the corner pill —
-  it signs you straight into the other role and lands you on `/submit` (student)
-  or `/review` (instructor), no retyping credentials, no separate tab.
-- Know the two demo assessments: **Physics** (formative) and **Math** (summative)
-  — real seeded past-paper questions with real sample scripts, not placeholders.
+- One browser window, full screen, sitting on the deck's title slide
+  (`/`) when you begin talking.
+- You'll toggle roles with the corner pill during the demo half — it signs
+  you straight into the other role and lands you on `/submit` (student) or
+  `/review` (instructor), no retyping credentials, no separate tab.
+- Know the two demo assessments: **Physics** (formative) and **Math**
+  (summative) — real seeded past-paper questions with real sample scripts,
+  not placeholders.
 - Run `npm run reset-demo` (needs `AIMS_CONFIGURE_DEMO=true`) to put both
-  assessments back to **draft/unissued** with the roster still assigned — the
-  whole value of this route is watching something become visible on the student
-  side the moment it's issued/released on the instructor side. If either
-  assessment is already "open" when you start, that beat is gone.
-- Then, still before you're on stage: sign in as Dr. Tan, open Math → "Upload a
-  script" → "Use sample script" → confirm mapping, and **leave it unapproved**.
-  That's the real ungraded submission the review-queue beat needs — running
-  OCR + grading live from a cold upload is 20–40s of dead air, so pre-seed it.
-- Confirm `AIMS_FIXTURE_MODE` — fixture mode replays cached AI responses with
-  zero network calls (safe against bad venue wifi); live mode actually calls
-  the providers (more impressive if the network's solid). Decide in advance,
-  don't switch mid-demo.
+  assessments back to **draft/unissued** with the roster still assigned —
+  the whole value of the route is watching something become visible on the
+  student side the moment it's issued/released on the instructor side. If
+  either assessment is already "open" when you start, that beat is gone.
+- Then, still before you're on stage: sign in as Dr. Tan, open Math →
+  "Upload a script" → "Use sample script" → confirm mapping, and **leave it
+  unapproved**. That's the real ungraded submission the review-queue beat
+  needs — running OCR + grading live from a cold upload is 20–40s of dead
+  air, so pre-seed it.
+- Confirm `AIMS_FIXTURE_MODE` — fixture mode replays cached AI responses
+  with zero network calls (safe against bad venue wifi); live mode
+  actually calls the providers (more impressive if the network's solid).
+  Decide in advance, don't switch mid-demo.
 
-## The route
+## 0:00–2:00 — The deck
+
+Click or scroll through all 7 slides at a natural talking pace — the
+eyebrow on each one already shows "N / 07" so you always know how much is
+left. Roughly:
+- **Title** (10s): let it land, don't over-narrate the headline.
+- **Background + Problem** (25s): institutional context, then the 4
+  problem bullets plus the 94.92% stat — this is Problem-Solution Fit, 30%
+  of the rubric, land it early.
+- **Solution** (20s): the one-sentence mechanism (two independent AI reads
+  cross-check each other, a human approves every mark) plus the 3 solution
+  cards.
+- **Anticipated Impact** (25s): the student/instructor before-after, close
+  on the "compounds every week" line.
+- **Scalability** (15s): many disciplines, one pipeline — let the
+  discipline pills speak for themselves.
+- **Feasibility** (25s): "this is the live app, not a mockup," the honest
+  "not yet measured at classroom scale" line (say it plainly, it reads as
+  rigor not weakness), then the one-line LMS/Brightspace mention.
+- **Close** (10s): "Let's see it live" — click **"Try it as an
+  instructor →"**, which is also your handoff into the demo below.
+
+## 2:00–7:00 — The live demo
 
 Full journey, live, for both modes — not a highlight reel. The only thing
-skipped is the OCR/mapping wait on the Math upload (pre-seeded above, nothing
-to watch); every click a judge would actually want to see stays live.
+skipped is the OCR/mapping wait on the Math upload (pre-seeded above,
+nothing to watch); every click a judge would actually want to see stays
+live.
 
-### 0:00–0:30 — Cold open
-State the problem in one breath before touching the screen: large classes,
-handwritten open-ended work, no time to give real feedback. (Problem-Solution
-Fit, 30% of the rubric — land this before any UI.)
-
-### 0:30–1:15 — Shared: rubric authoring (as instructor)
+### 2:00–2:45 — Shared: rubric authoring (as instructor)
 1. `/assignments` → open either assessment → "Review rubric."
 2. On `/assignments/[id]/rubric`: point at one criterion, its weight, its
    levels — editable right here, not baked in at question-creation time.
-3. "Issue settings" → confirm the roster → save. State once, for both modes:
-   *nothing is visible to a student until this step.*
+3. "Issue settings" → confirm the roster → save. State once, for both
+   modes: *nothing is visible to a student until this step.*
 
 Do this once, narrate that it's identical machinery for both modes, then
 diverge.
 
-### 1:15–3:15 — Formative route (Physics): student self-serve, no gate
+### 2:45–4:15 — Formative route (Physics): student self-serve, no gate
 Click **"Switch to student view →"** to hand off.
 
 1. `/submit` → Physics card → "Start attempt" → `/work/[id]`.
@@ -74,12 +106,14 @@ Click **"Switch to student view →"** to hand off.
    it, type a real answer, reveal the solution, self-report the outcome.
    This is your Innovation (20%) beat — say so.
 
-### 3:15–5:45 — Summative route (Math): instructor-gated
+### 4:15–6:15 — Summative route (Math): instructor-gated
 Click **"Switch to instructor view →"** to hand back.
 
 1. `/review` → open the pre-seeded Math submission → `/review/[id]`. Same
    source-image/transcription pairing the student saw, now with rubric
-   criteria + evidence indices + the AI's recommended per-criterion score.
+   criteria, evidence indices, and the AI's recommended per-criterion
+   score — the on-screen legend explains what "conf" means, no need to
+   define it yourself.
 2. Click "Edit step" on one line the AI wasn't confident about — correct it
    live, watch the score recompute. Proves the human isn't a rubber stamp.
 3. "Approve & next" (keyboard `A` reads well) — repeat until the queue's
@@ -91,21 +125,23 @@ Click **"Switch to instructor view →"** to hand back.
    shows "Review assessment" for Math → click it → `/feedback`. No resubmit
    button this time (contrast this explicitly against the formative loop):
    *this is the mark, reviewed and released by a human.*
-6. `/exam-prep` → generate + attempt one more practice item off this
-   result, same as the formative close — reinforces it's one shared
-   mechanism regardless of mode.
 
-### 5:45–6:30 — Zoom out: architecture and safeguards
-No new screen needed. In one breath: zero-cost build, two independent
-models on two different vendor families for transcription cross-checking
-(not two models from the same family), local embeddings, symbolic
-verification, and — the one concrete proof point — a criterion result
-without `evidence_step_indices` fails schema validation; that's enforced
-in code and a DB constraint, not a prompt asking nicely.
+If time allows, one more beat: `/exam-prep` → generate + attempt one more
+practice item off this result, same as the formative close. Cut this first
+if you're running long — the "no resubmit, human released it" contrast in
+step 5 is the point that matters, the second exam-prep visit is just an
+echo of a beat you already made once.
 
-### 6:30–7:00 — Close
-One sentence back to the problem statement, one sentence on what's next.
-Stop talking. Take questions.
+### 6:15–6:45 — Zoom out: architecture and safeguards
+No new screen needed. One breath: zero-cost build, two independent models
+on two different vendor families for transcription cross-checking (not two
+models from the same family), local embeddings, symbolic verification, and
+— the one concrete proof point — a criterion result without
+`evidence_step_indices` fails schema validation; that's enforced in code
+and a DB constraint, not a prompt asking nicely.
+
+### 6:45–7:00 — Close
+One sentence back to the problem statement. Stop talking. Take questions.
 
 ## If something breaks live
 
@@ -116,9 +152,8 @@ Stop talking. Take questions.
   decide before you go on, don't switch mid-demo.
 - **Wrong persona signed in:** the corner switcher pill signs you into the
   other role in one click — no need to sign out first.
-- **Running long:** the cut point is step 6 of the summative route (the
-  second exam-prep visit) — you've already made the "no resubmit, human
-  released it" contrast by step 5, which is the point that matters.
+- **Running long:** cut the deck's Scalability slide first (10s), then the
+  summative route's second exam-prep visit (see above) — in that order.
 
 ## Why not split screen
 
