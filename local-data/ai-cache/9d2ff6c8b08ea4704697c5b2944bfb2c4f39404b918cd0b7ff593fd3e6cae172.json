@@ -1,0 +1,30 @@
+{
+  "data": {
+    "detected": [
+      {
+        "misconception_key": "mc_candidate_derivative_simplification_error",
+        "confidence": 0.8,
+        "evidence_step_indices": [
+          2
+        ],
+        "severity": "procedural",
+        "observed_signature": "applies the quotient rule to differentiate y with respect to x"
+      },
+      {
+        "misconception_key": "mc_candidate_final_value_accuracy_issue",
+        "confidence": 0.7,
+        "evidence_step_indices": [
+          5
+        ],
+        "severity": "conceptual",
+        "observed_signature": "significant errors occur in the evaluation"
+      }
+    ],
+    "novel_candidates": []
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1292,
+  "outputTokens": 146,
+  "cachedAt": "2026-08-11T14:50:46.166Z"
+}

@@ -1,0 +1,41 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "part_i Finding dy/dx",
+        "level": "novice",
+        "score": 1,
+        "max_score": 2,
+        "evidence_step_indices": [
+          2
+        ],
+        "justification": "The student applies the quotient rule but does not simplify correctly to reach the final derivative expression.",
+        "confidence": 0.7
+      },
+      {
+        "criterion_key": "part_ii Evaluating the integral",
+        "level": "novice",
+        "score": 2,
+        "max_score": 4,
+        "evidence_step_indices": [
+          4,
+          5
+        ],
+        "justification": "The student sets up the integral and attempts integration by parts, but significant errors occur in the evaluation.",
+        "confidence": 0.6
+      }
+    ],
+    "total_recommended": 3,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "Errors in simplification and evaluation of the integral need further clarification."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1105,
+  "outputTokens": 239,
+  "cachedAt": "2026-08-11T14:50:41.380Z"
+}

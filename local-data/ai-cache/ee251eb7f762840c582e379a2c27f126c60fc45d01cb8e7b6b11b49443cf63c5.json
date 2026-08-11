@@ -1,0 +1,31 @@
+{
+  "data": {
+    "criterion_results": [
+      {
+        "criterion_key": "full_solution",
+        "level": "developing",
+        "score": 2,
+        "max_score": 6,
+        "evidence_step_indices": [
+          1,
+          2,
+          3
+        ],
+        "justification": "The student defines the speed of sound wave equation and states that k is a constant, but does not perform the calculation of k or determine its uncertainty.",
+        "confidence": 0.8
+      }
+    ],
+    "total_recommended": 2,
+    "max_total": 6,
+    "error_carry_forward_applied": false,
+    "needs_human_review": true,
+    "review_reasons": [
+      "Incomplete calculation and uncertainty determination."
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 1173,
+  "outputTokens": 157,
+  "cachedAt": "2026-08-11T14:48:02.143Z"
+}

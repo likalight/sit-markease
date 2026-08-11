@@ -1,0 +1,90 @@
+{
+  "data": {
+    "steps": [
+      {
+        "step_index": 1,
+        "line_indices": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "latex": "y = ux^{2}, \\quad \\frac{dy}{dx} = 2y - 6, \\quad \\text{Using the substitution, } \\frac{du}{dx} = f(x)",
+        "plain_text": "Sets up the problem with the given differential equation and substitution.",
+        "role": "setup",
+        "confidence": 0.95
+      },
+      {
+        "step_index": 2,
+        "line_indices": [
+          5,
+          6,
+          7
+        ],
+        "latex": "x^{2} \\frac{du}{dx} = 2ux^{2} - 6, \\quad \\text{differentiate both sides}",
+        "plain_text": "Applies the substitution and differentiates both sides of the equation.",
+        "role": "substitution",
+        "confidence": 0.94
+      },
+      {
+        "step_index": 3,
+        "line_indices": [
+          8,
+          9,
+          10
+        ],
+        "latex": "x^{3} \\frac{dy}{dx} = -6, \\quad \\frac{du}{dx} = -\\frac{6}{x^{3}}",
+        "plain_text": "Rearranges the equation to isolate the derivative.",
+        "role": "simplification",
+        "confidence": 0.94
+      },
+      {
+        "step_index": 4,
+        "line_indices": [
+          11,
+          12,
+          13
+        ],
+        "latex": "\\int du = -6 \\int x^{-3} dx, \\quad u = -\\frac{6}{x^{2}} + C",
+        "plain_text": "Integrates both sides to find u in terms of x.",
+        "role": "rule_application",
+        "confidence": 0.97
+      },
+      {
+        "step_index": 5,
+        "line_indices": [
+          14,
+          15,
+          16
+        ],
+        "latex": "y = 3 + Cx^{2}, \\quad \\text{Given } y = 2 \\text{ when } x = 1, \\quad 2 = 3 + C",
+        "plain_text": "Substitutes the initial condition to solve for the constant C.",
+        "role": "result",
+        "confidence": 0.9
+      },
+      {
+        "step_index": 6,
+        "line_indices": [
+          17,
+          18
+        ],
+        "latex": "C = -1, \\quad y = 3 - x^{2}",
+        "plain_text": "Finds the final expression for y in terms of x.",
+        "role": "result",
+        "confidence": 0.85
+      }
+    ],
+    "final_answer": {
+      "latex": "y = 3 - x^{2}",
+      "present": true
+    },
+    "flags": [],
+    "student_identifier": null,
+    "overall_legibility": 0.85
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 39126,
+  "outputTokens": 648,
+  "cachedAt": "2026-08-11T14:50:40.049Z"
+}

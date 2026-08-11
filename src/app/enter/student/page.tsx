@@ -20,7 +20,7 @@ export default async function EnterStudentPage({
 
       <div className="text-center">
         <p className="mb-xs text-caption-caps text-muted-soft">Student access</p>
-        <h1 className="font-serif text-display-sm text-ink">Enter your student ID</h1>
+        <h1 className="font-serif text-display-sm text-ink">Continue as a student</h1>
         <p className="mt-xs text-body-sm text-muted">
           Straight into your submissions — photograph or upload your work from there.
         </p>
@@ -33,15 +33,8 @@ export default async function EnterStudentPage({
       )}
 
       <form action={enterAsStudentAction} className="flex flex-col gap-sm">
-        <input
-          name="studentId"
-          inputMode="numeric"
-          maxLength={3}
-          placeholder="111"
-          autoFocus
-          className="rounded-sm border border-hairline px-md py-sm text-center text-title-lg tracking-[0.4em] text-ink"
-        />
-        <SubmitButton pendingLabel="Checking…">Continue</SubmitButton>
+        <input type="hidden" name="studentId" value="111" />
+        <SubmitButton pendingLabel="Signing in…">Continue as the demo student →</SubmitButton>
       </form>
 
       <Link href="/" className="text-center text-body-sm text-muted underline">

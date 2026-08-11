@@ -2,11 +2,14 @@ import { supabaseAdmin } from "@/lib/db/supabase-admin";
 import { db } from "@/lib/db/facade";
 import { env } from "@/lib/db/env";
 
-// Single source of truth for the 3-fixed-ID demo roster — shared by the
-// student login gate (src/app/enter/actions.ts) and the educator
-// on-behalf-of upload route, which needs a student's real uuid to attribute
-// a submission without ever establishing a session as that student.
-export const VALID_STUDENT_IDS = ["111", "222", "333"];
+// Single source of truth for the demo roster — shared by the student
+// login gate (src/app/enter/actions.ts) and the educator on-behalf-of
+// upload route, which needs a student's real uuid to attribute a
+// submission without ever establishing a session as that student. One
+// fixed demo student, not three — the live demo shows exactly two
+// personas (student, instructor), same as the instructor side only ever
+// has one demo account ("Dr. Tan").
+export const VALID_STUDENT_IDS = ["111"];
 export const GATE_PASSWORD = "practica-gate-access-2026";
 
 export function emailForStudentId(id: string) {
