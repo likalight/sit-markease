@@ -77,7 +77,7 @@ export function ScriptMappingReview({ scriptUploadId, pages, questions, initialM
         {page && <div className="relative overflow-hidden border border-hairline bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={page.url} alt={`Script page ${page.pageIndex + 1}`} className="block h-auto w-full" />
-          {overlays.map(({ mapping, mappingIndex, region }, index) => <div key={`${mappingIndex}-${index}`} className="absolute border-2 border-primary bg-primary/10" style={{ left: `${region.x * 100}%`, top: `${region.y * 100}%`, width: `${region.w * 100}%`, height: `${region.h * 100}%` }}><span className="bg-primary px-1 text-caption text-on-primary">Q{questions.find((q) => q.id === mapping.questionId)?.position ?? "?"}</span></div>)}
+          {overlays.map(({ mapping, mappingIndex, region }, index) => <div key={`${mappingIndex}-${index}`} className="absolute border-2 border-primary bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]" style={{ left: `${region.x * 100}%`, top: `${region.y * 100}%`, width: `${region.w * 100}%`, height: `${region.h * 100}%` }}><span className="bg-primary px-1 text-caption text-on-primary">Q{questions.find((q) => q.id === mapping.questionId)?.position ?? "?"}</span></div>)}
         </div>}
       </section>
       <section className="min-w-0">

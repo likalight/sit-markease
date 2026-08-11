@@ -29,7 +29,7 @@ export default async function ReviewQueuePage() {
       ) : (
         <div className="flex flex-col gap-lg">
           {groups.map((group) => (
-            <div key={group.questionId} className="rounded-lg border border-hairline">
+            <div key={group.questionId} className="glass-card">
               <div className="flex items-center justify-between border-b border-hairline px-md py-sm">
                 <div>
                   <p className="text-title-sm font-semibold text-body-strong">{group.assessmentTitle}</p>

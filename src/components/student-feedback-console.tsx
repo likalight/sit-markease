@@ -65,7 +65,7 @@ export function StudentFeedbackConsole(props: {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg border border-hairline">
+    <div className="glass-card flex flex-col overflow-hidden">
       <div className="flex items-center justify-between border-b border-hairline bg-surface-dark px-lg py-xs">
         <span className="font-mono text-caption-caps text-on-dark">
           {props.questionPosition ? `Question ${props.questionPosition}` : "Question"}

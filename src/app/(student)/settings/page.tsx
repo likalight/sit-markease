@@ -48,12 +48,12 @@ export default async function SettingsPage({
       </div>
 
       {saved && (
-        <p className="rounded-sm border border-verified/30 bg-verified-soft px-md py-sm text-body-sm text-verified">
+        <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-verified)_30%,transparent)] bg-verified-soft px-md py-sm text-body-sm text-verified">
           Saved.
         </p>
       )}
       {error && (
-        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">
+        <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-md py-sm text-body-sm text-disputed">
           {error}
         </p>
       )}

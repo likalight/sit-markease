@@ -48,7 +48,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
         <h1 className="text-title-lg text-body-strong">My assessments</h1>
         <p className="text-body-sm text-muted">Only assessments issued to you appear here.</p>
       </div>
-      {error && <p className="border border-disputed/30 bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
+      {error && <p className="border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-md py-sm text-body-sm text-disputed">{error}</p>}
       {rows.length === 0 ? (
         <p className="text-body-sm text-muted">You have no assessments assigned right now.</p>
       ) : (

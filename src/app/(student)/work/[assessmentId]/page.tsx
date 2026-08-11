@@ -40,7 +40,7 @@ export default async function AssessmentWorkPage({ params, searchParams }: { par
         </ol>
       </section>
       {submitted ? (
-        <p className="border border-verified/30 bg-verified-soft px-md py-sm text-body-sm text-verified">This attempt has been submitted.</p>
+        <p className="border border-[color-mix(in_srgb,var(--color-verified)_30%,transparent)] bg-verified-soft px-md py-sm text-body-sm text-verified">This attempt has been submitted.</p>
       ) : (
         <section>
           <h2 className="text-title-md text-body-strong">Submit your complete response</h2>

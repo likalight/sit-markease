@@ -81,7 +81,7 @@ export function TypedSubmissionForm({ questionId }: { questionId: string }) {
       </button>
 
       {error && (
-        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
+        <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
           {error}
         </p>
       )}
@@ -89,7 +89,7 @@ export function TypedSubmissionForm({ questionId }: { questionId: string }) {
       {result && (
         <div className="flex flex-col gap-sm">
           {autoReleased && (
-            <div className="flex items-center gap-sm rounded-sm border border-verified/30 bg-verified-soft px-sm py-xs">
+            <div className="flex items-center gap-sm rounded-sm border border-[color-mix(in_srgb,var(--color-verified)_30%,transparent)] bg-verified-soft px-sm py-xs">
               <p className="text-body-sm text-verified">Graded instantly — typed input has no legibility risk.</p>
               <button
                 type="button"
@@ -102,21 +102,21 @@ export function TypedSubmissionForm({ questionId }: { questionId: string }) {
           )}
 
           {needsEducatorReview && (
-            <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
+            <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-attention)_30%,transparent)] bg-attention-soft px-sm py-xs text-body-sm text-attention">
               The mark needs a quick educator check before it's released. You'll see it on your feedback page
               as soon as that's done.
             </p>
           )}
 
           {needsHumanTranscription && (
-            <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
+            <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-attention)_30%,transparent)] bg-attention-soft px-sm py-xs text-body-sm text-attention">
               Something about the typed steps couldn't be processed automatically — this needs a human to
               check it before it can be graded.
             </p>
           )}
 
           {pipelineFailed && (
-            <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
+            <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
               Processing failed after transcription — check stage_runs for details. The submission was still
               saved.
             </p>

@@ -29,11 +29,11 @@ export default async function EducatorUploadPage({ params }: { params: Promise<{
         </p>
       </div>
       {mode !== "summative" ? (
-        <p className="border border-attention/30 bg-attention-soft px-md py-sm text-body-sm text-attention">Formative assessments are submitted by students from their own dashboard.</p>
+        <p className="border border-[color-mix(in_srgb,var(--color-attention)_30%,transparent)] bg-attention-soft px-md py-sm text-body-sm text-attention">Formative assessments are submitted by students from their own dashboard.</p>
       ) : (questions as any[]).length === 0 ? (
         <p className="text-body-sm text-muted">This assessment has no questions yet.</p>
       ) : assignedStudentIds.length === 0 ? (
-        <p className="border border-attention/30 bg-attention-soft px-md py-sm text-body-sm text-attention">
+        <p className="border border-[color-mix(in_srgb,var(--color-attention)_30%,transparent)] bg-attention-soft px-md py-sm text-body-sm text-attention">
           Assign students first on the <Link href={`/assignments/${assessmentId}/setup`} className="underline">issue settings page</Link>.
         </p>
       ) : (

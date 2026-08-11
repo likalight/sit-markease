@@ -67,7 +67,7 @@ export function PracticeItemCard(props: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-sm rounded-lg border border-hairline bg-canvas p-lg">
+    <div className="glass-card flex flex-col gap-sm p-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-xxs" title={props.difficulty}>
           {DIFFICULTY_ORDER.map((_, i) => (

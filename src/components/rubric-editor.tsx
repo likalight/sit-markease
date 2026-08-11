@@ -111,7 +111,7 @@ export function RubricEditor({
   }
 
   return (
-    <div className="flex flex-col gap-sm rounded-lg border border-hairline p-md">
+    <div className="glass-card flex flex-col gap-sm p-md">
       <p className="text-body-sm text-muted">{questionPromptText}</p>
       <label className="flex flex-col gap-xs rounded-sm border border-dashed border-hairline px-sm py-xs text-body-sm text-body">
         Import rubric PDF

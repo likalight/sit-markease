@@ -104,7 +104,7 @@ export default async function AssignmentsPage() {
             </thead>
             <tbody>
               {visibleRows.map((r) => (
-                <tr key={r.assessmentId} className="border-b border-hairline last:border-b-0 hover:bg-surface-soft/60">
+                <tr key={r.assessmentId} className="border-b border-hairline last:border-b-0 hover:bg-[color-mix(in_srgb,var(--color-surface-soft)_60%,transparent)]">
                   <td className="px-md py-sm text-body text-body-strong">{r.assignmentName}</td>
                   <td className="px-md py-sm">
                     <span className="rounded-sm border border-hairline px-xs py-[1px] text-caption text-muted-soft">
@@ -118,14 +118,14 @@ export default async function AssignmentsPage() {
                   </td>
                   <td className="px-md py-sm">
                     {r.status === "released" ? (
-                      <span className="border border-verified/40 bg-verified-soft px-sm py-xxs text-caption font-medium text-verified">Released</span>
+                      <span className="border border-[color-mix(in_srgb,var(--color-verified)_40%,transparent)] bg-verified-soft px-sm py-xxs text-caption font-medium text-verified">Released</span>
                     ) : <form action={setAssessmentStatusAction}>
                       <input type="hidden" name="assessmentId" value={r.assessmentId} />
                       <input type="hidden" name="status" value={r.status === "open" ? "draft" : "open"} />
                       {r.status === "open" ? (
                         <SubmitButton
                           pendingLabel="Closing…"
-                          className="rounded-sm border border-verified/40 bg-verified-soft px-sm py-xxs text-caption font-medium text-verified"
+                          className="rounded-sm border border-[color-mix(in_srgb,var(--color-verified)_40%,transparent)] bg-verified-soft px-sm py-xxs text-caption font-medium text-verified"
                         >
                           Open — close
                         </SubmitButton>

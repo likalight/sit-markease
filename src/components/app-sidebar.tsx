@@ -14,18 +14,17 @@ export async function AppSidebar() {
   const homeHref = user.role === "educator" ? "/review" : "/submit";
 
   return (
-    <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-hairline bg-surface-soft">
+    <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-hairline bg-surface-dark">
       <Link href={homeHref} className="flex items-center gap-xs px-md py-md">
-        <Logo className="h-7 w-7" />
-        <span className="font-serif text-title-md text-ink">SIT MarkEase</span>
+        <Logo className="h-7 w-auto" />
       </Link>
 
       <SidebarNavLinks role={user.role} />
 
       <div className="mt-auto flex flex-col gap-xs border-t border-hairline px-md py-md">
-        <span className="truncate text-body-sm text-muted-soft">{user.name}</span>
+        <span className="truncate text-body-sm text-on-dark-soft">{user.name}</span>
         <form action={signOutAction}>
-          <button type="submit" className="text-caption text-muted underline">
+          <button type="submit" className="text-caption text-on-dark-soft underline">
             Sign out
           </button>
         </form>

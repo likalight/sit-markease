@@ -64,7 +64,7 @@ export function EducatorUploadForm({ questions, validStudentIds }: { questions: 
   }
 
   return (
-    <div className="flex flex-col gap-md rounded-lg border border-hairline p-md">
+    <div className="glass-card flex flex-col gap-md p-md">
       <div className="flex flex-col gap-xs">
         <label className="text-body-sm font-medium text-body-strong" htmlFor="edu-upload-question">
           Question
@@ -117,13 +117,13 @@ export function EducatorUploadForm({ questions, validStudentIds }: { questions: 
       </div>
 
       {error && (
-        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
+        <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
           {error}
         </p>
       )}
 
       {result && (
-        <div className="flex flex-col gap-xs rounded-sm border border-verified/30 bg-verified-soft px-sm py-xs">
+        <div className="flex flex-col gap-xs rounded-sm border border-[color-mix(in_srgb,var(--color-verified)_30%,transparent)] bg-verified-soft px-sm py-xs">
           <p className="text-body-sm text-verified">
             Saved for {result.studentName} ({result.studentId}) — now in the review queue.
           </p>

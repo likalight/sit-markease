@@ -494,7 +494,7 @@ export function ReviewConsole(props: {
                       <textarea
                         value={editText}
                         onChange={(e) => setEditText(e.target.value)}
-                        className="min-h-16 rounded-sm border border-primary/40 bg-canvas px-xs py-xs text-body-sm"
+                        className="min-h-16 rounded-sm border border-[color-mix(in_srgb,var(--color-primary)_40%,transparent)] bg-canvas px-xs py-xs text-body-sm"
                         autoFocus
                       />
                       <div className="flex gap-xs">
@@ -538,7 +538,7 @@ export function ReviewConsole(props: {
                               <textarea
                                 value={editLatexText}
                                 onChange={(e) => setEditLatexText(e.target.value)}
-                                className="min-h-14 rounded-sm border border-primary/40 bg-canvas px-xs py-xs font-mono text-caption"
+                                className="min-h-14 rounded-sm border border-[color-mix(in_srgb,var(--color-primary)_40%,transparent)] bg-canvas px-xs py-xs font-mono text-caption"
                                 autoFocus
                               />
                               <div className="flex gap-xs">
@@ -630,7 +630,7 @@ export function ReviewConsole(props: {
                   <textarea
                     value={feedbackSummary}
                     onChange={(e) => setFeedbackSummary(e.target.value)}
-                    className="min-h-14 rounded-sm border border-primary/40 bg-canvas px-xs py-xs text-body-sm text-body"
+                    className="min-h-14 rounded-sm border border-[color-mix(in_srgb,var(--color-primary)_40%,transparent)] bg-canvas px-xs py-xs text-body-sm text-body"
                   />
                 </label>
                 <label className="flex flex-col gap-xxs text-caption text-muted-soft">
@@ -638,7 +638,7 @@ export function ReviewConsole(props: {
                   <textarea
                     value={feedbackNextAction}
                     onChange={(e) => setFeedbackNextAction(e.target.value)}
-                    className="min-h-10 rounded-sm border border-primary/40 bg-canvas px-xs py-xs text-body-sm text-body"
+                    className="min-h-10 rounded-sm border border-[color-mix(in_srgb,var(--color-primary)_40%,transparent)] bg-canvas px-xs py-xs text-body-sm text-body"
                   />
                 </label>
                 <div className="flex gap-xs">
@@ -713,7 +713,7 @@ export function ReviewConsole(props: {
                     <span className="text-title-sm font-semibold text-body-strong">
                       {nameByKey[c.criterionKey] ?? c.criterionKey}
                     </span>
-                    <span className="rounded-sm border border-muted-soft/40 px-xs py-[1px] font-mono text-caption text-muted-soft">
+                    <span className="rounded-sm border border-[color-mix(in_srgb,var(--color-muted-soft)_40%,transparent)] px-xs py-[1px] font-mono text-caption text-muted-soft">
                       RAG
                     </span>
                   </div>
@@ -769,7 +769,7 @@ export function ReviewConsole(props: {
             this question, same as an AI-authored one), not just local
             state, so it persists past this page. */}
         {showAddCriterion ? (
-          <div className="mt-xs flex flex-col gap-xs rounded-sm border border-primary/40 bg-surface-soft p-sm">
+          <div className="mt-xs flex flex-col gap-xs rounded-sm border border-[color-mix(in_srgb,var(--color-primary)_40%,transparent)] bg-surface-soft p-sm">
             <label className="flex flex-col gap-xxs text-caption text-muted-soft">
               Item name
               <input
@@ -840,7 +840,7 @@ export function ReviewConsole(props: {
               levels, for disagreeing with the total wholesale rather than
               criterion by criterion. */}
           {showOverride ? (
-            <div className="flex flex-col gap-xs rounded-sm border border-attention/40 bg-attention-soft p-sm">
+            <div className="flex flex-col gap-xs rounded-sm border border-[color-mix(in_srgb,var(--color-attention)_40%,transparent)] bg-attention-soft p-sm">
               <label className="flex items-center gap-xs text-caption text-muted-soft">
                 Override total
                 <input
@@ -924,10 +924,10 @@ export function ReviewConsole(props: {
 
       {showShortcuts && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-surface-dark/60"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_srgb,var(--color-surface-dark)_60%,transparent)]"
           onClick={() => setShowShortcuts(false)}
         >
-          <div className="w-80 rounded-lg bg-canvas p-lg shadow-overlay" onClick={(e) => e.stopPropagation()}>
+          <div className="glass-card w-80 p-lg shadow-overlay" onClick={(e) => e.stopPropagation()}>
             <h3 className="mb-sm font-serif text-display-sm text-ink">Shortcuts</h3>
             <ul className="flex flex-col gap-xxs text-body-sm text-body">
               <li><strong>A</strong> — Approve and advance</li>

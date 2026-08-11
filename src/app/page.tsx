@@ -2,32 +2,49 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { SubmitButton } from "@/components/submit-button";
 import { startTourAction } from "@/lib/demo-tour/actions";
+import { RevealSection } from "@/components/reveal-section";
+import { ScrollJourney } from "@/components/homepage/scroll-journey";
+import { ImprovementJourney } from "@/components/homepage/improvement-journey";
+import { FEASIBILITY } from "@/lib/homepage/content";
+import { ComparisonTable } from "@/components/pitch/comparison-table";
+import {
+  PROBLEM_BULLETS,
+  STAT_CALLOUT,
+  SOLUTION_BULLETS,
+  IMPACT_STATEMENTS,
+  FORMATIVE,
+  SUMMATIVE,
+  REQUEST_REVISION,
+} from "@/lib/pitch/content";
+import {
+  ClockIcon,
+  ChatIcon,
+  EyeIcon,
+  TargetIcon,
+  CameraIcon,
+  ShieldIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  LayersIcon,
+  CpuIcon,
+  SearchIcon,
+  CalculatorIcon,
+  DatabaseIcon,
+  RocketIcon,
+} from "@/components/icons";
+
+const PROBLEM_ICONS = [ClockIcon, ChatIcon, EyeIcon, TargetIcon];
+const SOLUTION_ICONS = [CameraIcon, EyeIcon, ShieldIcon];
+const STACK_ICONS: Record<string, typeof CpuIcon> = {
+  OpenAI: CpuIcon,
+  "pix2text + AWS Textract": CameraIcon,
+  RAG: SearchIcon,
+  SymPy: CalculatorIcon,
+  Supabase: DatabaseIcon,
+  "Python / FastAPI sidecar": LayersIcon,
+};
 
 export const dynamic = "force-dynamic";
-
-function ShapeAccent({ className = "" }: { className?: string }) {
-  return (
-    <div
-      aria-hidden
-      className={`pointer-events-none absolute rounded-2xl bg-primary opacity-[0.06] ${className}`}
-    />
-  );
-}
-
-const PROBLEMS = [
-  {
-    title: "Manual grading doesn't scale",
-    body: "Large-enrolment modules can't give timely, individual feedback on open-ended, handwritten work — not at real class sizes.",
-  },
-  {
-    title: "Feedback collapses into a mark",
-    body: "A number and a tick tell a student they got it wrong. They don't tell them why, or what to do about it.",
-  },
-  {
-    title: "No practice targets the actual gap",
-    body: "Generic revision material isn't the same as a fresh question built for the exact misconception a student just showed.",
-  },
-];
 
 const DISCIPLINES = ["Mathematics", "Physics", "Engineering", "Nursing", "Accounting", "Business"];
 
@@ -35,6 +52,7 @@ const STACK = [
   {
     name: "OpenAI",
     body: "Reads the handwriting for real and grades it against the rubric — not a keyword match, an actual read.",
+    featured: true,
   },
   {
     name: "pix2text + AWS Textract",
@@ -55,6 +73,7 @@ const STACK = [
   {
     name: "Python / FastAPI sidecar",
     body: "OpenCV line detection, SymPy, and local embeddings — deployed separately from the Next.js app.",
+    featured: true,
   },
 ];
 
@@ -66,151 +85,272 @@ export default async function LandingPage({
   const { error } = await searchParams;
 
   return (
-    <main className="flex flex-col overflow-x-clip bg-canvas">
-      {/* Nav — brand only. The two real entry points live in the hero below;
-          repeating them here was redundant clutter, not a shortcut. */}
+    <main className="relative flex flex-col overflow-x-clip">
       <nav className="mx-auto flex w-full max-w-[1160px] items-center px-6 py-md">
         <Link href="/" className="flex items-center gap-xs">
-          <Logo className="h-9 w-9" />
-          <span className="font-serif text-title-lg text-ink">SIT MarkEase</span>
+          <Logo className="h-9 w-auto" />
         </Link>
       </nav>
 
-      {/* Hero + embedded entry */}
-      <section className="relative mx-auto flex w-full max-w-[1160px] flex-col gap-lg px-6 py-section">
-        <ShapeAccent className="-right-16 -top-10 h-56 w-56 rotate-12" />
-        <ShapeAccent className="-left-20 top-24 h-40 w-40 -rotate-6" />
-
-        <div className="relative flex flex-col gap-md text-center">
-          <p className="mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Built at SIT</p>
-          <h1 className="mx-auto max-w-2xl font-serif text-display-xl text-ink">
-            Photograph it. Get graded — and taught.
-          </h1>
-          <p className="mx-auto max-w-lg text-body-md text-muted">
-            Any subject with a checkable answer — math, physics, engineering, nursing dosage calculations,
-            accounting. Photograph the work, get it graded for real, get taught exactly what to fix.
-          </p>
-        </div>
+      {/* HOOK — the one deliberately centered, full-impact moment. The
+          guided-demo CTA lives at the very bottom now, as the closing
+          action after the full story, not competing with the headline. */}
+      <section className="relative mx-auto flex w-full max-w-[1160px] flex-col gap-lg px-6 py-section text-center">
+        <p className="mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Built at SIT</p>
+        <h1 className="mx-auto max-w-3xl font-serif text-display-xl font-bold text-gradient">
+          Photograph it. Get graded — and taught.
+        </h1>
+        <p className="mx-auto max-w-lg text-body-md text-muted">
+          Any subject with a checkable answer — math, physics, engineering, nursing dosage calculations,
+          accounting. Scroll to see exactly how it works.
+        </p>
 
         {error && (
-          <p className="relative mx-auto max-w-md rounded-sm border border-disputed/30 bg-disputed-soft px-md py-sm text-center text-body-sm text-disputed">
+          <p className="relative mx-auto max-w-md rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-md py-sm text-center text-body-sm text-disputed">
             {error}
           </p>
         )}
-
-        <div className="relative mx-auto flex w-full max-w-2xl flex-col gap-sm rounded-lg border border-primary/30 bg-primary-soft px-lg py-lg text-center">
-          <p className="font-serif text-title-md text-ink">Try a guided demo</p>
-          <p className="mx-auto max-w-md text-body-sm text-muted">
-            No account, no typing — one click walks you through a real submission from start to
-            finish, with a real sample script.
-          </p>
-          <div className="mx-auto flex flex-wrap justify-center gap-sm">
-            <form action={startTourAction.bind(null, "formative")}>
-              <SubmitButton pendingLabel="Starting…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
-                See the formative demo →
-              </SubmitButton>
-            </form>
-            <form action={startTourAction.bind(null, "summative")}>
-              <SubmitButton pendingLabel="Starting…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
-                See the summative demo →
-              </SubmitButton>
-            </form>
-          </div>
-        </div>
-
       </section>
 
-      {/* The problem */}
-      <section className="w-full bg-surface-soft">
-        <div className="mx-auto max-w-[960px] px-6 py-section">
-          <h2 className="mb-lg text-center font-serif text-display-sm text-ink">Why this exists</h2>
-          <div className="grid gap-md sm:grid-cols-3">
-            {PROBLEMS.map((p) => (
-              <div key={p.title} className="rounded-lg border border-hairline bg-surface-card px-lg py-lg">
-                <p className="mb-xs text-title-sm font-semibold text-body-strong">{p.title}</p>
-                <p className="text-body-sm text-muted">{p.body}</p>
-              </div>
+      {/* PROBLEM */}
+      <RevealSection className="w-full">
+        <div className="mx-auto grid w-full max-w-[1160px] gap-xl px-6 py-section md:grid-cols-[1.2fr_1fr]">
+          <div className="flex flex-col gap-md text-left">
+            <p className="font-mono text-caption-caps text-muted-soft">1 · Why this exists</p>
+            <h2 className="font-serif text-display-sm font-bold text-ink">
+              Large-enrolment modules struggle to provide meaningful feedback on open-ended assessments.
+            </h2>
+            <ul className="flex flex-col gap-sm">
+              {PROBLEM_BULLETS.map((b, i) => {
+                const Icon = PROBLEM_ICONS[i];
+                return (
+                  <li key={b} className="flex items-start gap-sm">
+                    <Icon className="mt-[2px] shrink-0 text-primary" width={22} height={22} />
+                    <span>{b}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="flex flex-col justify-center gap-xs text-left">
+            <p className="font-serif text-display-lg font-bold text-gradient">{STAT_CALLOUT.value}</p>
+            <p className="text-body-sm text-muted">{STAT_CALLOUT.body}</p>
+            <p className="font-mono text-caption text-muted-soft">— {STAT_CALLOUT.citation}</p>
+          </div>
+        </div>
+      </RevealSection>
+
+      {/* SOLUTION — deliberately short: a pointer into the Journey below,
+          which is the visual proof, not a second summary of it. */}
+      <RevealSection className="w-full bg-surface-soft">
+        <div className="mx-auto max-w-[1160px] px-6 py-section text-left">
+          <p className="mb-xxs font-mono text-caption-caps text-muted-soft">2 · Our solution</p>
+          <h2 className="mb-lg font-serif text-display-sm font-bold text-ink">
+            AIMS is a human-in-the-loop pipeline — scroll to watch it read, score, and teach from one real
+            submission.
+          </h2>
+          <ul className="flex flex-col gap-md md:flex-row md:gap-xl">
+            {SOLUTION_BULLETS.map((b, i) => {
+              const Icon = SOLUTION_ICONS[i];
+              return (
+                <li key={b} className="glass-card flex-1 px-lg py-lg text-body-md text-body">
+                  <Icon className="mb-sm text-primary" width={22} height={22} />
+                  {b}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </RevealSection>
+
+      {/* JOURNEY — the pinned Apple-product-page moment */}
+      <ScrollJourney />
+
+      {/* IMPACT — intro, then a second pinned scroll moment for the
+          Attempt→Feedback→Practice→Reattempt→Improvement loop, since it's
+          a real sequence (unlike Formative vs. Summative below, which is a
+          comparison and stays side-by-side). */}
+      <RevealSection className="w-full">
+        <div className="mx-auto max-w-[1160px] px-6 pt-section text-left">
+          <p className="mb-xxs font-mono text-caption-caps text-muted-soft">3 · Impact</p>
+          <div className="mb-lg flex flex-col gap-sm">
+            {IMPACT_STATEMENTS.map((s) => (
+              <p key={s.title} className="max-w-2xl text-body-md text-body">
+                <span className="font-semibold text-body-strong">{s.title}:</span> {s.body}
+              </p>
             ))}
           </div>
+          <p className="font-mono text-caption-caps text-muted-soft">Scroll to watch the loop close ↓</p>
         </div>
-      </section>
+      </RevealSection>
+      <ImprovementJourney />
 
-      {/* Two paths, one engine — the real current architecture, not the old
-          linear 8-step flow this section used to describe. */}
-      <section className="w-full">
-        <div className="mx-auto max-w-[960px] px-6 py-section">
-          <h2 className="mb-xxs text-center font-serif text-display-sm text-ink">One engine, two release paths</h2>
-          <p className="mb-lg text-center text-body-sm text-muted">
-            Every submission takes the same first step. What happens next depends on what's at stake.
-          </p>
-
-          <div className="mb-md flex flex-col items-center gap-xs rounded-lg border border-hairline bg-surface-card px-lg py-md text-center">
-            <p className="text-title-sm font-semibold text-body-strong">Submit → AI reads, scores &amp; writes feedback</p>
-            <p className="font-mono text-caption text-muted-soft">pix2text · Textract · RAG · OpenAI · SymPy check</p>
+      {/* CLIMAX — formative vs summative, full detail from the pitch */}
+      <RevealSection className="w-full bg-surface-soft">
+        <div className="mx-auto max-w-[1160px] px-6 py-section">
+          <div className="mb-lg max-w-2xl text-left">
+            <p className="mb-xxs font-mono text-caption-caps text-muted-soft">4 · One engine, two release paths</p>
+            <h2 className="font-serif text-display-sm font-bold text-ink">
+              Every submission takes the same first two steps. What happens next depends on what&apos;s at stake.
+            </h2>
           </div>
 
-          <div className="mb-md grid gap-md sm:grid-cols-2">
-            <div className="rounded-lg border border-hairline bg-surface-card px-lg py-lg">
-              <p className="mb-xxs font-serif text-title-md italic text-verified">Formative</p>
-              <p className="mb-sm text-caption-caps text-muted-soft">Weekly practice</p>
+          <div className="grid gap-md md:grid-cols-2">
+            <div className="flex flex-col gap-sm border-l-2 border-verified pl-md text-left">
+              <p className="font-serif text-title-lg italic text-verified">{FORMATIVE.label}</p>
+              <p className="text-caption-caps text-muted-soft">{FORMATIVE.subLabel}</p>
               <ul className="flex flex-col gap-xs text-body-sm text-body">
-                <li>Releases instantly — no instructor gate, no confidence check.</li>
-                <li>A guiding question, not the answer — Socratic-style hints.</li>
-                <li>Revise and resubmit the same question, as many times as it takes.</li>
-                <li>Every attempt logged for the instructor to review later.</li>
+                {FORMATIVE.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
               </ul>
+              <div className="mt-xs rounded-sm border border-hairline bg-surface-card px-md py-sm">
+                <p className="mb-xxs font-mono text-caption-caps text-muted-soft">{FORMATIVE.exampleLabel}</p>
+                <p className="mb-sm text-body-sm italic text-body">&ldquo;{FORMATIVE.example}&rdquo;</p>
+                <p className="text-caption text-muted-soft">{FORMATIVE.safeguard}</p>
+              </div>
             </div>
-            <div className="rounded-lg border border-hairline bg-surface-card px-lg py-lg">
-              <p className="mb-xxs font-serif text-title-md italic text-disputed">Summative</p>
-              <p className="mb-sm text-caption-caps text-muted-soft">Closed-book CA / exam</p>
+            <div className="flex flex-col gap-sm border-l-2 border-disputed pl-md text-left">
+              <p className="font-serif text-title-lg italic text-disputed">{SUMMATIVE.label}</p>
+              <p className="text-caption-caps text-muted-soft">{SUMMATIVE.subLabel}</p>
               <ul className="flex flex-col gap-xs text-body-sm text-body">
-                <li>Instructor reviews, grouped by question, lowest-confidence first.</li>
-                <li>Can adjust the score or the read transcription directly.</li>
-                <li>Approves the mark and the exact feedback text before release.</li>
-                <li>Nothing reaches the student without that explicit action.</li>
+                {SUMMATIVE.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
               </ul>
+              <div className="mt-xs rounded-sm border border-hairline bg-surface-card px-md py-sm">
+                <p className="mb-xxs font-mono text-caption-caps text-muted-soft">{SUMMATIVE.exampleLabel}</p>
+                <p className="mb-sm text-body-sm italic text-body">&ldquo;{SUMMATIVE.example}&rdquo;</p>
+                <p className="text-caption text-muted-soft">{SUMMATIVE.safeguard}</p>
+              </div>
             </div>
           </div>
 
-          <div className="rounded-lg border border-hairline bg-surface-soft px-lg py-md text-center">
+          <div className="mt-lg rounded-sm border border-hairline bg-surface-card px-lg py-md text-left">
             <p className="text-body-sm text-body">
-              <span className="font-medium text-body-strong">Either way:</span> once it's graded, the student can
-              request a fresh, verified practice set targeting the specific gap — checked by SymPy or an LLM before
-              anything ships.
+              <span className="font-medium text-body-strong">{REQUEST_REVISION.title}:</span> {REQUEST_REVISION.body}
             </p>
           </div>
         </div>
-      </section>
+      </RevealSection>
 
-      {/* Any discipline at SIT */}
-      <section className="w-full bg-surface-soft">
-        <div className="mx-auto max-w-[960px] px-6 py-section text-center">
-          <h2 className="mb-xs font-serif text-display-sm text-ink">Any discipline at SIT</h2>
-          <p className="mb-lg text-body-sm text-muted">
+      {/* Comparison table */}
+      <RevealSection className="w-full">
+        <div className="mx-auto max-w-[1160px] px-6 py-section text-left">
+          <p className="mb-xxs font-mono text-caption-caps text-muted-soft">5 · Existing platforms vs. AIMS</p>
+          <h2 className="mb-lg font-serif text-display-sm font-bold text-ink">
+            Existing platforms vs. <span className="text-gradient">AIMS</span>
+          </h2>
+          <ComparisonTable />
+        </div>
+      </RevealSection>
+
+      {/* Any discipline — the one deliberate dark-maroon band before the
+          midpoint, breaking the cream/peach rhythm the rest of the page
+          runs on (design review: the page committed to strong color only
+          in the comparison-table header and footer; borrowing that
+          confidence once earlier keeps the scroll from feeling monotonous). */}
+      <RevealSection className="w-full bg-surface-dark">
+        <div className="mx-auto max-w-[1160px] px-6 py-section text-left">
+          <p className="mb-xxs font-mono text-caption-caps text-on-dark-soft">6 · Any discipline at SIT</p>
+          <h2 className="mb-xs flex items-center gap-xs font-serif text-display-sm font-bold text-on-dark">
+            <LayersIcon className="text-primary-active" width={22} height={22} />
+            Any discipline at SIT
+          </h2>
+          <p className="mb-lg max-w-lg text-body-sm text-on-dark-soft">
             Only the rubric changes — the same pipeline reads, grades, and diagnoses every one of them.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-sm">
+          <div className="flex flex-wrap items-center gap-sm">
             {DISCIPLINES.map((d) => (
-              <span key={d} className="rounded-pill border border-hairline bg-surface-card px-md py-xs text-body-sm text-body">
+              <span key={d} className="rounded-pill border border-primary-hairline bg-surface-dark-elevated px-md py-xs text-body-sm text-on-dark">
                 {d}
               </span>
             ))}
           </div>
         </div>
-      </section>
+      </RevealSection>
 
-      {/* Built with — explained, not just name-dropped */}
-      <section className="mx-auto w-full max-w-[960px] px-6 py-section">
-        <h2 className="mb-lg text-center font-serif text-display-sm text-ink">Built with</h2>
-        <div className="grid gap-md sm:grid-cols-2">
-          {STACK.map((s) => (
-            <div key={s.name} className="flex flex-col gap-xxs">
-              <p className="font-mono text-body-sm font-semibold text-ink">{s.name}</p>
-              <p className="text-body-sm text-muted">{s.body}</p>
-            </div>
-          ))}
+      {/* Built with */}
+      <RevealSection className="mx-auto w-full max-w-[1160px] px-6 py-section">
+        <p className="mb-xxs font-mono text-caption-caps text-muted-soft">7 · Built with</p>
+        <h2 className="mb-lg text-left font-serif text-display-sm font-bold text-ink">Built with</h2>
+        <div className="grid auto-rows-fr gap-md sm:grid-cols-3">
+          {STACK.map((s) => {
+            const Icon = STACK_ICONS[s.name];
+            return (
+              <div
+                key={s.name}
+                className={`glass-card flex flex-col gap-xxs px-lg py-lg ${s.featured ? "sm:col-span-2" : ""}`}
+              >
+                <Icon className="mb-xxs text-primary" width={22} height={22} />
+                <p className={`font-mono font-semibold text-ink ${s.featured ? "text-title-sm" : "text-body-sm"}`}>
+                  {s.name}
+                </p>
+                <p className="text-body-sm text-muted">{s.body}</p>
+              </div>
+            );
+          })}
         </div>
-      </section>
+      </RevealSection>
+
+      {/* Feasibility & future potential */}
+      <RevealSection className="w-full">
+        <div className="mx-auto max-w-[1160px] px-6 py-section text-left">
+          <p className="mb-xxs font-mono text-caption-caps text-muted-soft">8 · Feasibility &amp; future potential</p>
+          <h2 className="mb-lg font-serif text-display-sm font-bold text-ink">
+            Everything above is the live app — here&apos;s where it goes next.
+          </h2>
+          <div className="grid gap-xl md:grid-cols-2">
+            <div>
+              <p className="mb-sm flex items-center gap-xs text-title-sm font-semibold text-body-strong">
+                <CheckCircleIcon className="text-verified" width={22} height={22} />
+                {FEASIBILITY.now.title}
+              </p>
+              <ul className="flex flex-col gap-sm border-l-2 border-verified pl-md text-body-md text-body">
+                {FEASIBILITY.now.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="mb-sm flex items-center gap-xs text-title-sm font-semibold text-body-strong">
+                <RocketIcon className="text-primary" width={22} height={22} />
+                {FEASIBILITY.next.title}
+              </p>
+              <ul className="flex flex-col gap-sm border-l-2 border-primary pl-md text-body-md text-body">
+                {FEASIBILITY.next.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </RevealSection>
+
+      {/* FINAL — guided demo, the closing action after the full scroll */}
+      <RevealSection className="w-full bg-surface-soft">
+        <div className="mx-auto flex max-w-[1160px] flex-col items-center px-6 py-section text-center">
+          <div className="glass-card glow-border flex w-full max-w-2xl flex-col gap-sm px-lg py-xl text-center">
+            <p className="font-serif text-display-sm font-bold text-ink">Try a guided demo</p>
+            <p className="mx-auto max-w-md text-body-sm text-muted">
+              No account, no typing — one click walks you through a real submission from start to
+              finish, with a real sample script.
+            </p>
+            <div className="mx-auto mt-xs flex flex-wrap justify-center gap-sm">
+              <form action={startTourAction.bind(null, "formative")}>
+                <SubmitButton pendingLabel="Starting…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
+                  See the formative demo →
+                </SubmitButton>
+              </form>
+              <form action={startTourAction.bind(null, "summative")}>
+                <SubmitButton pendingLabel="Starting…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
+                  See the summative demo →
+                </SubmitButton>
+              </form>
+            </div>
+          </div>
+        </div>
+      </RevealSection>
 
       {/* Footer */}
       <footer className="w-full bg-surface-dark">

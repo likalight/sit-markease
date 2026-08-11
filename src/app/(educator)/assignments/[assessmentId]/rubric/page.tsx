@@ -66,7 +66,7 @@ export default async function AssessmentRubricPage({
               {(assessment as any).status === "open" ? (
                 <SubmitButton
                   pendingLabel="Closing…"
-                  className="rounded-sm border border-verified/40 bg-verified-soft px-md py-xs text-body-sm font-medium text-verified"
+                  className="rounded-sm border border-[color-mix(in_srgb,var(--color-verified)_40%,transparent)] bg-verified-soft px-md py-xs text-body-sm font-medium text-verified"
                 >
                   Close for submissions
                 </SubmitButton>

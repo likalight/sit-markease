@@ -300,13 +300,13 @@ export function GuidedTour() {
             left: rect.left - 6,
             width: rect.width + 12,
             height: rect.height + 12,
-            boxShadow: "0 0 0 9999px rgba(30, 12, 8, 0.55)",
+            boxShadow: "0 0 0 9999px rgba(2, 3, 8, 0.7)",
           }}
         />
       )}
       <div
         ref={tooltipRef}
-        className="pointer-events-auto absolute w-80 rounded-lg border border-hairline bg-surface-card p-md shadow-overlay"
+        className="glass-card pointer-events-auto absolute w-80 p-md shadow-overlay"
         style={{ top: tooltipTop, left: tooltipLeft }}
       >
         <p className="font-mono text-caption-caps text-muted-soft">

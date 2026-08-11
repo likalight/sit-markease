@@ -40,6 +40,11 @@ not a dashboard about a data point.
 
 ## 1. Tokens
 
+> **Hex values below are historical (pre-dates the maroon/crimson palette,
+> and now the dark "ember" reskin for the hackathon stage-2 pitch push).**
+> Token *names* and the semantic mapping/discipline rules still hold —
+> `src/app/globals.css` is the authoritative source for current values.
+
 ### 1.1 Colors
 
 ```yaml

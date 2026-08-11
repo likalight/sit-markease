@@ -2,29 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SIT MarkEase design system — maroon/crimson/peach/cream, matching the
-   pitch deck exactly (same hex values as aims-deck.html's :root). Was
-   previously scoped to `.landing-theme`/`.review-theme` on just the
-   landing page, review console, and feedback page, while every other
-   authenticated page kept the older black/white/red "SIT mark" system —
-   now promoted to the actual global default so the whole app is one
-   consistent look. Token NAMES are unchanged throughout (every component
-   already references bg-canvas/text-muted/border-hairline/etc.) — this
-   file alone re-skins the whole app without touching component code. See
-   docs/DECISIONS.md for the full history of this palette's evolution. */
+/* SIT MarkEase design system — "ember" reskin (hackathon stage-2 pitch
+   push): cream canvas (matching the original warm palette) carrying the
+   glass/glow/gradient treatment from the dark iteration, adapted for
+   legibility on a light background. Token NAMES are unchanged throughout
+   (every component already references bg-canvas/text-muted/border-hairline
+   /etc.) — this file alone re-skins the whole app without touching
+   component code. */
 :root {
   --color-canvas: #fffbf6;
   --color-surface-soft: #ffeedd;
-  --color-surface-card: #fbdcc0;
-  --color-surface-strong: #f5c79d;
+  --color-surface-card: rgba(255, 255, 255, 0.55);
+  --color-surface-strong: rgba(255, 255, 255, 0.78);
 
-  --color-surface-dark: #880d1e;
-  --color-surface-dark-elevated: #a01526;
-  --color-surface-dark-soft: #6e0a18;
+  /* Dark accent surfaces — used as script-viewer's "dark stage" backdrop
+     and the sidebar rail, an intentional dark accent against the light
+     canvas (not a full light revert of every surface). */
+  --color-surface-dark: #5c0813;
+  --color-surface-dark-elevated: #7a0f1e;
+  --color-surface-dark-soft: #4a0610;
 
-  --color-ink: #34120e;
+  --color-ink: #2a0f0b;
   --color-body: #4a241c;
-  --color-body-strong: #34120e;
+  --color-body-strong: #24120d;
   --color-muted: #6b4438;
   --color-muted-soft: #8c6656;
   --color-hairline: rgba(136, 13, 30, 0.18);
@@ -32,21 +32,39 @@
   --color-on-dark: #ffeedd;
   --color-on-dark-soft: #e8b8a8;
 
+  /* Primary — crimson, the brand's own DD2D4A. Active/hover state uses a
+     deeper maroon (not orange) for real UI contrast on a light surface;
+     orange stays reserved for the decorative ember gradient below. */
   --color-primary: #dd2d4a;
-  --color-primary-active: #880d1e;
+  --color-primary-active: #a01526;
   --color-primary-soft: #fbe3e7;
-  --color-primary-hairline: rgba(221, 45, 74, 0.35);
-  --color-on-primary: #ffeedd;
+  --color-primary-hairline: rgba(221, 45, 74, 0.3);
+  --color-on-primary: #ffffff;
 
-  /* Semantic scale — kept deliberately far from the maroon/crimson brand
-     colors so status never reads as brand. */
-  --color-verified: #0f7a4d;
-  --color-verified-soft: #e2f3ea;
-  --color-attention: #b5720a;
-  --color-attention-soft: #faedd9;
-  --color-disputed: #7a2856;
-  --color-disputed-soft: #f3e2ec;
+  /* Semantic scale — deliberately kept OUT of the red/orange brand family,
+     darkened enough to hold contrast on cream (unlike the neon versions
+     used on the dark canvas). Chosen to stay distinguishable under
+     deuteranopia/protanopia. */
+  --color-verified: #0d9488;
+  --color-verified-soft: rgba(13, 148, 136, 0.12);
+  --color-attention: #a16207;
+  --color-attention-soft: rgba(161, 98, 7, 0.12);
+  --color-disputed: #6d28d9;
+  --color-disputed-soft: rgba(109, 40, 217, 0.12);
   --color-neutral-low: #b08d78;
+
+  /* NEW additive vars — ember gradient stops + glow shadows for the
+     .glass-card/.glow-border/.text-gradient utilities below. Not mapped
+     to any existing Tailwind color token, so nothing that already
+     references bg-primary/text-ink/etc. is affected by these. Glow
+     shadows are lower-opacity than the dark-theme version — a bright
+     glow reads as light emanating in the dark, but as a muddy smudge on
+     cream, so this is a soft warm shadow instead. */
+  --gradient-accent-1: #880d1e;
+  --gradient-accent-2: #dd2d4a;
+  --gradient-accent-3: #f2a16b;
+  --glow-primary: 0 4px 24px rgba(221, 45, 74, 0.18);
+  --glow-accent: 0 4px 20px rgba(242, 161, 107, 0.16);
 }
 
 body {
@@ -57,4 +75,55 @@ body {
 /* tabular figures wherever numbers sit near other numbers */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  /* Translucent + blurred card surface — required companion to
+     --color-surface-card now being alpha-transparent (a flat bg-surface-card
+     class alone would show whatever's behind it without this blur). */
+  .glass-card {
+    @apply rounded-lg border border-hairline bg-surface-card backdrop-blur-xl;
+    box-shadow:
+      0 8px 24px rgba(136, 13, 30, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  /* Gradient hairline ring around a card, via mask-composite so only the
+     1px ring paints, not the whole gradient fill. */
+  .glow-border {
+    position: relative;
+  }
+  .glow-border::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      var(--gradient-accent-1),
+      var(--gradient-accent-2),
+      var(--gradient-accent-3)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--gradient-accent-1), var(--gradient-accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-background * {
+    animation: none !important;
+  }
 }

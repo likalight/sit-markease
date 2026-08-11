@@ -18,8 +18,8 @@ export default async function LoginPage({
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">
       <div>
-        <Logo className="mb-sm h-12 w-12" />
-        <h1 className="font-serif text-display-sm text-ink">SIT MarkEase</h1>
+        <Logo className="mb-sm h-12 w-auto" />
+        <h1 className="font-serif text-display-sm text-ink">Create your account</h1>
         <p className="text-body-sm text-muted">
           Full account sign-up — for a real class, not the 3-ID test gate.
         </p>
@@ -30,7 +30,7 @@ export default async function LoginPage({
       </div>
 
       {error && (
-        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-3 py-2 text-body-sm text-disputed">
+        <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-3 py-2 text-body-sm text-disputed">
           {error}
         </p>
       )}

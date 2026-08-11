@@ -108,7 +108,7 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
       </div>
 
       {error && (
-        <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
+        <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
           {error}
         </p>
       )}
@@ -138,7 +138,7 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
           </div>
 
           {autoReleased && (
-            <div className="flex items-center gap-sm rounded-sm border border-verified/30 bg-verified-soft px-sm py-xs">
+            <div className="flex items-center gap-sm rounded-sm border border-[color-mix(in_srgb,var(--color-verified)_30%,transparent)] bg-verified-soft px-sm py-xs">
               <p className="text-body-sm text-verified">Graded instantly — the read was confident.</p>
               <button
                 type="button"
@@ -151,21 +151,21 @@ export function UploadAndViewer({ questionId }: { questionId: string }) {
           )}
 
           {needsEducatorReview && (
-            <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
+            <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-attention)_30%,transparent)] bg-attention-soft px-sm py-xs text-body-sm text-attention">
               The read wasn't confident enough to trust automatically, so this one needs a quick educator
               check before it's released. You'll see it on your feedback page as soon as that's done.
             </p>
           )}
 
           {needsHumanTranscription && (
-            <p className="rounded-sm border border-attention/30 bg-attention-soft px-sm py-xs text-body-sm text-attention">
+            <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-attention)_30%,transparent)] bg-attention-soft px-sm py-xs text-body-sm text-attention">
               The transcription confidence was too low to trust automatically — this submission needs a
               human to transcribe it before it can be graded.
             </p>
           )}
 
           {pipelineFailed && (
-            <p className="rounded-sm border border-disputed/30 bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
+            <p className="rounded-sm border border-[color-mix(in_srgb,var(--color-disputed)_30%,transparent)] bg-disputed-soft px-sm py-xs text-body-sm text-disputed">
               Processing failed after transcription — check stage_runs for details. The submission was still
               saved.
             </p>

@@ -27,8 +27,10 @@ export function SidebarNavLinks({ role }: { role: "educator" | "student" | "admi
           <Link
             key={link.href}
             href={link.href}
-            className={`rounded-sm px-sm py-xs text-body-sm ${
-              active ? "bg-surface-card font-medium text-body-strong" : "text-muted hover:text-body"
+            className={`rounded-sm px-sm py-xs text-body-sm transition-colors ${
+              active
+                ? "bg-primary-soft font-medium text-body-strong shadow-[var(--glow-primary)]"
+                : "text-on-dark-soft hover:text-on-dark"
             }`}
           >
             {link.label}
