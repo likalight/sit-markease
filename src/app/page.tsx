@@ -86,8 +86,11 @@ export default async function LandingPage({
 
   return (
     <main className="relative flex flex-col overflow-x-clip">
-      <nav className="mx-auto flex w-full max-w-[1160px] items-center px-6 py-md">
-        <Link href="/" className="flex items-center gap-xs">
+      <nav className="mx-auto mb-md flex w-full max-w-[1160px] items-center px-6 py-md">
+        <Link
+          href="/"
+          className="flex items-center gap-xs rounded-full border border-[color-mix(in_srgb,var(--color-disputed)_35%,transparent)] bg-[color-mix(in_srgb,var(--color-disputed)_18%,white_82%)]/80 px-md py-sm shadow-[0_8px_30px_rgba(140,20,20,0.12)] backdrop-blur-md"
+        >
           <Logo className="h-9 w-auto" />
         </Link>
       </nav>
