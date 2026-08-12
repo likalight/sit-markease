@@ -61,7 +61,7 @@ export default async function LandingPage({
   const { error } = await searchParams;
 
   return (
-    <main className="relative overflow-x-clip">
+    <main className="relative h-dvh overflow-hidden">
       <Deck>
         {/* 1 — TITLE */}
         <Slide>
