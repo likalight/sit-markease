@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The stated solution correctly represents the derivative of the function f(x) = x^2 + 3x.",
+    "method": "llm"
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 248,
+  "outputTokens": 40,
+  "cachedAt": "2026-08-12T14:59:52.646Z"
+}

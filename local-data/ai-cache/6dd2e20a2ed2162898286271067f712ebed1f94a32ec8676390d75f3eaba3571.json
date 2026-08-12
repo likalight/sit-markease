@@ -1,0 +1,47 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "correct_reversal",
+        "name": "Correct In-Place Reversal",
+        "weight": 90,
+        "max_score": 10,
+        "levels": [
+          {
+            "level": "expert",
+            "score": 10,
+            "descriptor": "Successfully reverses the linked list in place using only pointer reassignment."
+          },
+          {
+            "level": "proficient",
+            "score": 5,
+            "descriptor": "Attempts a correct approach but has a minor pointer-order bug."
+          }
+        ]
+      },
+      {
+        "key": "pointer_usage",
+        "name": "Pointer Reassignment Usage",
+        "weight": 10,
+        "max_score": 10,
+        "levels": [
+          {
+            "level": "expert",
+            "score": 10,
+            "descriptor": "Uses pointer reassignment correctly throughout the function."
+          },
+          {
+            "level": "novice",
+            "score": 0,
+            "descriptor": "Fails to use pointer reassignment appropriately."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 422,
+  "outputTokens": 222,
+  "cachedAt": "2026-08-12T15:12:09.035Z"
+}

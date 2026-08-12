@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "position": 1,
+        "difficulty": "scaffold",
+        "prompt_latex": "Find the derivative of f(x) = x^2 + 3x.",
+        "solution_latex": "\\frac{df}{dx} = 2x + 3.",
+        "hint_ladder": [
+          "Use the power rule for derivatives.",
+          "Remember to apply the derivative to each term separately.",
+          "Combine like terms if necessary."
+        ],
+        "targets_because": "This item isolates the process of applying the derivative to ensure correct simplification.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 3 Q1"
+        }
+      },
+      {
+        "position": 2,
+        "difficulty": "target",
+        "prompt_latex": "Differentiate the function f(x) = 4x^3 - 2x + 1.",
+        "solution_latex": "\\frac{df}{dx} = 12x^2 - 2.",
+        "hint_ladder": [
+          "Apply the power rule to each term.",
+          "What is the derivative of a constant term?",
+          "Combine and simplify your final answer."
+        ],
+        "targets_because": "This item targets the derivative simplification process by requiring the student to differentiate and simplify correctly.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Past Paper Q4"
+        }
+      },
+      {
+        "position": 3,
+        "difficulty": "target",
+        "prompt_latex": "Compute the derivative of f(x) = 5x^4 + 3x^2 - x.",
+        "solution_latex": "\\frac{df}{dx} = 20x^3 + 6x - 1.",
+        "hint_ladder": [
+          "Identify the terms to differentiate.",
+          "What happens to the coefficients in the power rule?",
+          "Make sure to check if any terms can be combined."
+        ],
+        "targets_because": "This problem emphasizes the need for correct simplification after differentiation, directly addressing the misconception.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Lecture Notes Example 5"
+        }
+      },
+      {
+        "position": 4,
+        "difficulty": "extension",
+        "prompt_latex": "Find the derivative of f(x) = 2x^5 - 4x^3 + 7x - 10 and simplify your answer.",
+        "solution_latex": "\\frac{df}{dx} = 10x^4 - 12x^2 + 7.",
+        "hint_ladder": [
+          "Differentiate each term using the power rule.",
+          "Don't forget to simplify your result.",
+          "Check if any terms can be factored or combined."
+        ],
+        "targets_because": "This item challenges the student to apply their understanding of derivatives and simplification in a more complex function.",
+        "provenance": {
+          "type": "variant_of",
+          "source_label": "Tutorial 5 Q2"
+        }
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 630,
+  "outputTokens": 642,
+  "cachedAt": "2026-08-12T14:59:50.990Z"
+}

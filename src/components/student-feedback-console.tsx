@@ -8,6 +8,7 @@ import { MathText } from "./math";
 import { FeedbackFlagButton } from "./feedback-flag-button";
 import { OcrStepFlagButton } from "./ocr-step-flag-button";
 import { stepState } from "@/lib/design/step-state";
+import { formatMisconceptionName } from "@/lib/design/misconception-label";
 
 interface Step {
   stepIndex: number;
@@ -225,7 +226,7 @@ export function StudentFeedbackConsole(props: {
               {props.misconceptions.map((m, i) => (
                 <div key={i} className="mt-xs">
                   <p className="text-body-sm text-body">
-                    {m.name} <span className="text-caption text-muted-soft">({m.severity})</span>
+                    {formatMisconceptionName(m.name)} <span className="text-caption text-muted-soft">({m.severity})</span>
                   </p>
                   <p className="text-caption text-muted">{m.observedSignature}</p>
                   {m.remediationNote && (

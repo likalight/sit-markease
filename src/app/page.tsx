@@ -91,7 +91,7 @@ export default async function LandingPage({
             </div>
             <div className="flex justify-center">
               <BrowserFrame caption="the whole grading pipeline, live">
-                <Image src="/step-score.png" alt="Rubric criteria matched via RAG with point values" width={672} height={896} className="max-h-[420px] w-auto rounded-md object-contain" />
+                <Image src="/deck-review-console.png" alt="The real review console: script, reconciled steps with per-step confidence, and the rubric recommendation, side by side" width={1600} height={1100} className="max-h-[420px] w-auto rounded-md object-contain" />
               </BrowserFrame>
             </div>
           </div>
@@ -148,8 +148,8 @@ export default async function LandingPage({
               </ul>
             </div>
             <div className="flex justify-center">
-              <BrowserFrame caption="not just a mark, the exact step that went wrong">
-                <Image src="/step-teach.png" alt="AI recommendation and the exact feedback the student will see" width={672} height={920} className="max-h-[460px] w-auto rounded-md object-contain" />
+              <BrowserFrame caption="flagged for a human, not shipped on its own">
+                <Image src="/deck-flagged-review.png" alt="The AI's own confidence per step, flagged for human review, next to the approve action nothing bypasses" width={885} height={1250} className="max-h-[460px] w-auto rounded-md object-contain" />
               </BrowserFrame>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default async function LandingPage({
             </div>
             <div className="flex justify-center">
               <BrowserFrame caption="feedback lands, named to the exact step">
-                <Image src="/loop-feedback.png" alt="AI summary, rubric, and a misconception card on the student's feedback page" width={614} height={1062} className="max-h-[420px] w-auto rounded-md object-contain" />
+                <Image src="/deck-student-feedback.png" alt="A student's released feedback: the mark, the rubric, and a named misconception card — Derivative Simplification Error" width={300} height={700} className="max-h-[420px] w-auto rounded-md object-contain" />
               </BrowserFrame>
             </div>
           </div>
@@ -215,9 +215,9 @@ export default async function LandingPage({
                 ))}
               </div>
             </div>
-            <div className="w-full">
-              <BrowserFrame caption="a fresh question, built for that exact gap">
-                <Image src="/loop-practice.png" alt="A practice item's scaffold tag and its verified, correctly-rendered solution" width={1446} height={184} className="w-full rounded-md object-contain" />
+            <div className="flex justify-center">
+              <BrowserFrame caption="a fresh question, built for that exact gap — this one's Physics">
+                <Image src="/deck-practice-item.png" alt="A Physics practice item generated from a real gap, with its solution and a Checked by model badge" width={622} height={400} className="max-h-[380px] w-auto rounded-md object-contain" />
               </BrowserFrame>
             </div>
           </div>

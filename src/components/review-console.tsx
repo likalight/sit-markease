@@ -7,6 +7,7 @@ import { ConfidenceBar } from "./confidence-bar";
 import { MathText } from "./math";
 import { stepState } from "@/lib/design/step-state";
 import { groupCriteriaByPart, extractPartLabel, stripPartLabel } from "@/lib/design/part-grouping";
+import { formatMisconceptionName } from "@/lib/design/misconception-label";
 
 interface Step {
   stepIndex: number;
@@ -148,7 +149,7 @@ export function ReviewConsole(props: {
   const weakestName = ranked.length > 1 ? labelName(ranked[ranked.length - 1]?.criterionKey) : null;
   const aiSummary = props.needsHumanReview
     ? `Recommends ${currentTotal}/${props.maxTotal}, but flagged this one for a closer look${
-        props.misconceptions.length > 0 ? ` — likely ${props.misconceptions[0].name.toLowerCase()}` : ""
+        props.misconceptions.length > 0 ? ` — likely ${formatMisconceptionName(props.misconceptions[0].name).toLowerCase()}` : ""
       }.`
     : `Recommends ${currentTotal}/${props.maxTotal}.${strongestName ? ` Strongest on "${strongestName}"` : ""}${
         weakestName && weakestName !== strongestName ? `, weakest on "${weakestName}"` : ""
@@ -830,7 +831,7 @@ export function ReviewConsole(props: {
             <p className="text-caption-caps text-attention">Misconceptions detected</p>
             {props.misconceptions.map((m, i) => (
               <p key={i} className="text-body-sm text-body">
-                {m.name} <span className="text-caption text-muted">(step {m.evidenceStepIndices.join(", ")})</span>
+                {formatMisconceptionName(m.name)} <span className="text-caption text-muted">(step {m.evidenceStepIndices.join(", ")})</span>
               </p>
             ))}
           </div>

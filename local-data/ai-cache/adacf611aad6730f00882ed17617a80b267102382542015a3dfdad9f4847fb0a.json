@@ -1,0 +1,29 @@
+{
+  "data": {
+    "criteria": [
+      {
+        "key": "in_place_reversal",
+        "name": "In-Place Reversal",
+        "weight": 100,
+        "max_score": 10,
+        "levels": [
+          {
+            "level": "expert",
+            "score": 10,
+            "descriptor": "Successfully reverses the linked list in place using only pointer reassignment."
+          },
+          {
+            "level": "proficient",
+            "score": 5,
+            "descriptor": "Reverses the linked list but contains a minor pointer-order bug."
+          }
+        ]
+      }
+    ]
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 430,
+  "outputTokens": 124,
+  "cachedAt": "2026-08-12T15:08:10.914Z"
+}

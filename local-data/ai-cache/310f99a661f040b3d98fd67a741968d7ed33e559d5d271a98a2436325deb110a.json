@@ -1,0 +1,12 @@
+{
+  "data": {
+    "valid": true,
+    "reason": "The stated solution correctly computes the derivative of the given function.",
+    "method": "llm"
+  },
+  "model": "gpt-4o-mini",
+  "provider": "openai",
+  "inputTokens": 260,
+  "outputTokens": 30,
+  "cachedAt": "2026-08-12T14:59:56.004Z"
+}

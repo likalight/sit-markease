@@ -16,8 +16,25 @@ import katex from "katex";
 // exists to prevent.
 const DELIMITER = /\\\(([\s\S]+?)\\\)|\\\[([\s\S]+?)\\\]|\$\$([\s\S]+?)\$\$|\$([^$]+?)\$/g;
 
+// A third shape reaches this component alongside the two the delimiter
+// split handles: pure natural-language prose with no math in it at all
+// (an LLM-generated practice prompt like "Define linear momentum and
+// provide the formula used to calculate it."). With no delimiters present
+// this used to fall into the pure-math branch and get handed whole to
+// KaTeX, which drops the spaces between ordinary words (each becomes an
+// adjacent italic variable) — same visible failure as the bug the
+// delimiter split above was written to fix, just with zero delimiters
+// instead of unescaped ones. Heuristic: several real English words and no
+// LaTeX command means prose, not math.
+function looksLikeProse(text: string): boolean {
+  if (/\\[a-zA-Z]/.test(text)) return false;
+  const words = text.trim().split(/\s+/).filter((w) => /^[A-Za-z][A-Za-z'-]*$/.test(w));
+  return words.length >= 4;
+}
+
 export function MathText({ latex, display = false }: { latex: string; display?: boolean }) {
   if (!DELIMITER.test(latex)) {
+    if (looksLikeProse(latex)) return <span>{latex}</span>;
     const html = katex.renderToString(latex, { throwOnError: false, displayMode: display });
     // eslint-disable-next-line react/no-danger
     return <span dangerouslySetInnerHTML={{ __html: html }} />;
