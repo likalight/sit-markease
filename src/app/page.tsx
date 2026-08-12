@@ -86,19 +86,10 @@ export default async function LandingPage({
 
   return (
     <main className="relative flex flex-col overflow-x-clip">
-      <nav className="mx-auto mb-md flex w-full max-w-[1160px] items-center px-6 py-md">
-        <Link
-          href="/"
-          className="flex items-center gap-xs rounded-full border border-[color-mix(in_srgb,var(--color-disputed)_35%,transparent)] bg-[color-mix(in_srgb,var(--color-disputed)_18%,white_82%)]/80 px-md py-sm shadow-[0_8px_30px_rgba(140,20,20,0.12)] backdrop-blur-md"
-        >
-          <Logo className="h-9 w-auto" />
-        </Link>
-      </nav>
-
       {/* HOOK — the one deliberately centered, full-impact moment. The
           guided-demo CTA lives at the very bottom now, as the closing
           action after the full story, not competing with the headline. */}
-      <section className="relative mx-auto flex w-full max-w-[1160px] flex-col gap-lg px-6 py-section text-center">
+      <section id="about" className="relative mx-auto flex w-full max-w-[1160px] flex-col gap-lg px-6 py-section text-center">
         <p className="mx-auto max-w-2xl font-mono text-caption-caps text-muted-soft">Built at SIT</p>
         <h1 className="mx-auto max-w-3xl font-serif text-display-xl font-bold text-gradient">
           Photograph it. Get graded — and taught.
@@ -331,7 +322,7 @@ export default async function LandingPage({
       </RevealSection>
 
       {/* FINAL — guided demo, the closing action after the full scroll */}
-      <RevealSection className="w-full bg-surface-soft">
+      <RevealSection id="tutorial" className="w-full bg-surface-soft">
         <div className="mx-auto flex max-w-[1160px] flex-col items-center px-6 py-section text-center">
           <div className="glass-card glow-border flex w-full max-w-2xl flex-col gap-sm px-lg py-xl text-center">
             <p className="font-serif text-display-sm font-bold text-ink">Try a guided demo</p>
