@@ -106,12 +106,16 @@ a clickable RAG-matched rubric, and the exact release text — editable before i
 </tr>
 </table>
 
-## Try it live
+## Try it locally
 
-**[sit-markease.vercel.app](https://sit-markease.vercel.app)**
+```
+npm install
+npm run dev          # http://localhost:3000
+```
 
-- **Student login** → enter one of the demo IDs (`111`, `222`, `333`) → straight into the submit screen
-- **Instructor login** → one click → straight into the review queue
+- `http://localhost:3000/demo/student` → one click, straight into the submit screen
+- `http://localhost:3000/demo/instructor` → one click, straight into the review queue
+- The pitch deck (`/`) has an "Open demo →" button that opens both of the above in two tabs at once
 
 ## Architecture
 

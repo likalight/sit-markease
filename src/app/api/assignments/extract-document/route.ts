@@ -2,10 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { extractQuestionAndRubric } from "@/lib/pipeline/document-extract";
 
-// Real vision AI calls, image preprocessing on the sidecar side — same
-// ballpark latency as a student submission's transcription stage, not an
-// instant form post.
-export const maxDuration = 60;
 
 // POST /api/assignments/extract-document — educator uploads a photo/PDF of
 // a real marking-scheme/rubric document; returns extracted fields to

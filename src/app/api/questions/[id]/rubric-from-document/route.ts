@@ -4,7 +4,6 @@ import { db } from "@/lib/db/facade";
 import { extractQuestionAndRubric } from "@/lib/pipeline/document-extract";
 import { structureRubric } from "@/lib/pipeline/rubric-structure";
 
-export const maxDuration = 120;
 
 async function jsonError(message: string, status: number) {
   return NextResponse.json({ error: { message } }, { status });

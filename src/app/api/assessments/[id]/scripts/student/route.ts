@@ -5,7 +5,6 @@ import { ingestAssessmentScript, materializeMappedSubmissions } from "@/lib/pipe
 import { documentsFromFormFiles, documentsFromStorageReferences } from "@/lib/pipeline/script-upload-documents";
 import { isSelfServeMode } from "@/lib/assessment-mode";
 
-export const maxDuration = 300;
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();

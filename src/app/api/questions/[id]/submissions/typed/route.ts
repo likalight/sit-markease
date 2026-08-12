@@ -3,8 +3,6 @@ import { db } from "@/lib/db/facade";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { runFullPipelineForTypedInput } from "@/lib/pipeline/orchestrator";
 
-// Same timeout reasoning as the photo upload route (src/app/api/questions/[id]/submissions/route.ts).
-export const maxDuration = 300;
 
 // Objective 1 (brief) — a second submission path alongside the photo
 // upload: a student who already has their solution as LaTeX/text types it

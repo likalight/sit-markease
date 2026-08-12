@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { materializeMappedSubmissions } from "@/lib/pipeline/script-ingest";
 
-export const maxDuration = 300;
 
 export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();

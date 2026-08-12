@@ -5,7 +5,6 @@ import { resolveStudentAccount, VALID_STUDENT_IDS } from "@/lib/auth/student-ros
 import { ingestSubmission } from "@/lib/pipeline/s1-ingest";
 import { runFullPipeline } from "@/lib/pipeline/orchestrator";
 
-export const maxDuration = 300;
 
 // Educator-on-behalf-of upload — reintroduces, in a scoped form, the
 // educator-uploads flow that self-submit (route.ts, sibling) replaced. That

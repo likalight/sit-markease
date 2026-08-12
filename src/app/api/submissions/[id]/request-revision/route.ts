@@ -4,11 +4,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { generatePracticeSet } from "@/lib/pipeline/s7-practice";
 import { isSelfServeMode } from "@/lib/assessment-mode";
 
-// Generation + per-item verification is several sequential real network
-// calls (same shape of concern as the full pipeline's maxDuration=300 in
-// api/submissions/[id]/process/route.ts, just one stage instead of six) —
-// give it real room rather than risking a silent mid-request kill.
-export const maxDuration = 60;
 
 // POST /api/submissions/:id/request-revision — the student-triggered
 // counterpart to S7 practice generation, which used to fire automatically

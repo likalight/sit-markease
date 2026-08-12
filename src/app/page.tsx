@@ -237,12 +237,7 @@ export default async function LandingPage({
               </div>
             </div>
             <div className="mt-md flex w-full max-w-2xl flex-wrap items-center justify-between gap-sm border-t border-hairline pt-sm font-mono text-title-sm text-muted-soft">
-              <span>
-                LIVE{" "}
-                <a href="https://sit-markease.vercel.app" target="_blank" rel="noreferrer" className="underline">
-                  sit-markease.vercel.app
-                </a>
-              </span>
+              <span>RUNNING LOCALLY · localhost:3000</span>
               <span>
                 GITHUB{" "}
                 <a href="https://github.com/likalight/sit-markease" target="_blank" rel="noreferrer" className="underline">

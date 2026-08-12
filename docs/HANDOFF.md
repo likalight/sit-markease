@@ -23,14 +23,18 @@ Other standing docs, already in the repo:
 
 - GitHub: `likalight/sit-markease`, branch `master`. Nothing is pushed automatically —
   every push this session was done explicitly, on request.
-- **Vercel is retired as of 2026-08-12 — the hackathon demo now runs entirely on
-  `localhost`, not the deployed site.** A Vercel deployment (`sit-markease.vercel.app`)
-  still exists from earlier sessions and may still respond, but don't spend time keeping
-  it in sync — no more `vercel deploy` / `vercel alias` going forward unless explicitly
-  asked again. All work should be verified against a local `npm run dev` server instead.
-  The pitch deck's closing slide (`src/app/page.tsx`, slide 7) still prints the
-  `sit-markease.vercel.app` URL and a GitHub link as text — cosmetic only, hasn't been
-  asked to change, safe to leave as-is unless it comes up.
+- **Vercel is retired as of 2026-08-12 — the hackathon demo runs entirely on
+  `localhost`.** As of 2026-08-13, all Vercel vestiges have been removed: the `.vercel/`
+  project-link directory is deleted, the 11 now-dead `export const maxDuration` route
+  configs (Vercel-only serverless timeout, no effect self-hosted) are stripped from the API
+  routes that had them, `README.md`'s "Try it live" section now gives local run
+  instructions instead of the old public URL, and the pitch deck's closing slide
+  (`src/app/page.tsx`, slide 7) prints "RUNNING LOCALLY · localhost:3000" instead of a
+  `sit-markease.vercel.app` link. See `docs/DECISIONS.md`'s "Vercel deployment retired"
+  entry for the full rationale. No more `vercel deploy` / `vercel alias` going forward
+  unless explicitly asked again — verify everything against a local `npm run dev` server.
+  The still-live `sit-markease.vercel.app` deployment (from before this cleanup) is not
+  being kept in sync and should be treated as stale, not a source of truth.
 - `.env` is gitignored (secrets) — it does **not** travel with the repo. The new account
   needs its own `.env` populated before `npm run dev` will do anything beyond serve static
   pages. Keys needed (get the values from wherever they're currently stored — password

@@ -3,9 +3,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { runFullPipeline } from "@/lib/pipeline/orchestrator";
 import { db } from "@/lib/db/facade";
 
-// See the identical note in api/questions/[id]/submissions/route.ts — this
-// route runs the same full S2-S7 chain and needs the same raised timeout.
-export const maxDuration = 300;
 
 // §10 — POST /api/submissions/:id/process
 // Runs S2 (transcribe) + S3 (assess quality) + S4 (assess) + S5 (diagnose) + S6

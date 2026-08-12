@@ -2,6 +2,19 @@
 
 Deviations from `docs/PRD.md`, with a one-line rationale each. Newest first.
 
+## Vercel deployment retired; hackathon demo runs fully local
+
+The Vercel deployment (`sit-markease.vercel.app`) is no longer used — the hackathon demo now
+runs entirely off `npm run dev` on `localhost`. Removed the now-dead `export const maxDuration`
+route-segment configs from the 11 API routes that had them (Vercel-only serverless timeout
+setting, silently ignored by `next dev`/`next start` — a self-hosted Node process has no such
+per-route timeout to begin with) and deleted the local `.vercel/` project-link directory
+(already gitignored, never committed). The earlier entries below documenting real bugs *found*
+while deployed on Vercel (the `EROFS` cache-write crash, the serverless timeout kills) are left
+as-is — they're accurate history explaining why `src/lib/ai/cache.ts`'s cache reads/writes are
+best-effort `try`/`catch`, which is still correct defensive code locally and wasn't reverted.
+`README.md`'s "Try it live" section was replaced with local run instructions to match.
+
 ## Tour now opens with the instructor authoring the assessment; per-question AI calls parallelized
 
 Two follow-ups from watching the tour live. First: both demo tours previously started mid-story, on an already-built assessment — reviewers asked to see where the question and rubric actually come from. Both tours now start signed in as the educator on `/assignments`, spotlight the real "Review rubric" link, then the real rubric page's "Issue settings" link, then the real "Save issue settings" button on the issue-settings page — the same screens an instructor actually uses, not a special tour-only view. Formative switches to the student right on that save click (safe — that form has no client-side redirect of its own to race); summative stays as the educator and continues straight into the upload flow.

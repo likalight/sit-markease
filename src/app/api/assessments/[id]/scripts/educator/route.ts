@@ -5,7 +5,6 @@ import { db } from "@/lib/db/facade";
 import { ingestAssessmentScript } from "@/lib/pipeline/script-ingest";
 import { documentsFromFormFiles, documentsFromStorageReferences } from "@/lib/pipeline/script-upload-documents";
 
-export const maxDuration = 300;
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();

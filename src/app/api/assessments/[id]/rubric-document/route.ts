@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { importAssessmentRubricDocument } from "@/lib/pipeline/assessment-rubric-import";
 
-export const maxDuration = 300;
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: { message } }, { status });
