@@ -7,9 +7,9 @@
 // straight into technical detail before the audience has the "why."
 export const BACKGROUND = {
   eyebrow: "Why this exists",
-  title: "SIT runs large, open-ended, hands-on modules — and grading them well doesn't scale.",
-  body: "Math, physics, engineering, nursing, business, computing — every one of these modules asks students to show their working, not just pick an answer. That's exactly the kind of response that takes real time to grade properly, and the kind that's hardest to give timely, specific feedback on at cohort scale.",
-  objective: "The objective: keep a human making every grading decision, while giving every student the kind of specific, immediate feedback that today only happens when an instructor has time to write it by hand.",
+  title: "SIT runs large, open-ended, hands-on modules. Grading them well doesn't scale.",
+  body: "Math, physics, engineering, nursing, business, computing: every one of these modules asks students to show their working, not just pick an answer. That takes real time to grade properly, and it's hard to give timely, specific feedback at cohort scale.",
+  objective: "The objective: a human makes every grading decision, and every student still gets specific, immediate feedback.",
 };
 
 export const PROBLEM_BULLETS = [
@@ -21,7 +21,7 @@ export const PROBLEM_BULLETS = [
 
 export const STAT_CALLOUT = {
   value: "94.92%",
-  body: "of students said feedback after a quiz was very important to them — and the majority wanted it in a timely manner, not at term's end.",
+  body: "of students said feedback after a quiz was very important to them, and most wanted it quickly, not at term's end.",
   citation: "Edokpayi, J. N. (2025). Assessing the impact of frequent quizzes on student performance. Discover Education, 4(480).",
 };
 
@@ -34,7 +34,7 @@ export const STAT_CALLOUT = {
 export const SOLUTION_BULLETS = [
   "Takes both handwritten and typed/digital responses as input.",
   "Detects misconceptions and valid alternative approaches, not just right/wrong.",
-  "Keeps instructors in control of every grading decision — AIMS suggests, it never finalises.",
+  "Keeps instructors in control of every grading decision. AIMS suggests, it never finalises.",
 ];
 
 // Restored the workload-reduction statement — it maps directly to the
@@ -83,59 +83,55 @@ export const COMPARISON_ROWS = [
 // unattended.
 export const DEVELOPMENTAL = {
   label: "Developmental",
-  plainLabel: "Practice mode — built to teach",
-  subLabel: "Weekly practice, feedback is the whole point",
+  plainLabel: "Practice mode, built to teach",
+  subLabel: "Weekly practice. Feedback is the whole point.",
   points: [
-    "Releases instantly. No instructor gate, no confidence check.",
+    "Releases instantly. No instructor gate.",
     "Student reads a guiding hint, not the answer.",
-    "Student revises and resubmits the same question.",
-    "Every attempt is logged, not just the latest one.",
-    "Instructor or TA can review engagement anytime, unhurried.",
+    "Student revises and resubmits freely.",
   ],
   exampleLabel: "EXAMPLE HINT",
   example: "Look again at step 2. What do you get if you substitute n=2 back into your own formula?",
-  safeguard: "With no reviewer, the check is the student: they see the transcription and can flag a misread.",
+  safeguard: "No reviewer. The student sees the transcription and can flag a misread.",
 };
 
 export const EVALUATIVE = {
   label: "Evaluative",
-  plainLabel: "Exam mode — built to assess",
-  subLabel: "Closed-book CA / final exam — the mark is what's required, not feedback",
+  plainLabel: "Exam mode, built to assess",
+  subLabel: "Closed-book exam. The mark is what's required.",
   points: [
-    "Instructor reviews, grouped by question, lowest-confidence first.",
-    "Can adjust the score or the exact transcription directly.",
-    "Approves the mark before anything reaches a student.",
-    "Feedback release is the instructor's call — a final exam may need only the mark; a graded CA can release the same feedback Developmental students get.",
+    "Instructor reviews every score first.",
+    "Can adjust the score or transcription directly.",
+    "Approves the mark before a student sees it.",
   ],
   exampleLabel: "EXAMPLE FEEDBACK (when released)",
   example:
     "Correctly differentiated in step 1, but the substitution in step 2 doesn't match your own derivative. Recheck the arithmetic.",
-  safeguard: "Student never sees the raw transcription. Low-confidence reads are flagged for visual check.",
+  safeguard: "Student never sees the raw transcription. Low-confidence reads get a visual check.",
 };
 
 // Third mode: no instructor involved at any point, not even at issue-time
 // (src/app/(educator)/assignments/new/actions.ts auto-opens it and assigns
 // every valid student the moment it's created). Positioned as a self-serve
-// trainer — the example leans on programming/skills practice rather than a
+// trainer, the example leans on programming/skills practice rather than a
 // specific class's syllabus, since it isn't tied to one.
 export const AI_MODE = {
   label: "AI",
-  plainLabel: "Trainer mode — built to self-serve",
-  subLabel: "No instructor, ever — any student can attempt it the moment it exists",
+  plainLabel: "Trainer mode, built to self-serve",
+  subLabel: "No instructor, ever. Open the moment it exists.",
   points: [
-    "No roster, no issue-settings step — open to every valid student immediately.",
-    "Releases instantly, same as Developmental — but there was never a human in the loop to begin with.",
-    "Built for open-ended skill practice (e.g. programming drills), not one class's syllabus.",
-    "Every attempt still logged — the trajectory is visible even with nobody watching in real time.",
+    "No roster, no issue step. Open immediately.",
+    "Built for open skill practice, not one class's syllabus.",
+    "Every attempt still logged and verified.",
   ],
   exampleLabel: "EXAMPLE PROMPT",
-  example: "Write a function that reverses a linked list in place — no extra data structures.",
-  safeguard: "Same confidence gating and symbolic/LLM verification as the other two modes — no human reviewer, but not an unchecked one either.",
+  example: "Write a function that reverses a linked list in place. No extra data structures.",
+  safeguard: "Same confidence gating and verification as the other two modes. No human reviewer, but not unchecked.",
 };
 
 export const REQUEST_REVISION = {
   title: "Request a practice revision set",
-  body: "A search over the module's own notes finds material for exactly what was missed; OpenAI turns it into a fresh, verified question that lands straight in the student's practice queue — no instructor gate, since nothing here is graded.",
+  body: "A search over the module's own notes finds material for exactly what was missed. OpenAI turns it into a fresh, verified question, straight into the student's practice queue.",
 };
 
 // Explicit "anticipated impact" framing — the hackathon rubric scores this
@@ -147,14 +143,14 @@ export const ANTICIPATED_IMPACT = {
   student: {
     label: "For the student",
     before: "Waits days to weeks for a mark, often with no explanation of what went wrong.",
-    after: "Gets a mark and a named misconception the same day — and a fresh, verified question built for exactly that gap.",
+    after: "Gets a mark and a named misconception the same day, plus a fresh question built for that exact gap.",
   },
   instructor: {
     label: "For the instructor",
-    before: "Spends most of the marking window decoding handwriting before any actual judgment happens.",
-    after: "Spends that time verifying and deciding — AIMS does the reading and the rubric-matching first.",
+    before: "Spends most of the marking window decoding handwriting before any real judgment happens.",
+    after: "Spends that time verifying and deciding. AIMS does the reading and rubric-matching first.",
   },
-  atScale: "Multiply either of those by a 200-student cohort and a 12-week term, and the time saved compounds every single week — not a one-off efficiency gain.",
+  atScale: "Multiply that by a 200-student cohort and a 12-week term. The time saved compounds every single week.",
 };
 
 // LMS integration — the natural home for AIMS once a module adopts it for
