@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { resolveStudentAccount, VALID_STUDENT_IDS } from "@/lib/auth/student-roster";
 import { db } from "@/lib/db/facade";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 function safeName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "script";
@@ -26,8 +27,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (files.length === 0) return jsonError("no files requested", 400);
 
   if (kind === "formative") {
-    if (user.role !== "student" || (assessment as any).assessment_mode !== "formative" || (assessment as any).status !== "open") {
-      return jsonError("formative assessment is not open", 400);
+    if (user.role !== "student" || !isSelfServeMode((assessment as any).assessment_mode) || (assessment as any).status !== "open") {
+      return jsonError("assessment is not open for self-serve submission", 400);
     }
     const assigned = await db.listAssessmentStudents(assessmentId);
     if (!(assigned as any[]).some((row) => row.student_id === user.id)) return jsonError("assessment is not assigned to you", 403);

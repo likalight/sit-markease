@@ -6,6 +6,7 @@ import { RubricEditor } from "@/components/rubric-editor";
 import { AssessmentRubricPdfImport } from "@/components/assessment-rubric-pdf-import";
 import { SubmitButton } from "@/components/submit-button";
 import { setAssessmentStatusAction } from "../../actions";
+import { assessmentModeLabel } from "@/lib/assessment-mode";
 
 export default async function AssessmentRubricPage({
   params,
@@ -37,7 +38,7 @@ export default async function AssessmentRubricPage({
           <div>
             <h1 className="text-title-lg text-body-strong">{(assessment as any).title}</h1>
             <p className="text-body-sm text-muted">
-              {(assessment as any).assessment_mode} · {withRubrics.length} question
+              {assessmentModeLabel((assessment as any).assessment_mode)} · {withRubrics.length} question
               {withRubrics.length === 1 ? "" : "s"} ·{" "}
               {(assessment as any).status === "open" ? "open for submissions" : "draft"}
             </p>

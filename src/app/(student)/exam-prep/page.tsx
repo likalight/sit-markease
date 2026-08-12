@@ -4,13 +4,14 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { PracticeItemCard } from "@/components/practice-item-card";
 import { RequestRevisionButton } from "@/components/request-revision-button";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 async function canStudentSeeResult(submission: any) {
   const finalGrade = await db.getFinalGrade(submission.id);
   if (!finalGrade) return false;
   const question = await db.getQuestionWithRubric(submission.question_id);
   const assessment = await db.getAssessment((question as any)?.assessment_id);
-  return (assessment as any)?.assessment_mode === "formative" || (assessment as any)?.status === "released";
+  return isSelfServeMode((assessment as any)?.assessment_mode) || (assessment as any)?.status === "released";
 }
 
 export default async function ExamPrepPage() {

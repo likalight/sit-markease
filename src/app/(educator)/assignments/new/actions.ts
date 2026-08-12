@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { structureRubric } from "@/lib/pipeline/rubric-structure";
+import type { AssessmentMode } from "@/lib/assessment-mode";
+import { VALID_STUDENT_IDS, resolveStudentAccount } from "@/lib/auth/student-roster";
 
 // Educator-facing "create a new question in any subject" — the concrete
 // fix for the app being permanently locked to one seeded math question
@@ -19,7 +21,7 @@ export async function createQuestionAction(formData: FormData) {
 
   const assignmentName = String(formData.get("assignmentName") ?? "").trim();
   const modeRaw = String(formData.get("mode") ?? "summative");
-  const mode: "formative" | "summative" = modeRaw === "formative" ? "formative" : "summative";
+  const mode: AssessmentMode = modeRaw === "formative" || modeRaw === "ai" ? modeRaw : "summative";
   const promptText = String(formData.get("promptText") ?? "").trim();
   const modelSolution = String(formData.get("modelSolution") ?? "").trim();
   const expectedAnswerLatex = String(formData.get("expectedAnswerLatex") ?? "").trim();
@@ -52,6 +54,16 @@ export async function createQuestionAction(formData: FormData) {
 
   const module_ = await db.findOrCreateDefaultModule(user!.id);
   const assessment = await db.createAssessment((module_ as any).id, assignmentName, mode);
+
+  // 'ai' mode has no instructor gate at all, including at issue-time — no
+  // roster to assign, no "open for submissions" toggle to remember. Any
+  // valid student can attempt it the moment it's created.
+  if (mode === "ai") {
+    const students = (await Promise.all(VALID_STUDENT_IDS.map(resolveStudentAccount))).filter(Boolean) as any[];
+    await db.replaceAssessmentStudents((assessment as any).id, students.map((s) => s.id));
+    await db.updateAssessment((assessment as any).id, { status: "open" });
+  }
+
   const existingCount = await db.countQuestionsForAssessment((assessment as any).id);
 
   const question = await db.createQuestion({

@@ -1,14 +1,21 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Deck } from "@/components/pitch/deck";
 import { Slide } from "@/components/pitch/slide";
-import { FEASIBILITY } from "@/lib/homepage/content";
+import { BrowserFrame } from "@/components/homepage/browser-frame";
+import { ComparisonTable } from "@/components/pitch/comparison-table";
+import { JOURNEY_STEPS, IMPROVEMENT_LOOP_STEPS, FEASIBILITY } from "@/lib/homepage/content";
 import {
   BACKGROUND,
   PROBLEM_BULLETS,
   STAT_CALLOUT,
   SOLUTION_BULLETS,
   ANTICIPATED_IMPACT,
+  DEVELOPMENTAL,
+  EVALUATIVE,
+  AI_MODE,
   REQUEST_REVISION,
+  LMS_INTEGRATION,
 } from "@/lib/pitch/content";
 import {
   ClockIcon,
@@ -20,10 +27,36 @@ import {
   CheckCircleIcon,
   RocketIcon,
   ScaleIcon,
+  PencilIcon,
+  RefreshIcon,
+  TrendingUpIcon,
+  CpuIcon,
+  SearchIcon,
+  CalculatorIcon,
+  DatabaseIcon,
+  LayersIcon,
 } from "@/components/icons";
 
 const PROBLEM_ICONS = [ClockIcon, ChatIcon, EyeIcon, TargetIcon];
 const SOLUTION_ICONS = [CameraIcon, EyeIcon, ShieldIcon];
+const LOOP_ICONS = { pencil: PencilIcon, chat: ChatIcon, target: TargetIcon, refresh: RefreshIcon, "trending-up": TrendingUpIcon };
+const STACK_ICONS: Record<string, typeof CpuIcon> = {
+  OpenAI: CpuIcon,
+  "pix2text + AWS Textract": CameraIcon,
+  RAG: SearchIcon,
+  SymPy: CalculatorIcon,
+  Supabase: DatabaseIcon,
+  "Python / FastAPI sidecar": LayersIcon,
+};
+
+const STACK = [
+  { name: "OpenAI", body: "Reads the handwriting for real and grades it against the rubric — not a keyword match, an actual read.", featured: true },
+  { name: "pix2text + AWS Textract", body: "Two independent OCR hints feed the model's read; neither replaces it — the image stays ground truth." },
+  { name: "RAG", body: "Local embeddings over the module's own corpus ground both rubric scoring and practice generation in real material." },
+  { name: "SymPy", body: "Verifies the final answer symbolically wherever it's checkable — not just \"looks right.\"" },
+  { name: "Supabase", body: "Postgres, Auth, and Storage for the whole app." },
+  { name: "Python / FastAPI sidecar", body: "OpenCV line detection, SymPy, and local embeddings — deployed separately from the Next.js app.", featured: true },
+];
 
 export const dynamic = "force-dynamic";
 
@@ -34,31 +67,84 @@ export const dynamic = "force-dynamic";
 // targets, same as a worked math derivation.
 const DISCIPLINES = ["Mathematics", "Physics", "Engineering", "Computing & Programming", "Nursing", "Accounting", "Business"];
 
+function JourneyVisual({ step }: { step: (typeof JOURNEY_STEPS)[number] }) {
+  if (!step.image) {
+    return (
+      <div className="deck-card flex w-full max-w-xs flex-col items-center gap-md px-lg py-xl text-center">
+        <CameraIcon width={56} height={56} className="text-primary" strokeWidth={1.4} />
+        <div>
+          <p className="font-mono text-caption-caps text-muted-soft">IMG_2847.jpg</p>
+          <p className="mt-xxs text-body-sm text-muted">A phone photo of the handwritten page — that&apos;s the entire input.</p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <BrowserFrame caption="from the real review console">
+      <Image src={step.image.src} alt={step.image.alt} width={step.image.width} height={step.image.height} className="max-h-[380px] w-auto rounded-md object-contain" />
+    </BrowserFrame>
+  );
+}
+
+function LoopVisual({ step, index }: { step: (typeof IMPROVEMENT_LOOP_STEPS)[number]; index: number }) {
+  if (!step.image) {
+    const Icon = LOOP_ICONS[step.icon];
+    return (
+      <div className="deck-card flex w-full max-w-xs flex-col items-center gap-md px-lg py-xl text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[var(--gradient-accent-2)] to-[var(--gradient-accent-3)] text-on-primary shadow-[var(--glow-primary)]">
+          <Icon width={30} height={30} strokeWidth={1.6} />
+        </div>
+        <p className="font-mono text-caption-caps text-muted-soft">{index + 1} of {IMPROVEMENT_LOOP_STEPS.length} · the loop repeats</p>
+      </div>
+    );
+  }
+  return (
+    <BrowserFrame caption="from the real student view">
+      <Image src={step.image.src} alt={step.image.alt} width={step.image.width} height={step.image.height} className="max-h-[380px] w-auto rounded-md object-contain" />
+    </BrowserFrame>
+  );
+}
+
+function ModeCard({ mode, accent }: { mode: typeof DEVELOPMENTAL; accent: string }) {
+  return (
+    <div className={`deck-card flex flex-col gap-sm border-l-2 px-lg py-lg text-left ${accent}`}>
+      <p className="font-mono text-title-lg font-bold text-ink">{mode.label}</p>
+      <p className="font-mono text-caption-caps text-muted-soft">{mode.plainLabel}</p>
+      <p className="text-body-sm text-muted">{mode.subLabel}</p>
+      <ul className="flex flex-col gap-xs text-body-sm text-body">
+        {mode.points.map((p) => <li key={p}>{p}</li>)}
+      </ul>
+      <div className="mt-xs rounded-sm border border-hairline bg-canvas px-md py-sm">
+        <p className="mb-xxs font-mono text-caption-caps text-muted-soft">{mode.exampleLabel}</p>
+        <p className="mb-sm text-body-sm italic text-body">&ldquo;{mode.example}&rdquo;</p>
+        <p className="text-caption text-muted-soft">{mode.safeguard}</p>
+      </div>
+    </div>
+  );
+}
+
 // Structural pattern borrowed from socrates-demo-chi.vercel.app/pitch —
 // monospace display type, "›" chevron micro-labels, FIG.NN eyebrows
 // (src/components/pitch/slide.tsx), dot-grid background (.dot-grid,
 // globals.css), thin-bordered .deck-card instead of the blurred
 // .glass-card used elsewhere in the app, an accent-colored closing clause
-// on every headline. Content and color tokens are entirely our own — see
-// the deck-nav.tsx/globals.css comments for why this wasn't a literal
-// copy of their dark navy/blue theme.
+// on every headline. Content and color tokens are entirely our own.
 //
-// Trimmed to 7 slides for a 2-minute pitch (the live demo gets the
-// remaining 5 minutes of a 7-minute slot). Journey/loop screenshots,
-// formative-vs-summative detail, the full comparison table, and the tech
-// stack all got cut as *standalone slides* here — not deleted, still real
-// content in src/lib/pitch/content.ts and src/lib/homepage/content.ts —
-// because the live demo right after this deck shows those exact things
-// interactively; walking through static screenshots of them first just
-// spends the clock twice on the same story. What's left is only what a
-// judge needs before watching the real thing: why this exists, what it
-// does, what changes, whether it scales, and whether it's real.
+// Expanded back out to a long-form deck (18 slides) — everything that was
+// cut for a 2-minute timed pitch (the Read/Score/Teach journey, the
+// Attempt->Feedback->Practice loop, the full 3-mode breakdown, the
+// comparison table, the tech stack) is back as real slides, restyled.
+// This version is the "browse it yourself" reference deck; docs/DEMO_PLAN.md
+// covers pacing a shorter live walkthrough separately if the actual timed
+// slot still needs one.
 export default async function LandingPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const [attempt, feedback, practice] = IMPROVEMENT_LOOP_STEPS;
+  const [reattempt, improvement] = IMPROVEMENT_LOOP_STEPS.slice(3);
 
   return (
     <main className="relative h-dvh overflow-hidden">
@@ -86,7 +172,7 @@ export default async function LandingPage({
           </div>
         </Slide>
 
-        {/* 2 — BACKGROUND + PROBLEM, merged */}
+        {/* 2 — BACKGROUND + PROBLEM */}
         <Slide eyebrow={BACKGROUND.eyebrow}>
           <div className="grid gap-xl md:grid-cols-[1.2fr_1fr]">
             <div className="flex flex-col gap-md text-left">
@@ -136,7 +222,21 @@ export default async function LandingPage({
           </div>
         </Slide>
 
-        {/* 4 — ANTICIPATED IMPACT */}
+        {/* 4-6 — JOURNEY: Read, Score, Teach */}
+        {JOURNEY_STEPS.slice(1).map((step) => (
+          <Slide key={step.label} eyebrow={`How it ${step.label.toLowerCase()}s`}>
+            <div className="grid items-center gap-xl md:grid-cols-2">
+              <div className="flex flex-col gap-sm text-left">
+                <p className="font-mono text-caption-caps text-primary">› {step.label}</p>
+                <h2 className="font-mono text-display-sm font-bold text-ink">{step.title}</h2>
+                <p className="max-w-md text-body-md text-body">{step.body}</p>
+              </div>
+              <div className="flex justify-center"><JourneyVisual step={step} /></div>
+            </div>
+          </Slide>
+        ))}
+
+        {/* 7 — ANTICIPATED IMPACT */}
         <Slide eyebrow={ANTICIPATED_IMPACT.eyebrow}>
           <div className="flex flex-col gap-lg text-left">
             <h2 className="font-mono text-display-sm font-bold text-ink">
@@ -155,7 +255,49 @@ export default async function LandingPage({
           </div>
         </Slide>
 
-        {/* 5 — SCALABILITY: many disciplines */}
+        {/* 8-10 — LOOP: Attempt, Feedback, Targeted Practice */}
+        {[attempt, feedback, practice].map((step, i) => (
+          <Slide key={step.label} eyebrow="The loop closes">
+            <div className="grid items-center gap-xl md:grid-cols-2">
+              <div className="flex flex-col gap-sm text-left">
+                <p className="font-mono text-caption-caps text-primary">› {step.label}</p>
+                <h2 className="font-mono text-display-sm font-bold text-ink">{step.title}</h2>
+                <p className="max-w-md text-body-md text-body">{step.body}</p>
+              </div>
+              <div className="flex justify-center"><LoopVisual step={step} index={i} /></div>
+            </div>
+          </Slide>
+        ))}
+
+        {/* 11 — LOOP: Reattempt & Improvement */}
+        <Slide eyebrow="The loop closes">
+          <div className="grid gap-xl md:grid-cols-2">
+            {[reattempt, improvement].map((step, i) => (
+              <div key={step.label} className="flex flex-col items-center gap-md text-center">
+                <LoopVisual step={step} index={i + 3} />
+                <p className="font-mono text-caption-caps text-primary">› {step.label}</p>
+                <h3 className="font-mono text-title-lg font-bold text-ink">{step.title}</h3>
+                <p className="max-w-sm text-body-sm text-body">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </Slide>
+
+        {/* 12 — THREE MODES */}
+        <Slide eyebrow="One engine, three release paths">
+          <div className="flex flex-col gap-lg text-left">
+            <h2 className="max-w-2xl font-mono text-display-sm font-bold text-ink">
+              Every submission starts the same way. <span className="text-primary">Who&apos;s watching release is the instructor&apos;s call.</span>
+            </h2>
+            <div className="grid gap-md md:grid-cols-3">
+              <ModeCard mode={DEVELOPMENTAL} accent="border-verified" />
+              <ModeCard mode={EVALUATIVE} accent="border-disputed" />
+              <ModeCard mode={AI_MODE} accent="border-primary" />
+            </div>
+          </div>
+        </Slide>
+
+        {/* 13 — SCALABILITY */}
         <Slide dark eyebrow="Scalability">
           <div className="flex flex-col gap-lg text-left">
             <h2 className="flex items-center gap-xs font-mono text-display-sm font-bold text-on-dark">
@@ -178,7 +320,36 @@ export default async function LandingPage({
           </div>
         </Slide>
 
-        {/* 6 — FEASIBILITY & FUTURE POTENTIAL, with LMS folded in as one line */}
+        {/* 14 — COMPARISON */}
+        <Slide eyebrow="Existing platforms vs. AIMS">
+          <div className="flex flex-col gap-lg text-left">
+            <h2 className="font-mono text-display-sm font-bold text-ink">
+              Existing platforms vs. <span className="text-primary">AIMS.</span>
+            </h2>
+            <ComparisonTable />
+          </div>
+        </Slide>
+
+        {/* 15 — BUILT WITH */}
+        <Slide eyebrow="Built with">
+          <div className="flex flex-col gap-lg text-left">
+            <h2 className="font-mono text-display-sm font-bold text-ink">Built with</h2>
+            <div className="grid auto-rows-fr gap-md sm:grid-cols-3">
+              {STACK.map((s) => {
+                const Icon = STACK_ICONS[s.name];
+                return (
+                  <div key={s.name} className={`deck-card flex flex-col gap-xxs px-lg py-lg ${s.featured ? "sm:col-span-2" : ""}`}>
+                    <Icon className="mb-xxs text-primary" width={22} height={22} />
+                    <p className={`font-mono font-semibold text-ink ${s.featured ? "text-title-sm" : "text-body-sm"}`}>{s.name}</p>
+                    <p className="text-body-sm text-muted">{s.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Slide>
+
+        {/* 16 — FEASIBILITY & FUTURE POTENTIAL */}
         <Slide eyebrow="Feasibility & future potential">
           <div className="flex flex-col gap-lg text-left">
             <h2 className="font-mono text-display-sm font-bold text-ink">
@@ -204,14 +375,29 @@ export default async function LandingPage({
                 </ul>
               </div>
             </div>
-            <p className="max-w-2xl border-l-2 border-primary pl-md text-body-sm text-body">
-              Next up: plugging straight into SIT&apos;s LMS (D2L Brightspace) — one-click sign-on and automatic
-              grade sync, no separate site to remember.
-            </p>
           </div>
         </Slide>
 
-        {/* 7 — CLOSE */}
+        {/* 17 — LMS INTEGRATION */}
+        <Slide eyebrow={LMS_INTEGRATION.eyebrow}>
+          <div className="flex flex-col gap-lg text-left">
+            <h2 className="max-w-2xl font-mono text-display-sm font-bold text-ink">{LMS_INTEGRATION.title}</h2>
+            <p className="max-w-2xl text-body-md text-body">{LMS_INTEGRATION.body}</p>
+            <div className="grid gap-md md:grid-cols-3">
+              {LMS_INTEGRATION.points.map((p) => (
+                <div key={p.title} className="deck-card flex flex-col gap-xxs px-lg py-lg">
+                  <p className="text-body-sm font-semibold text-body-strong">{p.title}</p>
+                  <p className="text-body-sm text-muted">{p.body}</p>
+                  <p className="mt-xs font-mono text-caption text-muted-soft">{p.tech}</p>
+                </div>
+              ))}
+            </div>
+            <p className="max-w-2xl border-l-2 border-primary pl-md text-body-sm text-body">{LMS_INTEGRATION.note}</p>
+            <p className="font-mono text-caption text-muted-soft">Source: {LMS_INTEGRATION.source}</p>
+          </div>
+        </Slide>
+
+        {/* 18 — CLOSE */}
         <Slide>
           <div className="flex flex-col items-center gap-sm text-center">
             <p className="font-mono text-caption-caps text-muted-soft">› ready when you are</p>

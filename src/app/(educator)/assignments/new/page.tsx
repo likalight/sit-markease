@@ -51,16 +51,25 @@ export default async function NewQuestionPage({
           <label className="flex items-start gap-xs">
             <input type="radio" name="mode" value="summative" defaultChecked className="mt-[3px]" />
             <span>
-              <strong>Summative</strong> — a real exam, test, or graded assignment. Every score is drafted
+              <strong>Evaluative</strong> — a real exam, test, or graded assignment. Every score is drafted
               by AI, but nothing reaches a student until an instructor reviews and approves it.
             </span>
           </label>
           <label className="flex items-start gap-xs">
             <input type="radio" name="mode" value="formative" className="mt-[3px]" />
             <span>
-              <strong>Formative</strong> — low-stakes weekly practice. Feedback releases to the student
+              <strong>Developmental</strong> — low-stakes weekly practice. Feedback releases to the student
               instantly with no instructor gate, uses progressive hints instead of revealing the answer
               outright, and lets the student revise and resubmit.
+            </span>
+          </label>
+          <label className="flex items-start gap-xs">
+            <input type="radio" name="mode" value="ai" className="mt-[3px]" />
+            <span>
+              <strong>AI</strong> — a self-serve trainer with no instructor involvement at all, not even
+              the review queue. Any student can attempt it freely; every grade is AI-drafted and released
+              on the spot, built for open-ended skill practice (e.g. programming drills) rather than a
+              specific class's syllabus.
             </span>
           </label>
         </fieldset>

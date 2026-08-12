@@ -2,6 +2,7 @@ import { env } from "./env";
 import { localStore } from "./local-store";
 import { localFiles } from "@/lib/storage/local-files";
 import { supabaseAdmin } from "./supabase-admin";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 // Single data-access seam for M2 onward. Every pipeline stage reads/writes
 // through `db`, never `localStore` or `supabaseAdmin` directly, so the
@@ -60,7 +61,7 @@ export const db = {
     if (fx()) {
       const openFormativeIds = new Set(
         (localStore.all("assessments") as any[])
-          .filter((a) => a.status === "open" && a.assessment_mode === "formative")
+          .filter((a) => a.status === "open" && isSelfServeMode(a.assessment_mode))
           .map((a) => a.id)
       );
       const open = (localStore.all("questions") as any[]).filter((q) => openFormativeIds.has(q.assessment_id));
@@ -71,7 +72,7 @@ export const db = {
       .from("assessments")
       .select("id")
       .eq("status", "open")
-      .eq("assessment_mode", "formative");
+      .in("assessment_mode", ["formative", "ai"]);
     const openIds = (openAssessments ?? []).map((a: any) => a.id);
     if (openIds.length === 0) return null;
     // `position` is scoped per-assessment (each restarts at 1), so it can't
@@ -95,7 +96,7 @@ export const db = {
   async listOpenFormativeQuestions() {
     if (fx()) {
       const openFormativeAssessments = (localStore.all("assessments") as any[]).filter(
-        (a) => a.status === "open" && a.assessment_mode === "formative"
+        (a) => a.status === "open" && isSelfServeMode(a.assessment_mode)
       );
       const byId = new Map(openFormativeAssessments.map((a) => [a.id, a]));
       return (localStore.all("questions") as any[])
@@ -107,7 +108,7 @@ export const db = {
       .from("assessments")
       .select("id, title")
       .eq("status", "open")
-      .eq("assessment_mode", "formative");
+      .in("assessment_mode", ["formative", "ai"]);
     const assessments = openAssessments ?? [];
     if (assessments.length === 0) return [];
     const titleById = new Map(assessments.map((a: any) => [a.id, a.title]));
@@ -164,7 +165,7 @@ export const db = {
   // for the "create assignment" flow (that one stays for anything that still
   // needs a bare default container). New assessments start "draft" (schema
   // default) — not submittable until updateAssessmentStatus opens them.
-  async createAssessment(moduleId: string, title: string, mode: "formative" | "summative" = "summative") {
+  async createAssessment(moduleId: string, title: string, mode: "formative" | "summative" | "ai" = "summative") {
     if (fx()) {
       return localStore.insert("assessments", { module_id: moduleId, title, status: "draft", assessment_mode: mode });
     }

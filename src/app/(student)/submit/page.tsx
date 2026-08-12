@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { startAssessmentAttemptAction } from "./actions";
+import { isSelfServeMode, assessmentModeLabel } from "@/lib/assessment-mode";
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "No fixed date";
@@ -14,7 +15,7 @@ async function visibleReviewCount(assessment: any, submissions: any[]) {
   let count = 0;
   for (const submission of submissions) {
     const finalGrade = await db.getFinalGrade(submission.id);
-    if (finalGrade && (assessment.assessment_mode === "formative" || assessment.status === "released")) count++;
+    if (finalGrade && (isSelfServeMode(assessment.assessment_mode) || assessment.status === "released")) count++;
   }
   return count;
 }
@@ -53,7 +54,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
       ) : (
         <div className="divide-y divide-hairline border-y border-hairline">
           {rows.map(({ assessment, questions, attempts, submissions, reviewCount }) => {
-            const isFormative = assessment.assessment_mode === "formative";
+            const isFormative = isSelfServeMode(assessment.assessment_mode);
             const active = (attempts as any[]).find((attempt) => attempt.status === "in_progress" && (!attempt.expires_at || new Date(attempt.expires_at) > new Date()));
             const remaining = Math.max(0, Number(assessment.attempts_allowed ?? 1) - attempts.length);
             const unavailable = assessment.status !== "open" || (assessment.opens_at && new Date(assessment.opens_at) > new Date()) || (assessment.due_at && new Date(assessment.due_at) <= new Date());
@@ -64,7 +65,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
                 <div>
                   <div className="flex items-center gap-xs">
                     <h2 className="text-title-md text-body-strong">{assessment.title}</h2>
-                    <span className="border border-hairline px-xs py-[1px] text-caption text-muted">{assessment.assessment_mode}</span>
+                    <span className="border border-hairline px-xs py-[1px] text-caption text-muted">{assessmentModeLabel(assessment.assessment_mode)}</span>
                   </div>
                   <p className="mt-xxs text-body-sm text-muted">
                     {questions.length} questions

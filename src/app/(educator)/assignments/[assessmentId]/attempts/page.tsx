@@ -29,7 +29,7 @@ export default async function AttemptsPage({ params }: { params: Promise<{ asses
       <div>
         <Link href="/assignments" className="text-body-sm text-muted underline">← Back to assignments</Link>
         <h1 className="mt-xs text-title-lg text-body-strong">{(assessment as any).title} — attempts</h1>
-        <p className="text-body-sm text-muted">Assessment-level attempts, question mapping, and released formative results.</p>
+        <p className="text-body-sm text-muted">Assessment-level attempts, question mapping, and released self-serve (Developmental/AI) results.</p>
       </div>
       {pendingMappings.length > 0 && (
         <section className="border-l-2 border-attention bg-attention-soft px-md py-sm">

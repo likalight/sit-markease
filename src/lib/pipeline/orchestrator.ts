@@ -22,18 +22,23 @@ import { generateFeedback } from "./s6-feedback";
 // submission only differ in how S2 produces its transcription; S4 onward
 // has no idea which path a submission came through.
 
-// Reintroduced auto-release, scoped to formative-mode assessments only
-// (Nicholas's review, docs/DECISIONS.md): a weekly-practice question is a
-// different product from a graded assessment — the whole point is instant
-// feedback with no human reviewer in the immediate loop. This is a
-// deliberate, mode-gated exception, not a reversion of the summative-mode
-// fix above; summative submissions are completely unaffected.
-async function autoReleaseIfFormative(submissionId: string): Promise<boolean> {
+// Reintroduced auto-release, scoped to formative/ai-mode assessments only
+// (Nicholas's review, docs/DECISIONS.md; 'ai' added alongside it — same
+// no-human-in-the-loop release path, just a distinct mode value so it can
+// be labeled/positioned separately, see src/lib/assessment-mode.ts): a
+// weekly-practice question or a self-serve AI trainer is a different
+// product from a graded assessment — the whole point is instant feedback
+// with no human reviewer in the immediate loop. This is a deliberate,
+// mode-gated exception, not a reversion of the summative-mode fix above;
+// summative ('Evaluative') submissions are completely unaffected — that
+// mode keeps the full instructor-approval gate CLAUDE.md rule 3 requires.
+async function autoReleaseIfNoInstructorGate(submissionId: string): Promise<boolean> {
   const submission = await db.getSubmission(submissionId);
   if (!submission) return false;
   const question = await db.getQuestionWithRubric(submission.question_id);
   const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
-  if ((assessment as any)?.assessment_mode !== "formative") return false;
+  const mode = (assessment as any)?.assessment_mode;
+  if (mode !== "formative" && mode !== "ai") return false;
 
   const grade = await db.getGradeRecommendation(submissionId);
   if (!grade) return false;
@@ -44,7 +49,10 @@ async function autoReleaseIfFormative(submissionId: string): Promise<boolean> {
     approved_by: null,
     approved_at: new Date().toISOString(),
     adjusted: false,
-    adjustment_note: "Auto-released — formative practice mode, no instructor gate.",
+    adjustment_note:
+      mode === "ai"
+        ? "Auto-released — AI trainer mode, no instructor ever involved."
+        : "Auto-released — developmental practice mode, no instructor gate.",
     review_seconds: 0,
   });
   await db.updateSubmission(submissionId, { status: "released" });
@@ -90,7 +98,7 @@ async function continuePipelineAfterTranscription(submissionId: string, transcri
   // showed the generic "needs educator check" banner regardless of whether
   // it had, in fact, already been released. Found live testing the
   // formative journey end to end.
-  const autoReleased = feedbackResult.status === "generated" ? await autoReleaseIfFormative(submissionId) : false;
+  const autoReleased = feedbackResult.status === "generated" ? await autoReleaseIfNoInstructorGate(submissionId) : false;
 
   return { ...transcribeResult, assess: assessResult, diagnose: diagnoseResult, feedback: feedbackResult, autoReleased };
 }

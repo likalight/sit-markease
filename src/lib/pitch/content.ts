@@ -75,8 +75,14 @@ export const COMPARISON_ROWS = [
   },
 ];
 
-export const FORMATIVE = {
-  label: "Formative",
+// Labels renamed from the original Formative/Summative terminology —
+// "Developmental" and "Evaluative" read plainly to a non-technical judge
+// without losing the distinction. Internal code/DB values stay
+// 'formative'/'summative' (src/lib/assessment-mode.ts) since renaming
+// the actual enum needs a live data migration this environment can't run
+// unattended.
+export const DEVELOPMENTAL = {
+  label: "Developmental",
   plainLabel: "Practice mode — built to teach",
   subLabel: "Weekly practice, feedback is the whole point",
   points: [
@@ -91,20 +97,40 @@ export const FORMATIVE = {
   safeguard: "With no reviewer, the check is the student: they see the transcription and can flag a misread.",
 };
 
-export const SUMMATIVE = {
-  label: "Summative",
+export const EVALUATIVE = {
+  label: "Evaluative",
   plainLabel: "Exam mode — built to assess",
   subLabel: "Closed-book CA / final exam — the mark is what's required, not feedback",
   points: [
     "Instructor reviews, grouped by question, lowest-confidence first.",
     "Can adjust the score or the exact transcription directly.",
     "Approves the mark before anything reaches a student.",
-    "Feedback release is the instructor's call — a final exam may need only the mark; a graded CA can release the same feedback formative students get.",
+    "Feedback release is the instructor's call — a final exam may need only the mark; a graded CA can release the same feedback Developmental students get.",
   ],
   exampleLabel: "EXAMPLE FEEDBACK (when released)",
   example:
     "Correctly differentiated in step 1, but the substitution in step 2 doesn't match your own derivative. Recheck the arithmetic.",
   safeguard: "Student never sees the raw transcription. Low-confidence reads are flagged for visual check.",
+};
+
+// Third mode: no instructor involved at any point, not even at issue-time
+// (src/app/(educator)/assignments/new/actions.ts auto-opens it and assigns
+// every valid student the moment it's created). Positioned as a self-serve
+// trainer — the example leans on programming/skills practice rather than a
+// specific class's syllabus, since it isn't tied to one.
+export const AI_MODE = {
+  label: "AI",
+  plainLabel: "Trainer mode — built to self-serve",
+  subLabel: "No instructor, ever — any student can attempt it the moment it exists",
+  points: [
+    "No roster, no issue-settings step — open to every valid student immediately.",
+    "Releases instantly, same as Developmental — but there was never a human in the loop to begin with.",
+    "Built for open-ended skill practice (e.g. programming drills), not one class's syllabus.",
+    "Every attempt still logged — the trajectory is visible even with nobody watching in real time.",
+  ],
+  exampleLabel: "EXAMPLE PROMPT",
+  example: "Write a function that reverses a linked list in place — no extra data structures.",
+  safeguard: "Same confidence gating and symbolic/LLM verification as the other two modes — no human reviewer, but not an unchecked one either.",
 };
 
 export const REQUEST_REVISION = {

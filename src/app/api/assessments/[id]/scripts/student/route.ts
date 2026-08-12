@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { ingestAssessmentScript, materializeMappedSubmissions } from "@/lib/pipeline/script-ingest";
 import { documentsFromFormFiles, documentsFromStorageReferences } from "@/lib/pipeline/script-upload-documents";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 export const maxDuration = 300;
 
@@ -11,8 +12,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!user || user.role !== "student") return NextResponse.json({ error: { message: "student role required" } }, { status: 403 });
   const { id: assessmentId } = await params;
   const assessment = await db.getAssessment(assessmentId);
-  if (!assessment || (assessment as any).assessment_mode !== "formative" || (assessment as any).status !== "open") {
-    return NextResponse.json({ error: { message: "formative assessment is not open" } }, { status: 400 });
+  if (!assessment || !isSelfServeMode((assessment as any).assessment_mode) || (assessment as any).status !== "open") {
+    return NextResponse.json({ error: { message: "assessment is not open for self-serve submission" } }, { status: 400 });
   }
   const assigned = await db.listAssessmentStudents(assessmentId);
   if (!(assigned as any[]).some((row) => row.student_id === user.id)) return NextResponse.json({ error: { message: "assessment is not assigned to you" } }, { status: 403 });

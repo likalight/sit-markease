@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { resolveStudentAccount, VALID_STUDENT_IDS } from "@/lib/auth/student-roster";
 import { db } from "@/lib/db/facade";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 function singaporeIso(value: FormDataEntryValue | null) {
   const raw = String(value ?? "").trim();
@@ -51,7 +52,7 @@ export async function saveAssessmentSetupAction(assessmentId: string, formData: 
   // to /assignments (where "Upload a script" lives next) is safe and, on
   // its own merits, better than leaving the educator stranded on a form
   // that just silently revalidated in place.
-  if ((assessment as any).assessment_mode !== "formative") {
+  if (!isSelfServeMode((assessment as any).assessment_mode)) {
     redirect("/assignments");
   }
 }

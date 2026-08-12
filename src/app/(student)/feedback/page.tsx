@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { StudentFeedbackConsole } from "@/components/student-feedback-console";
 import { groupCriteriaByPart, extractPartLabel, stripPartLabel } from "@/lib/design/part-grouping";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 // §11.1 S1 — student feedback view. Editorial density (docs/DESIGN.md §2):
 // a student reads this once, carefully. Mark + criterion bars, the
@@ -33,7 +34,7 @@ export default async function StudentFeedbackPage({
       const question = await db.getQuestionWithRubric(submission.question_id);
       const assessment = await db.getAssessment((question as any)?.assessment_id);
       if (assessmentParam && (assessment as any)?.id !== assessmentParam) return null;
-      const isFormative = (assessment as any)?.assessment_mode === "formative";
+      const isFormative = isSelfServeMode((assessment as any)?.assessment_mode);
 
       // CLAUDE.md rule 3: nothing reaches a student without explicit
       // educator approval. grade.total_recommended is the AI's unapproved

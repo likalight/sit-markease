@@ -3,13 +3,14 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 export async function startAssessmentAttemptAction(formData: FormData) {
   const user = await getCurrentUser();
   if (!user || user.role !== "student") redirect("/login");
   const assessmentId = String(formData.get("assessmentId") ?? "");
   const assessment = await db.getAssessment(assessmentId);
-  if (!assessment || (assessment as any).assessment_mode !== "formative" || (assessment as any).status !== "open") {
+  if (!assessment || !isSelfServeMode((assessment as any).assessment_mode) || (assessment as any).status !== "open") {
     redirect("/submit?error=assessment%20is%20not%20available");
   }
   const assigned = await db.listAssessmentStudents(assessmentId);

@@ -5,6 +5,7 @@ import { VALID_STUDENT_IDS, emailForStudentId } from "@/lib/auth/student-roster"
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { saveAssessmentSetupAction } from "./actions";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 function singaporeLocal(value: string | null | undefined) {
   if (!value) return "";
@@ -31,7 +32,7 @@ export default async function AssessmentSetupPage({ params }: { params: Promise<
   const assigned = await db.listAssessmentStudents(assessmentId);
   const assignedEmails = new Set((assigned as any[]).map((row) => row.student?.email));
   const save = saveAssessmentSetupAction.bind(null, assessmentId);
-  const formative = (assessment as any).assessment_mode === "formative";
+  const formative = isSelfServeMode((assessment as any).assessment_mode);
   const feedbackMode = (assessment as any).feedback_mode ?? "guided";
 
   return (

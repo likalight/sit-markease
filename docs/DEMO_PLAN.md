@@ -1,16 +1,34 @@
 # 7-Minute Slot Plan — SIT MarkEase (2 min pitch + 5 min demo)
 
-Two minutes of deck, five minutes of live product — not seven minutes of
-slides with a demo squeezed onto the end. The deck (`src/app/page.tsx`) is
-7 slides, ~15–20s each: Title → Background+Problem → Solution → Anticipated
-Impact → Scalability → Feasibility (+ one line on LMS integration) → Close.
-Everything the old, longer deck spent 8 slides showing as static
-screenshots (the Read/Score/Teach journey, the Attempt→Feedback→Practice
-loop) got cut as *slides* — not deleted, still real content in
-`src/lib/pitch/content.ts` and `src/lib/homepage/content.ts` — because the
-next five minutes show that exact story live and interactively. Walking
-through screenshots of it first just spends the clock twice on the same
-beat.
+The deck (`src/app/page.tsx`) is now the long-form, 18-slide "browse it
+yourself" version — everything that used to be cut for time (the
+Read/Score/Teach journey, the Attempt→Feedback→Practice loop, the full
+3-mode breakdown, the comparison table, the tech stack) is back in as real
+slides, restyled with the dot-grid/monospace system borrowed from
+socrates-demo-chi.vercel.app/pitch. **For the actual timed 7-minute slot**,
+don't scroll all 18 live — narrate a subset in 2 minutes (see below) and
+let the rest exist for judges to revisit afterward from the same URL.
+
+**Terminology**: what used to be called Formative/Summative is now
+**Developmental** (self-serve practice) / **Evaluative** (instructor-gated
+exam), plus a new third mode, **AI** (fully self-serve, no instructor
+ever — a skills trainer, not tied to one class). Internally the database
+still stores `formative`/`summative`/`ai` — only the display labels
+changed (`src/lib/assessment-mode.ts`); don't say the old names out loud.
+
+**Two migrations must be run in the Supabase SQL editor before this is
+fully live** (no direct DB access in this environment, only REST keys):
+
+```sql
+-- 0009 — instructor-controlled feedback style
+alter table assessments add column if not exists feedback_mode text
+  check (feedback_mode in ('socratic', 'guided', 'reveal')) default 'guided';
+
+-- 0010 — third assessment mode
+alter table assessments drop constraint if exists assessments_assessment_mode_check;
+alter table assessments add constraint assessments_assessment_mode_check
+  check (assessment_mode in ('formative', 'summative', 'ai'));
+```
 
 The demo itself: one screen, one presenter, toggling between the instructor
 and student view with a single click (a small "Switch to student view →" /
@@ -28,11 +46,13 @@ screen — with one projector, halving the screen makes the review console
 - You'll toggle roles with the corner pill during the demo half — it signs
   you straight into the other role and lands you on `/submit` (student) or
   `/review` (instructor), no retyping credentials, no separate tab.
-- Know the two demo assessments: **Physics** (formative) and **Math**
-  (summative) — real seeded past-paper questions with real sample scripts,
-  not placeholders.
+- Know the two demo assessments: **Physics** (Developmental) and **Math**
+  (Evaluative) — real seeded past-paper questions with real sample
+  scripts, not placeholders. If you want to also show **AI** mode live,
+  create one ahead of time on `/assignments/new` — it needs no roster or
+  issue step, it's open to the demo student the moment it's created.
 - Run `npm run reset-demo` (needs `AIMS_CONFIGURE_DEMO=true`) to put both
-  assessments back to **draft/unissued** with the roster still assigned —
+  Physics/Math back to **draft/unissued** with the roster still assigned —
   the whole value of the route is watching something become visible on the
   student side the moment it's issued/released on the instructor side. If
   either assessment is already "open" when you start, that beat is gone.
@@ -46,11 +66,10 @@ screen — with one projector, halving the screen makes the review console
   actually calls the providers (more impressive if the network's solid).
   Decide in advance, don't switch mid-demo.
 
-## 0:00–2:00 — The deck
+## 0:00–2:00 — The deck (narrated subset, not all 18)
 
-Click or scroll through all 7 slides at a natural talking pace — the
-eyebrow on each one already shows "N / 07" so you always know how much is
-left. Roughly:
+Pick these 6 slides at a natural talking pace — skip the rest live, they're
+there for judges to scroll through afterward:
 - **Title** (10s): let it land, don't over-narrate the headline.
 - **Background + Problem** (25s): institutional context, then the 4
   problem bullets plus the 94.92% stat — this is Problem-Solution Fit, 30%
@@ -58,23 +77,22 @@ left. Roughly:
 - **Solution** (20s): the one-sentence mechanism (a multimodal model reads
   the handwriting with its own confidence attached, a human approves every
   mark) plus the 3 solution cards.
-- **Anticipated Impact** (25s): the student/instructor before-after, close
-  on the "compounds every week" line.
-- **Scalability** (15s): many disciplines, one pipeline — let the
-  discipline pills speak for themselves.
-- **Feasibility** (25s): "this is the live app, not a mockup," the honest
-  "not yet measured at classroom scale" line (say it plainly, it reads as
-  rigor not weakness), then the one-line LMS/Brightspace mention.
+- **One engine, three release paths** (25s): Developmental / Evaluative /
+  AI, side by side — this is the slide that introduces the AI mode as a
+  concept before you show it live.
+- **Feasibility & future potential** (25s): "this is the live app, not a
+  mockup," the honest "not yet measured at classroom scale" line (say it
+  plainly, it reads as rigor not weakness).
 - **Close** (10s): "Let's see it live" — click **"Try it as an
   instructor →"**, which is also your handoff into the demo below.
 
 ## 2:00–7:00 — The live demo
 
-Full journey, live, for both modes — not a highlight reel, and no padding
-at the end either: every minute goes to a feature, nothing is reserved for
-a wrap-up speech. The only thing skipped is the OCR/mapping wait on the
-Math upload (pre-seeded above, nothing to watch); every click a judge
-would actually want to see stays live.
+Full journey, live, for both gated modes — not a highlight reel, and no
+padding at the end either: every minute goes to a feature, nothing is
+reserved for a wrap-up speech. The only thing skipped is the OCR/mapping
+wait on the Math upload (pre-seeded above, nothing to watch); every click
+a judge would actually want to see stays live.
 
 ### 2:00–3:00 — Shared: rubric authoring + feedback style (as instructor)
 1. `/assignments` → open either assessment → "Review rubric."
@@ -87,13 +105,13 @@ would actually want to see stays live.
    states the answer), Guided (names the mistake and explains it, still
    withholds the correct working), Reveal (shows the correct working and
    final answer outright). Leave Physics on **Guided** for now → save.
-   State once, for both modes: *nothing is visible to a student until this
-   step.*
+   State once, for both gated modes: *nothing is visible to a student
+   until this step.*
 
-Do this once, narrate that the roster/rubric machinery is identical for
-both modes, then diverge.
+Do this once, narrate that the roster/rubric machinery is identical across
+modes, then diverge.
 
-### 3:00–4:15 — Formative route (Physics): student self-serve, no gate
+### 3:00–4:15 — Developmental route (Physics): student self-serve, no gate
 Click **"Switch to student view →"** to hand off.
 
 1. `/submit` → Physics card → "Start attempt" → `/work/[id]`.
@@ -111,11 +129,17 @@ Click **"Switch to student view →"** to hand off.
    script, one question untouched) — "Revise and resubmit" → `/work/[id]`
    again → this time upload the complete/correct sample script → submit →
    `/submit` → "Review assessment" → improved `/feedback`. This is the beat
-   that proves formative has *no ceiling* on retries.
+   that proves Developmental has *no ceiling* on retries.
 5. `/exam-prep` → "Generate practice set" — targets the exact gap just
    diagnosed, freshly generated, SymPy/LLM-verified before it ships. Open
    it, type a real answer, reveal the solution, self-report the outcome.
    This is your Innovation (20%) beat — say so.
+
+**If you're also demoing AI mode**, this is the natural place: *"Same
+self-serve mechanics, but this one never had an instructor at all — not
+even at setup."* Switch to the AI-mode assessment you pre-created, submit
+against it the same way, land on `/feedback` — no instructor ever touched
+any part of this one, including its creation.
 
 ### 4:15–4:45 — Instructor beat: choosing Reveal for Math
 Click **"Switch to instructor view →"**.
@@ -125,7 +149,7 @@ Click **"Switch to instructor view →"**.
 students shown the correct working directly, not left to re-derive it.
 That's a teaching decision, and now it's one click, per assessment."*
 
-### 4:45–6:45 — Summative route (Math): instructor-gated
+### 4:45–6:45 — Evaluative route (Math): instructor-gated
 1. `/review` → open the pre-seeded Math submission → `/review/[id]`. Same
    source-image/transcription pairing the student saw, now with rubric
    criteria, evidence indices, and the AI's recommended per-criterion
@@ -140,12 +164,13 @@ That's a teaching decision, and now it's one click, per assessment."*
    release together, not piecemeal.
 5. Click **"Switch to student view →"** — the payoff shot. `/submit` now
    shows "Review assessment" for Math → click it → `/feedback`. No resubmit
-   button this time (contrast this explicitly against the formative loop):
-   *this is the mark, reviewed and released by a human* — **and point at
-   the feedback text itself showing the correct working**, right next to
-   Physics' guided feedback from five minutes ago that didn't. Same
-   pipeline, two different teaching decisions, both made by the instructor.
-   That contrast is your close — no separate wrap-up slide needed.
+   button this time (contrast this explicitly against the Developmental
+   loop): *this is the mark, reviewed and released by a human* — **and
+   point at the feedback text itself showing the correct working**, right
+   next to Physics' guided feedback from five minutes ago that didn't.
+   Same pipeline, different teaching decisions, all made by the
+   instructor. That contrast is your close — no separate wrap-up slide
+   needed.
 
 If you land here with time to spare: `/exam-prep` → generate + attempt one
 more practice item off this result. Cut this first if you're running long.
@@ -159,8 +184,8 @@ more practice item off this result. Cut this first if you're running long.
   decide before you go on, don't switch mid-demo.
 - **Wrong persona signed in:** the corner switcher pill signs you into the
   other role in one click — no need to sign out first.
-- **Running long:** cut the deck's Scalability slide first (10s), then the
-  summative route's second exam-prep visit (see above) — in that order.
+- **Running long:** drop the AI-mode aside first, then the Evaluative
+  route's second exam-prep visit (see above) — in that order.
 
 ## Why not split screen
 

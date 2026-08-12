@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { db } from "@/lib/db/facade";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { generatePracticeSet } from "@/lib/pipeline/s7-practice";
+import { isSelfServeMode } from "@/lib/assessment-mode";
 
 // Generation + per-item verification is several sequential real network
 // calls (same shape of concern as the full pipeline's maxDuration=300 in
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
   const question = await db.getQuestionWithRubric((submission as any).question_id);
   const assessment = question ? await db.getAssessment((question as any).assessment_id) : null;
-  if ((assessment as any)?.assessment_mode !== "formative" && (assessment as any)?.status !== "released") {
+  if (!isSelfServeMode((assessment as any)?.assessment_mode) && (assessment as any)?.status !== "released") {
     return NextResponse.json(
       { error: { code: "NOT_RELEASED", message: "this assessment has not been released yet" } },
       { status: 403 }

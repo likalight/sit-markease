@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { db } from "@/lib/db/facade";
 import { SubmitButton } from "@/components/submit-button";
 import { releaseAssessmentAction, setAssessmentStatusAction } from "./actions";
+import { isSelfServeMode, assessmentModeLabel } from "@/lib/assessment-mode";
 
 export default async function AssignmentsPage() {
   const user = await getCurrentUser();
@@ -107,7 +108,7 @@ export default async function AssignmentsPage() {
                   <td className="px-md py-sm text-body text-body-strong">{r.assignmentName}</td>
                   <td className="px-md py-sm">
                     <span className="rounded-sm border border-hairline px-xs py-[1px] text-caption text-muted-soft">
-                      {r.mode}
+                      {assessmentModeLabel(r.mode)}
                     </span>
                   </td>
                   <td className="px-md py-sm tabular-nums text-muted">{r.questionCount}</td>
@@ -149,7 +150,7 @@ export default async function AssignmentsPage() {
                       >
                         Review rubric →
                       </Link>
-                      {r.mode === "formative" ? (
+                      {isSelfServeMode(r.mode) ? (
                         <Link href={`/assignments/${r.assessmentId}/attempts`} className="underline">
                           {r.released} auto-released — view attempts →
                         </Link>
