@@ -10,13 +10,16 @@ export function RevealSection({
   children,
   className = "",
   stagger = false,
+  id,
 }: {
   children: ReactNode;
   className?: string;
   stagger?: boolean;
+  id?: string;
 }) {
   return (
     <motion.section
+      id={id}
       className={className}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
