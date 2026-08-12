@@ -215,18 +215,21 @@ export default async function LandingPage({
                 </Link>
               </div>
               <p className="mx-auto mt-md max-w-md text-body-sm text-muted">{REQUEST_REVISION.body}</p>
-              <div className="mx-auto mt-xxs flex flex-wrap justify-center gap-sm">
-                <a
-                  href="https://github.com/likalight/sit-markease"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-caption text-muted-soft underline"
-                >
-                  View the code →
-                </a>
-              </div>
             </div>
-            <p className="mt-md font-mono text-caption text-muted-soft">SIT MarkEase</p>
+            <div className="mt-md flex w-full max-w-2xl flex-wrap items-center justify-between gap-sm border-t border-hairline pt-sm font-mono text-caption text-muted-soft">
+              <span>
+                LIVE{" "}
+                <a href="https://sit-markease.vercel.app" target="_blank" rel="noreferrer" className="underline">
+                  sit-markease.vercel.app
+                </a>
+              </span>
+              <span>
+                GITHUB{" "}
+                <a href="https://github.com/likalight/sit-markease" target="_blank" rel="noreferrer" className="underline">
+                  github.com/likalight/sit-markease
+                </a>
+              </span>
+            </div>
           </div>
         </Slide>
       </Deck>

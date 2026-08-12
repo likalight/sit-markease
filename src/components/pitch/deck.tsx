@@ -2,6 +2,7 @@
 
 import { Children, cloneElement, isValidElement, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { ProgressRail } from "./progress-rail";
+import { DeckNav } from "./deck-nav";
 
 // A true slide deck, not a marketing scroll page: one <Slide> fills the
 // viewport at a time, scroll-snap-locked, with keyboard nav and a
@@ -76,6 +77,10 @@ export function Deck({ children }: { children: ReactNode }) {
           })
         )}
       </div>
+      <p className="pointer-events-none fixed right-4 top-4 z-40 font-mono text-caption text-muted-soft">
+        ← → to navigate
+      </p>
+      <DeckNav total={total} active={active} onPrev={() => goTo(active - 1)} onNext={() => goTo(active + 1)} />
       <ProgressRail total={total} active={active} onJump={goTo} />
     </div>
   );
