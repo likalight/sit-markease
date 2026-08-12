@@ -19,20 +19,18 @@ Other standing docs, already in the repo:
 - `docs/DEMO_PLAN.md` — the live walkthrough script (which routes, which order, what to say).
 - `docs/DESIGN.md` — design tokens / component patterns.
 
-## Repo / deploy state
+## Repo / demo state
 
 - GitHub: `likalight/sit-markease`, branch `master`. Nothing is pushed automatically —
-  every push and deploy this session was done explicitly, on request.
-- Vercel: project `sit-markease`, custom domain `sit-markease.vercel.app`. **Important:**
-  a plain `git push` does **not** trigger a production deploy to that domain in this
-  project's current config. The working pattern used all session:
-  ```
-  npx vercel deploy                                    # creates a Preview build
-  curl -s -o /dev/null -w "%{http_code}\n" <preview-url>   # confirm 200
-  npx vercel alias set <preview-url> sit-markease.vercel.app   # repoint the custom domain
-  ```
-  Requires the Vercel CLI to already be authenticated in the new environment (`npx vercel login`
-  if not).
+  every push this session was done explicitly, on request.
+- **Vercel is retired as of 2026-08-12 — the hackathon demo now runs entirely on
+  `localhost`, not the deployed site.** A Vercel deployment (`sit-markease.vercel.app`)
+  still exists from earlier sessions and may still respond, but don't spend time keeping
+  it in sync — no more `vercel deploy` / `vercel alias` going forward unless explicitly
+  asked again. All work should be verified against a local `npm run dev` server instead.
+  The pitch deck's closing slide (`src/app/page.tsx`, slide 7) still prints the
+  `sit-markease.vercel.app` URL and a GitHub link as text — cosmetic only, hasn't been
+  asked to change, safe to leave as-is unless it comes up.
 - `.env` is gitignored (secrets) — it does **not** travel with the repo. The new account
   needs its own `.env` populated before `npm run dev` will do anything beyond serve static
   pages. Keys needed (get the values from wherever they're currently stored — password
@@ -53,6 +51,26 @@ Other standing docs, already in the repo:
   Set `AIMS_FIXTURE_MODE=true` to work with zero network calls / zero API keys (serves
   cached responses from `local-data/ai-cache/`, which **is** committed). Real end-to-end
   work (like this session's screenshot capture) needs `AIMS_FIXTURE_MODE=false` and real keys.
+
+## Running the demo locally
+
+```
+npm install
+npm run dev          # http://localhost:3000
+```
+
+Sign-in shortcuts (Route Handlers, set the session cookie and redirect — added this
+session specifically so a live demo can open two already-signed-in tabs with one click):
+- `http://localhost:3000/demo/instructor` → signs in as the demo educator, lands on `/review`
+- `http://localhost:3000/demo/student` → signs in as demo student `111`, lands on `/submit`
+- The pitch deck's closing slide (`/`, slide 7, `OpenDemoButton`) opens both of the above
+  in two new tabs from a single click — the intended way to kick off a live demo.
+
+`AIMS_FIXTURE_MODE=true` in `.env` makes every AI call replay from
+`local-data/ai-cache/` (committed, zero network calls) — safest option for the actual
+timed demo slot, since it can't 429 or go slow on stage. `AIMS_FIXTURE_MODE=false` hits
+real providers and is what this session used to capture fresh screenshots; keep it `true`
+for the live pitch unless a specific beat needs to show a real, uncached model call.
 
 ## Outstanding action item — two SQL migrations not yet run
 
@@ -102,8 +120,9 @@ the live product, not only the deck):
   `student-feedback-console.tsx`. This is a formatting fix, not a change to stored data or
   to what the model returns.
 
-All committed (`eb236e4`), pushed, deployed to a Vercel preview, and aliased onto
-`sit-markease.vercel.app` — confirmed live (200) at end of session.
+All committed (`eb236e4`) and pushed. At the time this was done, it was also deployed to a
+Vercel preview and aliased onto `sit-markease.vercel.app` — but per the "Repo / demo state"
+section above, that workflow is now retired; treat it as historical, not something to repeat.
 
 ## Loose ends / worth knowing if you pick this up
 
@@ -124,3 +143,7 @@ All committed (`eb236e4`), pushed, deployed to a Vercel preview, and aliased ont
   fixed, but it's a reminder that demo-data drift like this can happen across long-running
   Supabase state and is worth a sanity check (`/assignments` → does "Submitted" match
   "reviewed & released" + pending, for both rows) before a live demo.
+- `docs/DEMO_PLAN.md`'s opening paragraph still describes the deck as "the long-form,
+  18-slide 'browse it yourself' version" — stale. The actual deck (`src/app/page.tsx`) is
+  the 7-slide horizontal carousel this session worked on. Worth a pass to reconcile
+  `DEMO_PLAN.md` with the current deck before rehearsing off of it.
