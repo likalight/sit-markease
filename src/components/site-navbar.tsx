@@ -20,7 +20,7 @@ export function SiteNavbar() {
           <Link href="/#tutorial" className="rounded-full px-3 py-2 text-body-sm font-medium text-ink/80 transition hover:bg-[rgba(255,255,255,0.12)] hover:text-ink">
             Tutorial
           </Link>
-          <Link href="/login/select" className="rounded-full bg-[rgba(120,32,32,0.82)] px-3 py-2 text-body-sm font-medium text-white transition hover:bg-[rgba(103,24,24,0.9)]">
+          <Link href="/login" className="rounded-full bg-[rgba(120,32,32,0.82)] px-3 py-2 text-body-sm font-medium text-white transition hover:bg-[rgba(103,24,24,0.9)]">
             Login
           </Link>
         </nav>

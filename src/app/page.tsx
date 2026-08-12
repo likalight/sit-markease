@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { SiteNavbar } from "@/components/site-navbar";
 import { SubmitButton } from "@/components/submit-button";
 import { startTourAction } from "@/lib/demo-tour/actions";
 import { RevealSection } from "@/components/reveal-section";
@@ -86,6 +87,7 @@ export default async function LandingPage({
 
   return (
     <main className="relative flex flex-col overflow-x-clip">
+      <SiteNavbar />
       {/* HOOK — the one deliberately centered, full-impact moment. The
           guided-demo CTA lives at the very bottom now, as the closing
           action after the full story, not competing with the headline. */}
