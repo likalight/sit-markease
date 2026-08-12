@@ -46,7 +46,7 @@ const STACK_ICONS: Record<string, typeof CpuIcon> = {
 
 export const dynamic = "force-dynamic";
 
-const DISCIPLINES = ["Mathematics", "Physics", "Engineering", "Nursing", "Accounting", "Business"];
+const DISCIPLINES = ["Mathematics", "Computing", "Physics", "Engineering", "Nursing", "Accounting", "Business"];
 
 const STACK = [
   {
