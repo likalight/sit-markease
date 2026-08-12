@@ -120,6 +120,24 @@ body {
     background-clip: text;
     color: transparent;
   }
+
+  /* Faint dot-matrix texture — pitch deck only, structural nod to
+     socrates-demo-chi.vercel.app/pitch's dark dotted-grid background,
+     rebuilt in-brand (hairline-red dots on cream instead of blue dots on
+     navy) rather than copied wholesale. */
+  .dot-grid {
+    background-image: radial-gradient(circle, var(--color-hairline) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Flatter, thin-bordered card for the pitch deck — no blur, sharper
+     than .glass-card, closer to the reference site's spec-sheet look.
+     Deliberately separate from .glass-card so the rest of the app (which
+     relies on glass-card's blur over the alpha-transparent surface-card
+     token) is untouched. */
+  .deck-card {
+    @apply rounded-sm border border-hairline bg-canvas;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
