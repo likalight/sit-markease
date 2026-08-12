@@ -98,6 +98,10 @@ export default async function LandingPage({
         </Slide>
 
         {/* 2 — BACKGROUND + PROBLEM */}
+        {/* No screenshot here on purpose (ui-ux-designer review): a
+            working, confident transcription screenshot on the *problem*
+            slide undercuts the reveal on slide 3, where the product is
+            first shown. The stat carries this slide alone. */}
         <Slide eyebrow={BACKGROUND.eyebrow}>
           <div className="grid gap-xl md:grid-cols-[1.2fr_0.9fr]">
             <div className="flex flex-col gap-md text-left">
@@ -116,15 +120,10 @@ export default async function LandingPage({
                 })}
               </ul>
             </div>
-            <div className="flex flex-col gap-md">
-              <div className="deck-card flex flex-col justify-center gap-xs px-lg py-lg text-left">
-                <p className="font-mono text-display-md font-bold text-gradient">{STAT_CALLOUT.value}</p>
-                <p className="text-title-sm text-muted">{STAT_CALLOUT.body}</p>
-                <p className="font-mono text-body-sm text-muted-soft">{STAT_CALLOUT.citation}</p>
-              </div>
-              <BrowserFrame caption="every line, read for real">
-                <Image src="/step-read.png" alt="Reconciled transcription steps with per-step confidence" width={960} height={1195} className="max-h-[220px] w-auto rounded-md object-contain" />
-              </BrowserFrame>
+            <div className="deck-card flex flex-col justify-center gap-sm px-xl py-xl text-left">
+              <p className="font-mono text-display-xl font-bold text-gradient">{STAT_CALLOUT.value}</p>
+              <p className="text-title-md text-muted">{STAT_CALLOUT.body}</p>
+              <p className="font-mono text-body-sm text-muted-soft">{STAT_CALLOUT.citation}</p>
             </div>
           </div>
         </Slide>
@@ -216,9 +215,9 @@ export default async function LandingPage({
                 ))}
               </div>
             </div>
-            <div className="flex justify-center">
+            <div className="w-full">
               <BrowserFrame caption="a fresh question, built for that exact gap">
-                <Image src="/loop-practice.png" alt="A practice item's scaffold tag and its verified, correctly-rendered solution" width={1446} height={184} className="w-full max-w-md rounded-md object-contain" />
+                <Image src="/loop-practice.png" alt="A practice item's scaffold tag and its verified, correctly-rendered solution" width={1446} height={184} className="w-full rounded-md object-contain" />
               </BrowserFrame>
             </div>
           </div>
