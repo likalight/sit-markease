@@ -14,12 +14,13 @@ same result. Documented deviation, not a silent swap (docs/DECISIONS.md).
 
 import base64
 import io
+from typing import Optional
 
 
 def pdf_to_page_images_b64(
     pdf_bytes: bytes,
     dpi: int = 144,
-    max_width: int | None = 1600,
+    max_width: Optional[int] = 1600,
     image_format: str = "jpeg",
     quality: int = 78,
 ) -> list[str]:

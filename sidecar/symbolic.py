@@ -7,6 +7,7 @@ what it does and doesn't cover.
 """
 
 import re
+from typing import Optional
 
 from sympy import E, diff, simplify, symbols
 from sympy.parsing.latex import parse_latex
@@ -27,7 +28,7 @@ def _parse_math(latex: str):
     return _fix_euler(parse_latex(latex))
 
 
-def equivalent(a_latex: str, b_latex: str) -> bool | None:
+def equivalent(a_latex: str, b_latex: str) -> Optional[bool]:
     try:
         a, b = _parse_math(a_latex), _parse_math(b_latex)
         return bool(simplify(a - b) == 0)

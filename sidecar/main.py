@@ -7,7 +7,7 @@ the demo (`npm run sidecar:dev`).
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Literal
+from typing import Literal, Optional
 
 import base64
 
@@ -80,7 +80,7 @@ def math_verify_item(req: VerifyItemRequest):
 class PdfToImagesRequest(BaseModel):
     pdf_b64: str
     dpi: int = 144
-    max_width: int | None = 1600
+    max_width: Optional[int] = 1600
     image_format: Literal["png", "jpeg"] = "jpeg"
     quality: int = 78
 

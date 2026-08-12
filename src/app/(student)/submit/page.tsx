@@ -76,7 +76,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
                     <p className="text-caption text-muted-soft">{remaining} of {assessment.attempts_allowed ?? 1} attempts remaining</p>
                   ) : (
                     <p className="text-caption text-muted-soft">
-                      Your teacher uploads summative scripts. Results appear here after release.
+                      Your teacher uploads developmental scripts. Results appear here after release.
                     </p>
                   )}
                   {submitted && reviewCount === 0 && (

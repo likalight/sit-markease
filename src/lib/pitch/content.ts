@@ -65,7 +65,7 @@ export const COMPARISON_ROWS = [
 ];
 
 export const FORMATIVE = {
-  label: "Formative",
+  label: "Evaluative",
   subLabel: "Weekly practice",
   points: [
     "Releases instantly. No instructor gate, no confidence check.",
@@ -80,7 +80,7 @@ export const FORMATIVE = {
 };
 
 export const SUMMATIVE = {
-  label: "Summative",
+  label: "Developmental",
   subLabel: "Closed-book CA / exam",
   points: [
     "Instructor reviews, grouped by question, lowest-confidence first.",

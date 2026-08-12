@@ -255,10 +255,10 @@ export default async function LandingPage({
           confidence once earlier keeps the scroll from feeling monotonous). */}
       <RevealSection className="w-full bg-surface-dark">
         <div className="mx-auto max-w-[1160px] px-6 py-section text-left">
-          <p className="mb-xxs font-mono text-caption-caps text-on-dark-soft">6 · Any discipline at SIT</p>
+          <p className="mb-xxs font-mono text-caption-caps text-on-dark-soft">6 · Many disciplines at SIT</p>
           <h2 className="mb-xs flex items-center gap-xs font-serif text-display-sm font-bold text-on-dark">
             <LayersIcon className="text-primary-active" width={22} height={22} />
-            Any discipline at SIT
+            Many disciplines at SIT
           </h2>
           <p className="mb-lg max-w-lg text-body-sm text-on-dark-soft">
             Only the rubric changes — the same pipeline reads, grades, and diagnoses every one of them.
@@ -342,12 +342,12 @@ export default async function LandingPage({
             <div className="mx-auto mt-xs flex flex-wrap justify-center gap-sm">
               <form action={startTourAction.bind(null, "formative")}>
                 <SubmitButton pendingLabel="Starting…" className="rounded-sm bg-primary px-lg py-sm text-title-sm font-medium text-on-primary">
-                  See the formative demo →
+                  See the evaluative demo →
                 </SubmitButton>
               </form>
               <form action={startTourAction.bind(null, "summative")}>
                 <SubmitButton pendingLabel="Starting…" className="rounded-sm border border-hairline bg-canvas px-lg py-sm text-title-sm font-medium text-body">
-                  See the summative demo →
+                  See the developmental demo →
                 </SubmitButton>
               </form>
             </div>

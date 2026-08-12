@@ -82,7 +82,7 @@ export default async function ExamPrepPage() {
       <section className="flex flex-col gap-sm">
         <h2 className="text-title-md text-body-strong">Generate practice sets</h2>
         {reviewedSubmissions.length === 0 ? (
-          <p className="text-body-md text-muted">Nothing ready yet. Reviewed formative work and released summative work will appear here.</p>
+          <p className="text-body-md text-muted">Nothing ready yet. Reviewed evaluative work and released developmental work will appear here.</p>
         ) : (
           <div className="divide-y divide-hairline border-y border-hairline">
             {reviewedSubmissions.map(({ submission, question, assessment, practiceSet }, index) => (
